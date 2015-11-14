@@ -14,7 +14,6 @@ public class BaseDao extends AbstractDao{
 
     @Resource(name = "dataSource")
     private DataSource ds;
-    // test
 
     /**
      * 获得当前dao需要的链接
