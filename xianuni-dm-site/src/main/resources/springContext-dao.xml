@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName">
+			<value>${db.driverClassName}</value>
+		</property>
+		<property name="url">
+			<value>${db.url}</value>
+		</property>
+		<property name="username">
+			<value>${db.username}</value>
+		</property>
+		<property name="password">
+			<value>${db.password}</value>
+		</property>
+		<property name="defaultReadOnly">
+			<value>false</value>
+		</property>
+		<!-- 最大连接数 -->
+		<property name="maxActive">
+			<value>${db.pool.maxsize}</value>
+		</property>
+		<!-- 初始化连接数 -->
+		<property name="initialSize">
+			<value>${db.pool.initsize}</value>
+		</property>
+		<!--  超时等待时间以毫秒为单位 -->
+		<property name="maxWait">
+			<value>6000</value>
+		</property>
+		<!-- 最大空闲连接数 -->
+		<property name="maxIdle">
+			<value>${db.pool.maxidle}</value>
+		</property>
+		<!-- 最小空闲连接数 -->
+		<property name="minIdle">
+			<value>${db.pool.minidle}</value>
+		</property>
+		<!--  是否在自动回收超时连接的时候打印连接的超时错误 -->
+		<property name="logAbandoned">
+			<value>true</value>
+		</property>
+		<!-- 是否自动回收超时连接 -->
+		<property name="removeAbandoned">
+			<value>true</value>
+		</property>
+		<!-- 超时时间(以秒数为单位) -->
+		<property name="removeAbandonedTimeout">
+			<value>60</value>
+		</property>
+		<!-- 每过timeBetweenEvictionRunsMillis 时间，就会启动一个线程，校验连接池中闲置时间超过minEvictableIdleTimeMillis的连接对象 -->
+		<property name="timeBetweenEvictionRunsMillis">
+			<value>60000</value>
+		</property>
+		<property name="minEvictableIdleTimeMillis">
+			<value>1800000</value>
+		</property>
+		<!-- 连接空闲时是否进行有效性验证（即是否还和数据库连通的） -->
+		<property name="testWhileIdle">
+			<value>true</value>
+		</property>
+		<!-- 取得连接 -->
+		<property name="testOnBorrow">
+			<value>true</value>
+		</property>
+		<!-- 返回连接 -->
+		<property name="testOnReturn">
+			<value>true</value>
+		</property>
+		<property name="numTestsPerEvictionRun">
+			<value>20</value>
+		</property>
+		<property name="connectionProperties">
+			<value>LoginTimeout=1</value>
+		</property>
+	</bean>
+</beans>
