@@ -16,6 +16,7 @@
 
     <link href="../static/css/animate.css" rel="stylesheet">
     <link href="../static/css/style.css?v=4.0.0" rel="stylesheet"><base target="_blank">
+    <link href="../static/css/plugins/iCheck/custom.css" rel="stylesheet">
     <!--[if lt IE 8]>
     <meta http-equiv="refresh" content="0;ie.html" />
     <![endif]-->
@@ -38,7 +39,7 @@
                     <input type="password" id="password" name="password" class="form-control" placeholder="密码" required="" aria-required="true">
                 </div>
                 <div class="form-group">
-                    <input type="checkbox" id="admin" name="admin" class="i-checks" checked="checked">是否是管理员
+                    <input type="radio" id="admin" name="admin" value="true" checked="" class="i-checks">是否是管理员
                 </div>
                 <button id="loginSubmit" type="submit" class="btn btn-primary block full-width m-b">登 录</button>
 
@@ -54,26 +55,41 @@
     <script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
     <script src="../static/js/plugins/validate/jquery.validate.min.js"></script>
     <script src="../static/js/plugins/validate/messages_zh.min.js"></script>
+    <!-- layer javascript -->
+    <script src="../static/js/plugins/layer/layer.min.js"></script>
+    <!-- iCheck -->
+    <script src="../static/js/plugins/iCheck/icheck.min.js"></script>
+
+
     <script>
         $(document).ready(function () {
+            $(".i-checks").iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green'
+            });
 
             $("#loginForm").submit(function () {
                 var strTxtName = encodeURI($("#number").val());
                 var strTxtPass = encodeURI($("#password").val());
-                var strAdmin = encodeURI($("#admin").val());
+                var strAdmin = $("#admin:checked").val();
+                var index;
                 $.ajax({
                     url: "/xianuni-dm/login/user.do",
                     dataType: "json",
                     data: { number: strTxtName, password: strTxtPass,admin:strAdmin},
+                    beforeSend: function(){
+                        index=layer.load(1);
+                    },
                     success: function (data) { //登录成功后返回的数据
+                        layer.close(index);
                         if(data.success){
                             location.href ="/xianuni-dm/html/index.html"
                         }else{
-                            alert(data.success);
+
                         }
                     },
                     error:function(){
-
+                        layer.close(index);
                     }
                 })
                 return false;

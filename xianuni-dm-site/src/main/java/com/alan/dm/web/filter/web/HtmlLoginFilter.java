@@ -43,13 +43,13 @@ public class HtmlLoginFilter implements Filter {
                         chain.doFilter(request,response);
                         return;
                     }else{
-                        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/static/html/login.html");
+                        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/html/login.html");
                     }
                 }else{
-                    httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/static/html/login.html");
+                    httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/html/login.html");
                 }
             }else{
-                httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/static/html/login.html");
+                httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/html/login.html");
             }
         }
     }
