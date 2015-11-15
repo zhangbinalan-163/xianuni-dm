@@ -7,9 +7,11 @@ import java.util.Date;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class PartyDuesPayInfo {
+public class PartyDuesPay {
     private int id;
-    private PartyMemberInfo member; // 党员
+    private int organizationId; // 组织关系ID
+    private int partyMemberId; // 党员ID
+    private PartyMember member; // 党员
     private Date payStartDate; // 缴费起始日期
     private Date payEndDate; // 缴费截止日期
     private Date payDate; // 缴费日期
@@ -22,11 +24,27 @@ public class PartyDuesPayInfo {
         this.id = id;
     }
 
-    public PartyMemberInfo getMember() {
+    public int getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public int getPartyMemberId() {
+        return partyMemberId;
+    }
+
+    public void setPartyMemberId(int partyMemberId) {
+        this.partyMemberId = partyMemberId;
+    }
+
+    public PartyMember getMember() {
         return member;
     }
 
-    public void setMember(PartyMemberInfo member) {
+    public void setMember(PartyMember member) {
         this.member = member;
     }
 

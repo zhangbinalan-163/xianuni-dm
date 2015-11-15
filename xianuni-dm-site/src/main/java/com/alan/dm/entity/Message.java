@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class Message {
     private int id;
-    private Date date; // 日期
+    private Date messageTime; // 日期
     private String type; // 类型
     private String title; // 标题
     private String content; // 内容
@@ -22,12 +22,12 @@ public class Message {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getMessageTime() {
+        return messageTime;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setMessageTime(Date messageTime) {
+        this.messageTime = messageTime;
     }
 
     public String getType() {

@@ -7,20 +7,33 @@ import java.util.Date;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class PartyMemberInfo {
+public class PartyMember {
     private int id;
+    private int organizationId; // 组织关系ID
     private Orgnization orgnization; // 党员所属支部
-    private String type; // 党员类型
+    private int type; // 党员类型 1-教工 2-学生
     private String memberId; // 学工号
     private String name; // 姓名
     private String idCardNo; // 身份证号
     private int sex; // 性别 1-男 2-女
     private String nation; // 民族
-    private String education; // 学历
+    private int education; // 学历
     private String degree; // 学位
     private String nativePlace; // 籍贯
     private Date birthday; // 出生日期
     private int stats; // 党员状态 // todo
+    private int origin; // 党员来源 1-校内 2-校外
+
+    public PartyMember(int organizationId, Orgnization orgnization, int type,
+                       String memberId, String name, String idCardNo, int sex) {
+        this.organizationId = organizationId;
+        this.orgnization = orgnization;
+        this.type = type;
+        this.memberId = memberId;
+        this.name = name;
+        this.idCardNo = idCardNo;
+        this.sex = sex;
+    }
 
     public int getId() {
         return id;
@@ -28,6 +41,14 @@ public class PartyMemberInfo {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
     }
 
     public Orgnization getOrgnization() {
@@ -38,11 +59,11 @@ public class PartyMemberInfo {
         this.orgnization = orgnization;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 
@@ -86,11 +107,11 @@ public class PartyMemberInfo {
         this.nation = nation;
     }
 
-    public String getEducation() {
+    public int getEducation() {
         return education;
     }
 
-    public void setEducation(String education) {
+    public void setEducation(int education) {
         this.education = education;
     }
 
@@ -124,5 +145,13 @@ public class PartyMemberInfo {
 
     public void setStats(int stats) {
         this.stats = stats;
+    }
+
+    public int getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(int origin) {
+        this.origin = origin;
     }
 }

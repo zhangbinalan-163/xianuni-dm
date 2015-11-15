@@ -1,5 +1,7 @@
 package com.alan.dm.entity.condition;
 
+import com.alan.dm.entity.DateRange;
+
 import java.util.Date;
 
 /**
@@ -8,15 +10,24 @@ import java.util.Date;
  * @author: fan
  */
 public class PartyDuesCondition {
-    private Date payDate; // 缴费日期
+    private DateRange range; // 缴费日期
+    private int[] partyMemberIds; // 党员ID列表
     private String name; // 党员姓名
 
-    public Date getPayDate() {
-        return payDate;
+    public DateRange getRange() {
+        return range;
     }
 
-    public void setPayDate(Date payDate) {
-        this.payDate = payDate;
+    public void setRange(DateRange range) {
+        this.range = range;
+    }
+
+    public int[] getPartyMemberIds() {
+        return partyMemberIds;
+    }
+
+    public void setPartyMemberIds(int[] partyMemberIds) {
+        this.partyMemberIds = partyMemberIds;
     }
 
     public String getName() {

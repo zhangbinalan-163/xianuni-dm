@@ -11,7 +11,7 @@ public class MemberCondition {
     private String idCardNo; // 身份证号
     private String memberId; // 学工号
     private int memberType; // 人员类型
-    private String education; // 学历
+    private int education; // 学历
     private int sex; // 性别 1-男 2-女
     private int stats; // 党员状态 1-历史党员 ...
 
@@ -55,11 +55,11 @@ public class MemberCondition {
         this.memberType = memberType;
     }
 
-    public String getEducation() {
+    public int getEducation() {
         return education;
     }
 
-    public void setEducation(String education) {
+    public void setEducation(int education) {
         this.education = education;
     }
 

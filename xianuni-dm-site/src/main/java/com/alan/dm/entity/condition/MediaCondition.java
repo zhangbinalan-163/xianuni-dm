@@ -8,16 +8,16 @@ import java.util.Date;
  * @author: fan
  */
 public class MediaCondition {
-    private String mediaType; // 媒体类型
+    private int mediaType; // 媒体类型
     private String mediaName; // 媒体名称
-    private Date uploadDate; // 上传日期
+    private Date uploadTime; // 上传日期
     private boolean forbidden; // 禁用
 
-    public String getMediaType() {
+    public int getMediaType() {
         return mediaType;
     }
 
-    public void setMediaType(String mediaType) {
+    public void setMediaType(int mediaType) {
         this.mediaType = mediaType;
     }
 
@@ -29,12 +29,12 @@ public class MediaCondition {
         this.mediaName = mediaName;
     }
 
-    public Date getUploadDate() {
-        return uploadDate;
+    public Date getUploadTime() {
+        return uploadTime;
     }
 
-    public void setUploadDate(Date uploadDate) {
-        this.uploadDate = uploadDate;
+    public void setUploadTime(Date uploadTime) {
+        this.uploadTime = uploadTime;
     }
 
     public boolean isForbidden() {

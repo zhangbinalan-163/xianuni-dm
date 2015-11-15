@@ -1,10 +1,10 @@
 package com.alan.dm.service;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.entity.MediaInfo;
+import com.alan.dm.entity.MediaResource;
 import com.alan.dm.entity.Page;
-import com.alan.dm.entity.PartyTrainingInfo;
-import com.alan.dm.entity.StudyRecordInfo;
+import com.alan.dm.entity.PartyTraining;
+import com.alan.dm.entity.StudyRecord;
 import com.alan.dm.entity.condition.MediaCondition;
 import com.alan.dm.entity.condition.StudyRecordCondition;
 import com.alan.dm.entity.condition.TrainingCondition;
@@ -24,23 +24,23 @@ public interface ITrainingService {
      * @return
      * @throws DMException
      */
-    int addTraining(PartyTrainingInfo trainingInfo) throws DMException;
+    int addTraining(PartyTraining trainingInfo) throws DMException;
 
     /**
      * 新增媒体资源
-     * @param mediaInfo
+     * @param mediaResource
      * @return
      * @throws DMException
      */
-    int addMediaResource(MediaInfo mediaInfo) throws DMException;
+    int addMediaResource(MediaResource mediaResource) throws DMException;
 
     /**
      * 新增学习记录
-     * @param studyRecordInfo
+     * @param studyRecord
      * @return
      * @throws DMException
      */
-    int addStudyRecord(StudyRecordInfo studyRecordInfo) throws DMException;
+    int addStudyRecord(StudyRecord studyRecord) throws DMException;
 
     void deleteTraining(int id) throws DMException;
 
@@ -48,15 +48,15 @@ public interface ITrainingService {
 
     void deleteStudyRecord(int id) throws DMException;
 
-    void modifyTraining(PartyTrainingInfo trainingInfo) throws DMException;
+    void modifyTraining(PartyTraining trainingInfo) throws DMException;
 
-    void modifyMediaResource(MediaInfo mediaInfo) throws DMException;
+    void modifyMediaResource(MediaResource mediaResource) throws DMException;
 
-    void modifyStudyRecord(StudyRecordInfo studyRecordInfo) throws DMException;
+    void modifyStudyRecord(StudyRecord studyRecord) throws DMException;
 
-    List<PartyTrainingInfo> getTraining(TrainingCondition condition, Page page) throws DMException;
+    List<PartyTraining> getTraining(TrainingCondition condition, Page page) throws DMException;
 
-    List<MediaInfo> getMediaResource(MediaCondition condition, Page page) throws DMException;
+    List<MediaResource> getMediaResource(MediaCondition condition, Page page) throws DMException;
 
-    List<StudyRecordInfo> getStudyRecord(StudyRecordCondition condition, Page page) throws DMException;
+    List<StudyRecord> getStudyRecord(StudyRecordCondition condition, Page page) throws DMException;
 }

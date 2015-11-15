@@ -7,7 +7,7 @@ import java.util.Date;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class StudyRecordInfo {
+public class StudyRecord {
     private int id;
     private String title; // 学习标题
     private String user; // 学习人员

@@ -8,16 +8,25 @@ import com.alan.dm.entity.DateRange;
  * @author: fan
  */
 public class TrainingCondition {
-    private String trainingType; // 培训类别
+    private int trainingType; // 培训类别
+    private int[] organizationIds; // 组织名称ID数组
     private String organization; // 组织名称
     private DateRange range; // 时间范围
 
-    public String getTrainingType() {
+    public int getTrainingType() {
         return trainingType;
     }
 
-    public void setTrainingType(String trainingType) {
+    public void setTrainingType(int trainingType) {
         this.trainingType = trainingType;
+    }
+
+    public int[] getOrganizationIds() {
+        return organizationIds;
+    }
+
+    public void setOrganizationIds(int[] organizationIds) {
+        this.organizationIds = organizationIds;
     }
 
     public String getOrganization() {

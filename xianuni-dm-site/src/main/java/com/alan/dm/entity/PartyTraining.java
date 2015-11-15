@@ -7,13 +7,14 @@ import java.util.Date;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class PartyTrainingInfo {
+public class PartyTraining {
     private int id;
     private String title; // 培训标题
-    private String trainingType; // 培训类别
+    private int trainingType; // 培训类别
+    private int organizationId; // 组织机构ID
     private Orgnization organization; // 组织机构
-    private Date startDate; // 开始时间
-    private Date endDate; // 结束时间
+    private Date startTime; // 开始时间
+    private Date endTime; // 结束时间
     private int period; // 课时
     private String trainingObject; // 培训对象
     private String content; // 培训内容
@@ -36,12 +37,20 @@ public class PartyTrainingInfo {
         this.title = title;
     }
 
-    public String getTrainingType() {
+    public int getTrainingType() {
         return trainingType;
     }
 
-    public void setTrainingType(String trainingType) {
+    public void setTrainingType(int trainingType) {
         this.trainingType = trainingType;
+    }
+
+    public int getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
     }
 
     public Orgnization getOrganization() {
@@ -52,20 +61,20 @@ public class PartyTrainingInfo {
         this.organization = organization;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public int getPeriod() {

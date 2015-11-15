@@ -7,10 +7,19 @@ import javafx.geometry.Orientation;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class PartyDuesStatisInfo {
+public class PartyDuesStatis {
+    private int organizationId; // 组织关系ID
     private Orientation organization; // 党支部
     private int partyMembersNum; // 党员人数
     private int payNum; // 缴费人数
+
+    public int getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
+    }
 
     public Orientation getOrganization() {
         return organization;

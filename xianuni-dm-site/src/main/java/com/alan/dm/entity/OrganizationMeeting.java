@@ -7,10 +7,10 @@ import java.util.Date;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class MeetingInfo {
+public class OrganizationMeeting {
     private int id;
     private int activity; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-三会一课
-    private String meetingType; // 会议类型
+    private int meetingType; // 会议类型
     private Date startTime; // 会议开始时间
     private Date endTime; // 会议结束时间
     private String location; // 会议地点
@@ -19,6 +19,7 @@ public class MeetingInfo {
     private int shouldNumberOfPeople; // 应到人数
     private int realNumberOfPeople; // 实到人数
     private String content; // 主要内容
+    private String filePath; // 附件地址
     private String attendancePeople; // 出勤人员
     private String absencePeople; // 缺勤人员
 
@@ -38,11 +39,11 @@ public class MeetingInfo {
         this.activity = activity;
     }
 
-    public String getMeetingType() {
+    public int getMeetingType() {
         return meetingType;
     }
 
-    public void setMeetingType(String meetingType) {
+    public void setMeetingType(int meetingType) {
         this.meetingType = meetingType;
     }
 
@@ -108,6 +109,14 @@ public class MeetingInfo {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public String getAttendancePeople() {

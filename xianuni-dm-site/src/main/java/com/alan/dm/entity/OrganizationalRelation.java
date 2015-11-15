@@ -9,9 +9,11 @@ import java.util.Date;
  */
 public class OrganizationalRelation {
     private int id;
-    private PartyMemberInfo member; // 党员
-    private String rollInType; // 转入类型
-    private String rollOutType; // 转出类型
+    private int organizationId; // 组织关系ID
+    private int partyMemberId; // 党员ID
+    private PartyMember member; // 党员
+    private int rollInType; // 转入类型 1-校内转入 2-校外转入
+    private int rollOutType; // 转出类型 1-校内转出 2-校外转出
     private String rollInOrganization; // 转入组织
     private String rollOutOrganization; // 转出组织
     private Date rollDate; // 转入/转出日期
@@ -27,27 +29,43 @@ public class OrganizationalRelation {
         this.id = id;
     }
 
-    public PartyMemberInfo getMember() {
+    public int getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(int organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public int getPartyMemberId() {
+        return partyMemberId;
+    }
+
+    public void setPartyMemberId(int partyMemberId) {
+        this.partyMemberId = partyMemberId;
+    }
+
+    public PartyMember getMember() {
         return member;
     }
 
-    public void setMember(PartyMemberInfo member) {
+    public void setMember(PartyMember member) {
         this.member = member;
     }
 
-    public String getRollInType() {
+    public int getRollInType() {
         return rollInType;
     }
 
-    public void setRollInType(String rollInType) {
+    public void setRollInType(int rollInType) {
         this.rollInType = rollInType;
     }
 
-    public String getRollOutType() {
+    public int getRollOutType() {
         return rollOutType;
     }
 
-    public void setRollOutType(String rollOutType) {
+    public void setRollOutType(int rollOutType) {
         this.rollOutType = rollOutType;
     }
 

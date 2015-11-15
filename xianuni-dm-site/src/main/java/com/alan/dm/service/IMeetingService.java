@@ -1,7 +1,7 @@
 package com.alan.dm.service;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.entity.MeetingInfo;
+import com.alan.dm.entity.OrganizationMeeting;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.condition.MeetingCondition;
 
@@ -16,11 +16,11 @@ public interface IMeetingService {
 
     /**
      * 新增组织会议
-     * @param meetingInfo
+     * @param organizationMeeting
      * @return
      * @throws DMException
      */
-    int addMeeting(MeetingInfo meetingInfo) throws DMException;
+    int addMeeting(OrganizationMeeting organizationMeeting) throws DMException;
 
     /**
      * 删除组织会议
@@ -31,10 +31,10 @@ public interface IMeetingService {
 
     /**
      * 更新组织会议
-     * @param meetingInfo
+     * @param organizationMeeting
      * @throws DMException
      */
-    void update(MeetingInfo meetingInfo) throws DMException;
+    void update(OrganizationMeeting organizationMeeting) throws DMException;
 
     /**
      * 根据查询条件获取组织会议列表
@@ -43,7 +43,7 @@ public interface IMeetingService {
      * @return
      * @throws DMException
      */
-    List<MeetingInfo> getMeeting(MeetingCondition condition, Page page) throws DMException;
+    List<OrganizationMeeting> getMeeting(MeetingCondition condition, Page page) throws DMException;
 
     /**
      * 根据会议ID获取组织会议
@@ -51,5 +51,5 @@ public interface IMeetingService {
      * @return
      * @throws DMException
      */
-    MeetingInfo getMeeting(int id) throws DMException;
+    OrganizationMeeting getMeeting(int id) throws DMException;
 }

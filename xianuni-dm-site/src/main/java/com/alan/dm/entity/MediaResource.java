@@ -7,13 +7,14 @@ import java.util.Date;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class MediaInfo {
+public class MediaResource {
     private int id;
     private String name;
-    private String type;
+    private int type;
     private boolean forbidden;
     private Date uploadDate;
     private String description;
+    private String resourcePath;
 
     public int getId() {
         return id;
@@ -31,11 +32,11 @@ public class MediaInfo {
         this.name = name;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
     }
 
@@ -61,5 +62,13 @@ public class MediaInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getResourcePath() {
+        return resourcePath;
+    }
+
+    public void setResourcePath(String resourcePath) {
+        this.resourcePath = resourcePath;
     }
 }
