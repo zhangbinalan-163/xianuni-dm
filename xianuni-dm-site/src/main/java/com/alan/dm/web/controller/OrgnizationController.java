@@ -103,7 +103,7 @@ public class OrgnizationController extends BaseController{
 			for(Orgnization subOrg:subOrgList){
 				JSONObject subOrgObject=new JSONObject();
 				subOrgObject.put("id", subOrg.getId());
-				List<String> cellList=new ArrayList<>();
+				List<String> cellList=new ArrayList<String>();
 				cellList.add(String.valueOf(subOrg.getId()));
 				cellList.add(subOrg.getName());
 				cellList.add(TimeUtils.convertToDateString(subOrg.getCreateTime()));

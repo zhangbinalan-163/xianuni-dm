@@ -1,0 +1,6 @@
+.gradle/
+.idea/
+build/
+xianuni-dm-site/build/
+xianuni-dm-site/xianuni-dm-site.iml
+xianuni-dm.iml

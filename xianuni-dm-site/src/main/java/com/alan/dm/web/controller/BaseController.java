@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class BaseController {
     private static Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
+
     /**
      * 获得封装的请求
      * @param httpServletRequest
