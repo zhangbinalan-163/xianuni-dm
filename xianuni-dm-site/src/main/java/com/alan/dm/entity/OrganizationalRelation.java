@@ -18,7 +18,7 @@ public class OrganizationalRelation {
     private String rollOutOrganization; // 转出组织
     private Date rollDate; // 转入/转出日期
     private Date reviewDate; // 审核日期
-    private String operator; // 经办人
+    private int operator; // 经办人
     private String tel; // 联系电话
 
     public int getId() {
@@ -101,11 +101,11 @@ public class OrganizationalRelation {
         this.reviewDate = reviewDate;
     }
 
-    public String getOperator() {
+    public int getOperator() {
         return operator;
     }
 
-    public void setOperator(String operator) {
+    public void setOperator(int operator) {
         this.operator = operator;
     }
 

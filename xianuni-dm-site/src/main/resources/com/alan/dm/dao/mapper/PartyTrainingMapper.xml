@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.PartyTrainingMapper">
+
+    <sql id="TABLE">tb_party_training</sql>
+
+
+    <insert id="insert" parameterType="com.alan.dm.entity.PartyTraining" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO <include refid="TABLE"/>
+        (title, trainingType, organizationId, startTime, endTime, period, trainingObject,
+        content, harvest, opinion, createTime)
+        VALUES(#{title},#{trainingType},#{organizationId},#{startTime},#{endTime},#{period}
+        ,#{trainingObject},#{content},#{harvest},#{opinion},#{createTime})
+    </insert>
+
+    <update id="update" parameterType="com.alan.dm.entity.PartyTraining">
+        update
+        <include refid="TABLE" />
+        <set>
+            <if test="trainingType != 0">trainingType=#{trainingType},</if>
+            <if test="organizationId != 0">organizationId=#{organizationId},</if>
+            <if test="startTime != null">startTime=#{startTime},</if>
+            <if test="endTime != null">endTime=#{endTime},</if>
+            <if test="title != null">title=#{title},</if>
+            <if test="period != 0">period=#{period},</if>
+            <if test="content != null">content=#{content},</if>
+            <if test="trainingObject != null">trainingObject=#{trainingObject},</if>
+            <if test="harvest != null">harvest=#{harvest},</if>
+            <if test="opinion != null">opinion=#{opinion},</if>
+            <if test="updateTime != null">updateTime=#{updateTime}</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="com.alan.dm.entity.PartyTraining">
+        delete from
+        <include refid="TABLE" />
+        where id=#{id}
+    </delete>
+
+
+    <select id="getTrainings" resultMap="com.alan.dm.entity.PartyTraining">
+        select * from
+        <include refid="TABLE" />
+        <where>
+            <if test="organizationId != 0">organizationId=#{con.organization}</if>
+            <if test="activityType != 0">AND activityType=#{con.activityType}</if>
+            <if test="theme != null">AND theme=#{con.theme}</if>
+            <if test="range != null">
+                AND startTime=BETWEEN #{range.startTime} AND #{range.endTime}
+            </if>
+        </where>
+        ORDER BY createTime DESC LIMIT #{page.page}, #{page.limit}
+    </select>
+
+    <select id="findOne"  parameterType="int" resultMap="com.alan.dm.entity.PartyTraining">
+        select * from
+        <include refid="TABLE" />
+        where id=#{id}
+    </select>
+</mapper>

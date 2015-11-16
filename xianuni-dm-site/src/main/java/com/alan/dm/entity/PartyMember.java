@@ -23,6 +23,8 @@ public class PartyMember {
     private Date birthday; // 出生日期
     private int stats; // 党员状态 // todo
     private int origin; // 党员来源 1-校内 2-校外
+    private Date createTime; // 创建时间
+    private Date updateTime; // 更新时间
 
     public PartyMember(int organizationId, Orgnization orgnization, int type,
                        String memberId, String name, String idCardNo, int sex) {
@@ -153,5 +155,21 @@ public class PartyMember {
 
     public void setOrigin(int origin) {
         this.origin = origin;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

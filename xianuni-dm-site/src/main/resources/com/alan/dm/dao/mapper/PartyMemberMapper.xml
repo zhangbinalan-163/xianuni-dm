@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.PartyMemberMapper">
+
+    <sql id="TABLE">tb_party_member</sql>
+
+
+    <insert id="insert" parameterType="com.alan.dm.entity.PartyMember" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO <include refid="TABLE"/>
+        (organizationId, type, memberId, name, idCardNo, sex, nation, education, degree, nativePlace, birthday, stats, origin, createTime)
+        VALUES(#{organizationId},#{type},#{memberId},#{name},#{idCardNo},#{sex},#{education},#{degree},#{nativePlace},#{birthday},#{stats},#{origin},#{createTime})
+    </insert>
+
+    <update id="update" parameterType="com.alan.dm.entity.PartyMember">
+        update
+        <include refid="TABLE" />
+        <set>
+            <if test="organizationId != 0">organizationId=#{organizationId},</if>
+            <if test="type != 0">type=#{type},</if>
+            <if test="memberId != null">memberId=#{memberId},</if>
+            <if test="name != null">name=#{name},</if>
+            <if test="idCardNo != null">idCardNo=#{idCardNo},</if>
+            <if test="sex != 0">sex=#{sex},</if>
+            <if test="nation != null">nation=#{nation},</if>
+            <if test="education != 0">education=#{education},</if>
+            <if test="degree != null">degree=#{degree},</if>
+            <if test="nativePlace != null">nativePlace=#{nativePlace},</if>
+            <if test="birthday != null">birthday=#{birthday},</if>
+            <if test="stats != 0">stats=#{stats},</if>
+            <if test="origin != 0">origin=#{origin},</if>
+            <if test="source != null">source=#{source},</if>
+            <if test="updateTime != null">updateTime=#{updateTime}</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="com.alan.dm.entity.PartyMember">
+        delete from
+        <include refid="TABLE" />
+        where id=#{id}
+    </delete>
+
+    <select id="getMembers" resultMap="com.alan.dm.entity.PartyMember">
+        select * from
+        <include refid="TABLE" />
+        <where>
+            <if test="organizationId != 0">organizationId=#{con.organization}</if>
+            <if test="name != null">AND name LIKE #{con.name}</if>
+            <if test="idCardNo != null">AND idCardNo=#{con.idCardNo}</if>
+            <if test="memberId != null">AND memberId=#{con.memberId}</if>
+            <if test="memberType != 0">AND memberType=#{con.memberType}</if>
+            <if test="education != 0">AND education=#{con.education}</if>
+            <if test="sex != 0">AND sex=#{con.sex}</if>
+            <if test="stats != 0">AND stats=#{con.stats}</if>
+        </where>
+        ORDER BY createTime DESC LIMIT #{page.page}, #{page.limit}
+    </select>
+
+    <select id="findOne" resultMap="com.alan.dm.entity.PartyMember">
+        select * from
+        <include refid="TABLE" />
+        where id=#{id}
+    </select>
+</mapper>
