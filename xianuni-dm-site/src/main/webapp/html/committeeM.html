@@ -37,17 +37,14 @@
                 <div class="ibox-content">
                     <form role="form" class="form-inline form-group">
                         <div class="form-group">
-                            <label for="searchName" class="sr-only">姓名</label>
-                            <input type="text" placeholder="请输入姓名" id="searchName" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="searchAge" class="sr-only">年龄</label>
-                            <input type="text" placeholder="请输入年龄" id="searchAge" class="form-control">
+                            <input type="text" placeholder="请输入姓名" id="name" class="form-control">
                         </div>
                         <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
                     </form>
-                    <table id="list"></table>
-                    <div id="pager"></div>
+                    <div class="jqGrid_wrapper">
+                        <table id="list"></table>
+                        <div id="pager"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,11 +72,13 @@
         var table = ({
             init: function () {
                 this.$el = $("#list");
+                this.orgId = '';
                 this.render();
                 this.bindEvents();
                 return this
             },
             fetchData: function (data) {
+                this.orgId = data.orgId = data.orgId || this.orgId;
                 this.$el.jqGrid("setGridParam", {
                     postData: data,
                     page: 1
@@ -89,32 +88,32 @@
                 var self = this;
                 $('#searchBtn').on('click', function(){
                     self.fetchData({
-                        name: $('#searchName').val().trim(),
-                        age: $('#searchAge').val().trim()
+                        name: $('#name').val().trim()
                     })
                 })
             },
             render: function () {
                 this.$el.jqGrid(
                         {
-                            url: '../static/data/jqgrid1.json',
+                            url: '/xianuni-dm/reward/list.do',
                             datatype: "json",
-                            colNames: ['No', 'Date', 'Client', 'Amount', 'Tax', 'Total', 'Notes'],
+                            autowidth: true,
+                            shrinkToFit: true,
+                            colNames: ['ID','党组织', '名称', '时间', '级别', '类型'],
                             colModel: [
-                                {name: 'id', index: 'id', width: 55},
-                                {name: 'invdate', index: 'invdate', width: 90},
-                                {name: 'name', index: 'name asc, invdate', width: 100},
-                                {name: 'amount', index: 'amount', width: 80, align: "right"},
-                                {name: 'tax', index: 'tax', width: 80, align: "right"},
-                                {name: 'total', index: 'total', width: 80, align: "right"},
-                                {name: 'note', index: 'note', width: 150, sortable: false}
+                                {name: 'id', index: 'id',width: 50, align: "left"},
+                                {name: 'org', index: 'org',width: 100, align: "left"},
+                                {name: 'name', index: 'name',width: 100, align: "left"},
+                                {name: 'time', index: 'time',width: 60, align: "left"},
+                                {name: 'level', index: 'level',width: 60, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
                             pager: '#pager',
                             sortname: 'id',
                             mtype: "get",
-                            height: 450,
+                            height: 400,
                             viewrecords: true
                         })
                         .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
@@ -153,7 +152,7 @@
             },
             updateTable: function (event, treeId, treeNode) {
                 table.fetchData({
-                    catId: treeNode.id
+                    orgId: treeNode.id
                 })
             },
             filter: function (treeId, parentNode, childNodes) {
@@ -165,6 +164,12 @@
             }
 
         }).init();
+
+        // Add responsive to jqGrid
+        $(window).bind('resize', function () {
+            var width = $('.jqGrid_wrapper').width();
+            $('#list').setGridWidth(width);
+        });
     });
 </script>
 </body>
