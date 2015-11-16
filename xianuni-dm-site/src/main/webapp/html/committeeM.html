@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../static/css/plugins/jsTree/style.min.css" rel="stylesheet">
+    <!-- jqgrid-->
+    <link href="../static/css/plugins/jqgrid/ui.jqgrid.css?0820" rel="stylesheet">
+    <!-- zTree -->
+    <link href="../static/css/plugins/zTree/metroStyle/metroStyle.css" rel="stylesheet">
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>我的党组织信息</h5>
+                </div>
+                <div class="ibox-content">
+                    <ul id="orgTree" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>委员会信息</h5>
+                </div>
+                <div class="ibox-content">
+                    <form role="form" class="form-inline form-group">
+                        <div class="form-group">
+                            <label for="searchName" class="sr-only">姓名</label>
+                            <input type="text" placeholder="请输入姓名" id="searchName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchAge" class="sr-only">年龄</label>
+                            <input type="text" placeholder="请输入年龄" id="searchAge" class="form-control">
+                        </div>
+                        <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
+                    </form>
+                    <table id="list"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../static/js/content.js?v=1.0.0"></script>
+
+<!-- jqGrid -->
+<script src="../static/js/plugins/jqgrid/i18n/grid.locale-cn.js?0820"></script>
+<script src="../static/js/plugins/jqgrid/jquery.jqGrid.min.js?0820"></script>
+
+<!-- zTree plugin javascript -->
+<script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        var table = ({
+            init: function () {
+                this.$el = $("#list");
+                this.render();
+                this.bindEvents();
+                return this
+            },
+            fetchData: function (data) {
+                this.$el.jqGrid("setGridParam", {
+                    postData: data,
+                    page: 1
+                }).trigger("reloadGrid");
+            },
+            bindEvents: function(){
+                var self = this;
+                $('#searchBtn').on('click', function(){
+                    self.fetchData({
+                        name: $('#searchName').val().trim(),
+                        age: $('#searchAge').val().trim()
+                    })
+                })
+            },
+            render: function () {
+                this.$el.jqGrid(
+                        {
+                            url: '../static/data/jqgrid1.json',
+                            datatype: "json",
+                            colNames: ['No', 'Date', 'Client', 'Amount', 'Tax', 'Total', 'Notes'],
+                            colModel: [
+                                {name: 'id', index: 'id', width: 55},
+                                {name: 'invdate', index: 'invdate', width: 90},
+                                {name: 'name', index: 'name asc, invdate', width: 100},
+                                {name: 'amount', index: 'amount', width: 80, align: "right"},
+                                {name: 'tax', index: 'tax', width: 80, align: "right"},
+                                {name: 'total', index: 'total', width: 80, align: "right"},
+                                {name: 'note', index: 'note', width: 150, sortable: false}
+                            ],
+                            rowNum: 10,
+                            rowList: [10, 20, 30],
+                            pager: '#pager',
+                            sortname: 'id',
+                            mtype: "get",
+                            height: 450,
+                            viewrecords: true
+                        })
+                        .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
+            }
+        }).init();
+
+        var tree = ({
+            init: function () {
+                $.fn.zTree.init($("#orgTree"), this.config());
+            },
+            config: function () {
+                var self = this;
+                return this.setting = {
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: 0
+                        }
+                    },
+                    async: {
+                        enable: true,
+                        url: "/xianuni-dm/orgnization/orgtree.do",
+                        dataFilter: self.filter,
+                        type: "get",
+                        autoParam:["id", "name", "level"]
+                    },
+                    view: {
+                        showIcon: false
+                    },
+                    callback: {
+                        onClick: self.updateTable
+                    }
+                }
+            },
+            updateTable: function (event, treeId, treeNode) {
+                table.fetchData({
+                    catId: treeNode.id
+                })
+            },
+            filter: function (treeId, parentNode, childNodes) {
+//                if (!childNodes) return null;
+//                for (var i = 0, l = childNodes.length; i < l; i++) {
+//                    childNodes[i].name = 'Test>' + childNodes[i].name;
+//                }
+                return childNodes;
+            }
+
+        }).init();
+    });
+</script>
+</body>
+</html>

@@ -10,6 +10,10 @@ public class Admin {
     public static final int STATUS_NORMAL = 0;
     public static final int STATUS_FORBIDDEN = 1;
 
+    public static final int ORG_ADMIN=0;
+    public static final int SYSTEM_ADMIN=1;
+
+
     private int id;
     private String name;
     private String schoolNumber;

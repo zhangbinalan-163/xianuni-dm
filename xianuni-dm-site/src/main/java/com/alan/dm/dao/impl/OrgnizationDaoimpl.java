@@ -6,6 +6,7 @@ import com.alan.dm.dao.IOrgnizationDao;
 import com.alan.dm.entity.Orgnization;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -15,11 +16,13 @@ import java.util.List;
  */
 @Repository(value = "orgnizationDao")
 public class OrgnizationDaoimpl extends BaseDao implements IOrgnizationDao{
+
     private static final String tableName="party_orgnization";
 
     @Override
     public void insert(Orgnization orgnization) throws DMException {
-
+        String sql="insert into "+tableName+"(name,parent,isParent,status,updateTime,createTime,electionTime,desc) values(?,?,?,?,?,?,?,?)";
+        update(sql,orgnization.getName(),orgnization.getParent(),orgnization.isParent(),orgnization.getStatus(),orgnization.getUpdateTime(),orgnization.getCreateTime(),orgnization.getElectionTime(),orgnization.getDesc());
     }
 
     @Override
@@ -29,7 +32,7 @@ public class OrgnizationDaoimpl extends BaseDao implements IOrgnizationDao{
     }
     @Override
     public void update(Orgnization orgnization) throws DMException {
-
+        //TODO
     }
 
     @Override

@@ -22,17 +22,20 @@ public class AdminDaoimpl extends BaseDao implements IAdminDao{
 
     @Override
     public void insert(Admin admin) throws DMException {
-
+        String sql="insert into "+tableName+"(name,schoolNumber,password,createTime,updateTime,status,type,orgId) values(?,?,?,?,?,?,?,?)";
+        update(sql,admin.getName(),admin.getSchoolNumber(),admin.getPassword(),admin.getCreateTime(),admin.getUpdateTime(),admin.getStatus(),admin.getType(),admin.getOrgId());
     }
 
     @Override
     public void delete(Admin admin) throws DMException {
-
+        String sql="delete from "+tableName+" where id=?";
+        update(sql,admin.getId());
     }
 
     @Override
     public void update(Admin admin) throws DMException {
-
+        String sql = "update "+tableName+" set name=?,status=?,updateTime=?,type=?,orgId=?,password=? where id=?";
+        update(sql, admin.getName(), admin.getStatus(), admin.getUpdateTime(), admin.getOrgId(), admin.getPassword(), admin.getId());
     }
 
     @Override
@@ -43,11 +46,13 @@ public class AdminDaoimpl extends BaseDao implements IAdminDao{
 
     @Override
     public List<Admin> getByOrg(Orgnization orgnization) throws DMException {
-        return null;
+        String sql = "select * from "+tableName+" where orgId=?";
+        return getBeanList(sql,Admin.class,orgnization.getId());
     }
 
     @Override
     public Admin getById(int id) throws DMException {
-        return null;
+        String sql = "select * from "+tableName+" where id=?";
+        return getBean(sql,Admin.class,id);
     }
 }

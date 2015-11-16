@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "name": "父节点1",
+    "isParent": true
+  },
+  {
+    "id": 11,
+    "name": "父节点2",
+    "isParent": false
+  },
+  {
+    "id": 3,
+    "name": "3",
+    "isParent": true
+  }
+]

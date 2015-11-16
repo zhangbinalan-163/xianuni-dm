@@ -1,0 +1,348 @@
+/**
+ * Created by Vijay on 15/11/15.
+ */
+$(function () {
+    /* global settings */
+    $.jgrid.defaults.styleUI = 'Bootstrap';
+
+    var table4 = ({
+        init: function () {
+            this.$el = $("#list4");
+            this.render();
+            this.bindEvents();
+            return this
+        },
+        fetchData: function (data) {
+            this.$el.jqGrid("setGridParam", {
+                postData: data,
+                page: 1
+            }).trigger("reloadGrid");
+        },
+        bindEvents: function(){
+            var self = this;
+            $('#searchBtn4').on('click', function(){
+                self.fetchData({
+                    name: $('#searchName4').val().trim(),
+                    age: $('#searchAge4').val().trim()
+                })
+            })
+        },
+        render: function () {
+            this.$el.jqGrid(
+                {
+                    url: '../static/data/jqgrid1.json',
+                    datatype: "json",
+                    colNames: ['No', 'Date', 'Client', 'Amount', 'Tax', 'Total', 'Notes'],
+                    colModel: [
+                        {name: 'id', index: 'id', width: 55},
+                        {name: 'invdate', index: 'invdate', width: 90},
+                        {name: 'name', index: 'name asc, invdate', width: 100},
+                        {name: 'amount', index: 'amount', width: 80, align: "right"},
+                        {name: 'tax', index: 'tax', width: 80, align: "right"},
+                        {name: 'total', index: 'total', width: 80, align: "right"},
+                        {name: 'note', index: 'note', width: 150, sortable: false}
+                    ],
+                    rowNum: 10,
+                    rowList: [10, 20, 30],
+                    pager: '#pager4',
+                    sortname: 'id',
+                    mtype: "get",
+                    height: 300,
+                    viewrecords: true,
+                    sortorder: "desc",
+                    caption: "JSON 实例"
+                })
+                .jqGrid('navGrid', '#pager4', {edit: false, add: false, del: false});
+        }
+    }).init();
+
+    var tree4 = ({
+        init: function () {
+            $.fn.zTree.init($("#treeDemo4"), this.config());
+        },
+        config: function () {
+            var self = this;
+            return this.setting = {
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pId",
+                        rootPId: 0
+                    }
+                },
+                async: {
+                    enable: true,
+                    url: "../static/data/treeAll2.json",
+                    dataFilter: self.filter,
+                    type: "get",
+                    autoParam:["id", "name", "level"]
+                },
+                view: {
+                    showIcon: false
+                },
+                callback: {
+                    onClick: self.updateTable
+                }
+            }
+        },
+        updateTable: function (event, treeId, treeNode) {
+            //if (!treeNode.isParent) {
+            table4.fetchData({
+                catId: treeNode.id
+            })
+            //}
+        },
+        filter: function (treeId, parentNode, childNodes) {
+            if (!childNodes) return null;
+            for (var i = 0, l = childNodes.length; i < l; i++) {
+                childNodes[i].name = 'Test>' + childNodes[i].name;
+            }
+            return childNodes;
+        }
+
+    }).init();
+
+
+
+    /* 基本 示例*/
+    var tree1 = (function () {
+        var setting = {
+            view: {
+                showIcon: false,
+                selectedMulti: false
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            }
+        };
+
+        var zNodes = [
+            {id: 1, pId: 0, name: "父节点1", open: true},
+            {id: 11, pId: 1, name: "父节点11"},
+            {id: 111, pId: 11, name: "叶子节点111"},
+            {id: 112, pId: 11, name: "叶子节点112"},
+            {id: 12, pId: 1, name: "父节点12"},
+            {id: 121, pId: 12, name: "叶子节点121"},
+            {id: 122, pId: 12, name: "叶子节点122"},
+            {id: 13, pId: 1, name: "父节点13", isParent: true},
+            {id: 2, pId: 0, name: "父节点2"},
+            {id: 21, pId: 2, name: "父节点21", open: true},
+            {id: 211, pId: 21, name: "叶子节点211"},
+            {id: 212, pId: 21, name: "叶子节点212"},
+            {id: 22, pId: 2, name: "父节点22"},
+            {id: 221, pId: 22, name: "叶子节点221"},
+            {id: 222, pId: 22, name: "叶子节点222"},
+            {id: 23, pId: 2, name: "父节点23"},
+            {id: 231, pId: 23, name: "叶子节点231"},
+            {id: 232, pId: 23, name: "叶子节点232"},
+            {id: 3, pId: 0, name: "父节点3", isParent: true}
+        ];
+
+        $.fn.zTree.init($("#treeDemo1"), setting, zNodes);
+    })();
+
+    /* 异步加载全部树结构 */
+    var table2 = ({
+        init: function () {
+            this.$el = $("#list2");
+            this.render();
+            this.bindEvents();
+            return this
+        },
+        fetchData: function (data) {
+            this.$el.jqGrid("setGridParam", {
+                postData: data,
+                page: 1
+            }).trigger("reloadGrid");
+        },
+        bindEvents: function(){
+            var self = this;
+            $('#searchBtn').on('click', function(){
+                self.fetchData({
+                    name: $('#searchName').val().trim(),
+                    age: $('#searchAge').val().trim()
+                })
+            })
+        },
+        render: function () {
+
+            this.$el.jqGrid(
+                {
+                    url: '../static/data/jqgrid1.json',
+                    datatype: "json",
+                    colNames: ['No', 'Date', 'Client', 'Amount', 'Tax', 'Total', 'Notes'],
+                    colModel: [
+                        {name: 'id', index: 'id', width: 55},
+                        {name: 'invdate', index: 'invdate', width: 90},
+                        {name: 'name', index: 'name asc, invdate', width: 100},
+                        {name: 'amount', index: 'amount', width: 80, align: "right"},
+                        {name: 'tax', index: 'tax', width: 80, align: "right"},
+                        {name: 'total', index: 'total', width: 80, align: "right"},
+                        {name: 'note', index: 'note', width: 150, sortable: false}
+                    ],
+                    rowNum: 10,
+                    rowList: [10, 20, 30],
+                    pager: '#pager2',
+                    sortname: 'id',
+                    mtype: "get",
+                    height: 300,
+                    viewrecords: true,
+                    sortorder: "desc",
+                    caption: "JSON 实例"
+                })
+                .jqGrid('navGrid', '#pager2', {edit: false, add: false, del: false});
+        }
+    }).init();
+    var tree2 = ({
+        init: function () {
+            $.fn.zTree.init($("#treeDemo2"), this.config());
+        },
+        config: function () {
+            var self = this;
+            return this.setting = {
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pId",
+                        rootPId: 0
+                    }
+                },
+                async: {
+                    enable: true,
+                    url: "../static/data/treeAll.json",
+                    dataFilter: self.filter,
+                    type: "get"
+                },
+                view: {
+                    showIcon: false
+                },
+                callback: {
+                    onClick: self.updateTable
+                }
+            }
+        },
+        updateTable: function (event, treeId, treeNode) {
+            //if (!treeNode.isParent) {
+                table2.fetchData({
+                    catId: treeNode.id
+                })
+            //}
+        },
+        filter: function (treeId, parentNode, childNodes) {
+            if (!childNodes) return null;
+            for (var i = 0, l = childNodes.length; i < l; i++) {
+                childNodes[i].name = 'Test>' + childNodes[i].name;
+                childNodes[i].open = true;
+            }
+            return childNodes;
+        }
+
+    }).init();
+
+    /* 异步分次加载数据 */
+    var table3 = ({
+        init: function () {
+            this.render();
+            return this
+        },
+        render: function () {
+
+        }
+    }).init();
+    var tree3 = ({
+        init: function () {
+            this.perCount = 100;
+            this.perTime = 100;
+            var zNodes = [
+                {name: "500个节点", id: "1", count: 500, times: 1, isParent: true},
+                {name: "1000个节点", id: "2", count: 1000, times: 1, isParent: true},
+                {name: "2000个节点", id: "3", count: 2000, times: 1, isParent: true}
+            ];
+            $.fn.zTree.init($("#treeDemo3"), this.config(), zNodes);
+        },
+        config: function () {
+            var self = this;
+            return this.setting = {
+                async: {
+                    enable: true,
+                    url: self.getUrl
+                },
+                check: {
+                    enable: true
+                },
+                data: {
+                    simpleData: {
+                        enable: true
+                    }
+                },
+                view: {
+                    expandSpeed: "",
+                    showIcon: false
+                },
+                callback: {
+                    beforeExpand: self.beforeExpand.bind(this),
+                    onAsyncSuccess: self.onAsyncSuccess.bind(this),
+                    onAsyncError: self.onAsyncError.bind(this)
+                }
+            };
+        },
+        getTreeObj: function () {
+            return $.fn.zTree.getZTreeObj("treeDemo3")
+        },
+        getUrl: function (treeId, treeNode) {
+            var curCount = (treeNode.children) ? treeNode.children.length : 0;
+            var getCount = (curCount + this.perCount) > treeNode.count ? (treeNode.count - curCount) : this.perCount;
+            var param = "id=" + treeNode.id + "_" + (treeNode.times++) + "&count=" + getCount;
+            return "data/treeAll.json?" + param;
+        },
+        fetchNodes: function (treeNode, reloadType) {
+            var zTree = this.getTreeObj();
+            if (reloadType == "refresh") {
+                treeNode.icon = "/css/plugins/zTree/zTreeStyle/img/loading.gif";
+                zTree.updateNode(treeNode);
+            }
+            zTree.reAsyncChildNodes(treeNode, reloadType, true);
+        },
+        beforeExpand: function (treeId, treeNode) {
+            var self = this;
+            if (!treeNode.isAjaxing) {
+                treeNode.times = 1;
+                self.fetchNodes(treeNode, "refresh");
+                return true;
+            } else {
+                alert("zTree 正在下载数据中，请稍后展开节点。。。");
+                return false;
+            }
+        },
+        onAsyncSuccess: function (event, treeId, treeNode, msg) {
+            var self = this;
+            if (!msg || msg.length == 0) {
+                return;
+            }
+            var zTree = self.getTreeObj(),
+                totalCount = treeNode.count;
+            // 分页加载
+            //if (treeNode.children.length < totalCount) {
+            //    setTimeout(function () {
+            //        self.fetchNodes(treeNode);
+            //    }, self.perTime);
+            //} else {
+            //    treeNode.icon = "";
+            //    zTree.updateNode(treeNode);
+            //    zTree.selectNode(treeNode.children[0]);
+            //}
+        },
+
+        onAsyncError: function (event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+            var zTree = $.fn.zTree.getZTreeObj("treeDemo2");
+            alert("异步获取数据出现异常。");
+            treeNode.icon = "";
+            zTree.updateNode(treeNode);
+        }
+    }).init();
+})
+;
