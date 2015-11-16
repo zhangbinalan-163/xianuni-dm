@@ -41,12 +41,10 @@ public class OrgRewardController extends BaseController{
 		Integer orgId=request.getInt("orgId",-1);
 		String name=request.getString("name", null);
 
-		Orgnization parentOrg=new Orgnization();
-		parentOrg.setId(1);
 		Page pageInfo=new Page();
 		pageInfo.setCurrent(page);
 		pageInfo.setSize(limit);
-		OrgRewardCondition condition=new OrgRewardCondition();;
+		OrgRewardCondition condition=new OrgRewardCondition();
 		if(orgId!=-1){
 			condition.setOrgId(orgId);
 		}

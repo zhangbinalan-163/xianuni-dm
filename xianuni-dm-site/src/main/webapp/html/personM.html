@@ -32,12 +32,13 @@
         <div class="col-sm-9">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>委员会信息</h5>
+                    <h5>基础人员信息</h5>
                 </div>
                 <div class="ibox-content">
                     <form role="form" class="form-inline form-group">
                         <div class="form-group">
                             <input type="text" placeholder="请输入姓名" id="name" class="form-control">
+                            <input type="text" placeholder="请输入学工号" id="number" class="form-control">
                         </div>
                         <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
                     </form>
@@ -88,24 +89,26 @@
                 var self = this;
                 $('#searchBtn').on('click', function(){
                     self.fetchData({
-                        name: $('#name').val().trim()
+                        name: $('#name').val().trim(),
+                        number: $('#number').val().trim()
                     })
                 })
             },
             render: function () {
                 this.$el.jqGrid(
                         {
-                            url: '/xianuni-dm/reward/list.do',
+                            url: '/xianuni-dm/person/basicList.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['党组织', '名称', '时间', '级别', '类型'],
+                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '创建日期'],
                             colModel: [
+                                {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 100, align: "left"},
                                 {name: 'name', index: 'name',width: 100, align: "left"},
-                                {name: 'time', index: 'time',width: 60, align: "left"},
-                                {name: 'level', index: 'level',width: 60, align: "left"},
-                                {name: 'type', index: 'type',width: 60, align: "left"}
+                                {name: 'type', index: 'type',width: 60, align: "left"},
+                                {name: 'number', index: 'number',width: 60, align: "left"},
+                                {name: 'create', index: 'create',width: 60, align: "left"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],

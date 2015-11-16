@@ -49,37 +49,6 @@ public class OrgnizationController extends BaseController{
 		orgObject.put("message","success");
 		return JsonUtils.fromObject(orgObject);
 	}
-	@RequestMapping("/list.do")
-	public String list(HttpServletRequest httpServletRequest) throws Exception {
-		Request request = getRequest(httpServletRequest);
-		Integer parentId=request.getInt("orgId", -1);
-		Integer pageNum=request.getInt("pageCurrent",1);
-		Integer numPerPage=request.getInt("pageSize", 20);
-		int totalCount=0;
-		Orgnization parentOrg = orgnizationService.getOrgById(parentId);
-		if(parentOrg==null){
-			pageNum=1;
-			numPerPage=0;
-			totalCount=0;
-		}else{
-			//计算总数
-			totalCount=orgnizationService.countSubOrg(parentOrg);
-			//
-			if(totalCount>0){
-				Page page=new Page();
-				page.setCurrent(pageNum);
-				page.setSize(numPerPage);
-				List<Orgnization> orgnizationList=orgnizationService.getOrgByParent(parentOrg,page);
-				httpServletRequest.setAttribute("orgList", orgnizationList);
-			}
-		}
-		httpServletRequest.setAttribute("pageCurrent", pageNum);
-		httpServletRequest.setAttribute("pageSize", numPerPage);
-		httpServletRequest.setAttribute("totalCount", totalCount);
-		httpServletRequest.setAttribute("orgId", parentId);
-
-		return "orgnization/list";
-	}
 
 	@RequestMapping("/orglist.do")
 	@ResponseBody
@@ -126,6 +95,12 @@ public class OrgnizationController extends BaseController{
 		Integer parentId=request.getInt("id", -1);
 		JSONArray orgArray=new JSONArray();
 		if(parentId==-1){
+			JSONObject allObject=new JSONObject();
+			allObject.put("id",0);
+			allObject.put("name","全部党组织");
+			allObject.put("isParent",false);
+			allObject.put("pId", -1);
+			orgArray.add(allObject);
 			//最外层
 			Orgnization parentOrg=new Orgnization();
 			parentOrg.setId(-1);
