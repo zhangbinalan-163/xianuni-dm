@@ -15,10 +15,15 @@ import java.util.List;
  * @author: fan
  */
 public interface IPartyDuesDao {
+
     int insert(PartyDuesPay partyDuesPay) throws DMException;
+
     void delete(PartyDuesPay partyDuesPay) throws DMException;
+
     void update(PartyDuesPay partyDuesPay) throws DMException;
+
     PartyDuesPay findOne(int id) throws DMException;
+
     List<PartyDuesPay> getPartyDuesPay(PartyDuesCondition condition, Page page) throws DMException;
 
     /**

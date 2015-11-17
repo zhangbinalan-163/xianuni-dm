@@ -6,6 +6,7 @@ import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.OrgRewardCondition;
 import com.alan.dm.entity.condition.PersonCondition;
+import com.alan.dm.entity.condition.PrepareInfo;
 import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
@@ -34,6 +35,15 @@ public class PersonController extends BaseController{
 
 	@Resource(name = "activitistService")
 	private IActivitistService activitistService;
+
+	@Resource(name = "intentionService")
+	private IIntentionService intentionService;
+
+	@Resource(name = "prepareService")
+	private IPrepareService prepareService;
+
+	@Resource(name = "normalService")
+	private INormalService normalService;
 
 	@Resource(name = "orgnizationService")
 	private IOrgnizationService orgnizationService;
@@ -217,6 +227,189 @@ public class PersonController extends BaseController{
 				cellList.add(StringUtils.isEmpty(meetTime)?"未召开":meetTime);
 				String director=activitistInfo.getDirector();
 				cellList.add(StringUtils.isEmpty(director)?"未确定":"已确定");
+				subOrgObject.put("cell", cellList);
+				rowsArray.add(subOrgObject);
+			}
+		}
+		jsonObject.put("rows",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 * 获取发展对象信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/intentionList.do")
+	@ResponseBody
+	public String intentionList(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer limit = request.getInt("rows", 10);
+		Integer page = request.getInt("page", 1);
+		Integer orgId=request.getInt("orgId", 0);
+		String name=request.getString("name", null);
+		String number=request.getString("number", null);
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(page);
+		pageInfo.setSize(limit);
+		PersonCondition condition=new PersonCondition();
+		condition.setStatus(PersonStatus.INTENTION.getId());
+		if(orgId!=0){
+			condition.setOrgId(orgId);
+		}
+		if(!StringUtils.isEmpty(name)){
+			condition.setName(name);
+		}
+		if(!StringUtils.isEmpty(number)){
+			condition.setNumber(number);
+		}
+
+		int subCount = personService.countByCondition(condition);
+
+		List<Person> personList=personService.getByCondition(condition,pageInfo);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("page",page);
+		jsonObject.put("total",subCount==0?0:subCount/limit+1);
+		jsonObject.put("records",subCount);
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject subOrgObject=new JSONObject();
+				subOrgObject.put("id", person.getId());
+				List<String> cellList=new ArrayList<String>();
+				cellList.add(String.valueOf(person.getId()));
+				Orgnization orgInfo = orgnizationService.getOrgById(person.getOrgId());
+				cellList.add(orgInfo.getName());
+				cellList.add(person.getName());
+				cellList.add(PersonType.getInstance(person.getType()).getName());
+				cellList.add(person.getNumber());
+				IntentionInfo intentionInfo=intentionService.getByPerson(person);
+				cellList.add(intentionInfo.isPubliced()?"已公示":"已公示");
+				cellList.add(intentionInfo.getTrainHour()==0?"未设置":intentionInfo.getTrainHour()+"课时");
+				cellList.add(intentionInfo.isRecorded()?"未备案":"已备案");
+				subOrgObject.put("cell", cellList);
+				rowsArray.add(subOrgObject);
+			}
+		}
+		jsonObject.put("rows",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 * 获取预备党员信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/prepareList.do")
+	@ResponseBody
+	public String prepareList(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer limit = request.getInt("rows", 10);
+		Integer page = request.getInt("page", 1);
+		Integer orgId=request.getInt("orgId", 0);
+		String name=request.getString("name", null);
+		String number=request.getString("number", null);
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(page);
+		pageInfo.setSize(limit);
+		PersonCondition condition=new PersonCondition();
+		condition.setStatus(PersonStatus.PERPARE.getId());
+		if(orgId!=0){
+			condition.setOrgId(orgId);
+		}
+		if(!StringUtils.isEmpty(name)){
+			condition.setName(name);
+		}
+		if(!StringUtils.isEmpty(number)){
+			condition.setNumber(number);
+		}
+
+		int subCount = personService.countByCondition(condition);
+
+		List<Person> personList=personService.getByCondition(condition,pageInfo);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("page",page);
+		jsonObject.put("total",subCount==0?0:subCount/limit+1);
+		jsonObject.put("records",subCount);
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject subOrgObject=new JSONObject();
+				subOrgObject.put("id", person.getId());
+				List<String> cellList=new ArrayList<String>();
+				cellList.add(String.valueOf(person.getId()));
+				Orgnization orgInfo = orgnizationService.getOrgById(person.getOrgId());
+				cellList.add(orgInfo.getName());
+				cellList.add(person.getName());
+				cellList.add(PersonType.getInstance(person.getType()).getName());
+				cellList.add(person.getNumber());
+				PrepareInfo prepareInfo = prepareService.getByPerson(person);
+				cellList.add(prepareInfo.isApplication()?"已提交":"未提交");
+				cellList.add(StringUtils.isEmpty(prepareInfo.getBranchApproval())?"未审核":"已审核");
+				cellList.add(StringUtils.isEmpty(prepareInfo.getSchoolApproval())?"未审核":"已审核");
+				subOrgObject.put("cell", cellList);
+				rowsArray.add(subOrgObject);
+			}
+		}
+		jsonObject.put("rows",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 * 获取正式党员信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/normalList.do")
+	@ResponseBody
+	public String normalList(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer limit = request.getInt("rows", 10);
+		Integer page = request.getInt("page", 1);
+		Integer orgId=request.getInt("orgId", 0);
+		String name=request.getString("name", null);
+		String number=request.getString("number", null);
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(page);
+		pageInfo.setSize(limit);
+		PersonCondition condition=new PersonCondition();
+		condition.setStatus(PersonStatus.NORMAL.getId());
+		if(orgId!=0){
+			condition.setOrgId(orgId);
+		}
+		if(!StringUtils.isEmpty(name)){
+			condition.setName(name);
+		}
+		if(!StringUtils.isEmpty(number)){
+			condition.setNumber(number);
+		}
+
+		int subCount = personService.countByCondition(condition);
+
+		List<Person> personList=personService.getByCondition(condition,pageInfo);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("page",page);
+		jsonObject.put("total",subCount==0?0:subCount/limit+1);
+		jsonObject.put("records",subCount);
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject subOrgObject=new JSONObject();
+				subOrgObject.put("id", person.getId());
+				List<String> cellList=new ArrayList<String>();
+				cellList.add(String.valueOf(person.getId()));
+				Orgnization orgInfo = orgnizationService.getOrgById(person.getOrgId());
+				cellList.add(orgInfo.getName());
+				cellList.add(person.getName());
+				cellList.add(PersonType.getInstance(person.getType()).getName());
+				cellList.add(person.getNumber());
+				NormalInfo normalInfo = normalService.getByPerson(person);
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}

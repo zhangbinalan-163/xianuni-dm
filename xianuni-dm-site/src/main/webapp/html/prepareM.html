@@ -32,7 +32,7 @@
         <div class="col-sm-9">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>入党申请人信息</h5>
+                    <h5>预备党员信息</h5>
                 </div>
                 <div class="ibox-content">
                     <form role="form" class="form-inline form-group">
@@ -95,19 +95,20 @@
             render: function () {
                 this.$el.jqGrid(
                         {
-                            url: '/xianuni-dm/person/applierList.do',
+                            url: '/xianuni-dm/person/prepareList.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '申请书提交时间','谈话时间'],
+                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '申请书','党总支审批','校党委审批'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
-                                {name: 'org', index: 'org',width: 80, align: "left"},
-                                {name: 'name', index: 'name',width: 60, align: "left"},
-                                {name: 'type', index: 'type',width: 60, align: "left"},
-                                {name: 'number', index: 'number',width: 60, align: "left"},
-                                {name: 'applyTime', index: 'applyTime',width: 60, align: "left"},
-                                {name: 'talkTime', index: 'talkTime',width: 60, align: "left"}
+                                {name: 'org', index: 'org',width: 100},
+                                {name: 'name', index: 'name',width: 60},
+                                {name: 'type', index: 'type',width: 60},
+                                {name: 'number', index: 'number',width: 60},
+                                {name: 'apply', index: 'apply',width: 50},
+                                {name: 'branch', index: 'branch',width: 60},
+                                {name: 'school', index: 'school',width: 60}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],

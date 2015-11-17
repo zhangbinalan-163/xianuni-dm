@@ -9,11 +9,9 @@ import java.util.Date;
  */
 public class PartyDuesPay {
     private int id;
-    private int organizationId; // 组织关系ID
-    private int partyMemberId; // 党员ID
-    private PartyMember member; // 党员
-    private Date payStartDate; // 缴费起始日期
-    private Date payEndDate; // 缴费截止日期
+    private int personId; // 党员ID
+    private Date payStartTime; // 缴费起始日期
+    private Date payEndTime; // 缴费截止日期
     private Date payDate; // 缴费日期
 
     public int getId() {
@@ -24,44 +22,28 @@ public class PartyDuesPay {
         this.id = id;
     }
 
-    public int getOrganizationId() {
-        return organizationId;
+    public int getPersonId() {
+        return personId;
     }
 
-    public void setOrganizationId(int organizationId) {
-        this.organizationId = organizationId;
+    public void setPersonId(int personId) {
+        this.personId = personId;
     }
 
-    public int getPartyMemberId() {
-        return partyMemberId;
+    public Date getPayStartTime() {
+        return payStartTime;
     }
 
-    public void setPartyMemberId(int partyMemberId) {
-        this.partyMemberId = partyMemberId;
+    public void setPayStartTime(Date payStartTime) {
+        this.payStartTime = payStartTime;
     }
 
-    public PartyMember getMember() {
-        return member;
+    public Date getPayEndTime() {
+        return payEndTime;
     }
 
-    public void setMember(PartyMember member) {
-        this.member = member;
-    }
-
-    public Date getPayStartDate() {
-        return payStartDate;
-    }
-
-    public void setPayStartDate(Date payStartDate) {
-        this.payStartDate = payStartDate;
-    }
-
-    public Date getPayEndDate() {
-        return payEndDate;
-    }
-
-    public void setPayEndDate(Date payEndDate) {
-        this.payEndDate = payEndDate;
+    public void setPayEndTime(Date payEndTime) {
+        this.payEndTime = payEndTime;
     }
 
     public Date getPayDate() {

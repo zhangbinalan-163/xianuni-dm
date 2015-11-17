@@ -32,11 +32,12 @@
         <div class="col-sm-9">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>入党申请人信息</h5>
+                    <h5>正式党员信息</h5>
                 </div>
                 <div class="ibox-content">
                     <form role="form" class="form-inline form-group">
                         <div class="form-group">
+                            <input type="text" placeholder="请输入姓名" id="name" class="form-control">
                             <input type="text" placeholder="请输入学工号" id="number" class="form-control">
                         </div>
                         <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
@@ -88,6 +89,7 @@
                 var self = this;
                 $('#searchBtn').on('click', function(){
                     self.fetchData({
+                        name: $('#name').val().trim(),
                         number: $('#number').val().trim()
                     })
                 })
@@ -95,19 +97,17 @@
             render: function () {
                 this.$el.jqGrid(
                         {
-                            url: '/xianuni-dm/person/applierList.do',
+                            url: '/xianuni-dm/person/normalList.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '申请书提交时间','谈话时间'],
+                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
                                 {name: 'type', index: 'type',width: 60, align: "left"},
-                                {name: 'number', index: 'number',width: 60, align: "left"},
-                                {name: 'applyTime', index: 'applyTime',width: 60, align: "left"},
-                                {name: 'talkTime', index: 'talkTime',width: 60, align: "left"}
+                                {name: 'number', index: 'number',width: 60, align: "left"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
