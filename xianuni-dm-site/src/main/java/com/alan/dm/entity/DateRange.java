@@ -11,6 +11,14 @@ public class DateRange {
     private Date startDate; // 开始日期
     private Date endDate; // 结束日期
 
+    public DateRange() {
+    }
+
+    public DateRange(Date startDate, Date endDate) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
     public Date getStartDate() {
         return startDate;
     }

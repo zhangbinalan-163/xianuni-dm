@@ -24,10 +24,10 @@ public class PartyDuesDaoImpl extends BaseDao implements IPartyDuesDao {
     @Override
     public int insert(PartyDuesPay partyDuesPay) throws DMException {
         String sql = "INSERT INTO " + TABLE_NAME + " " +
-                "(organizationId, partyMemberId, payStartDate, payEndDate, payDate, createTime) " +
+                "(partyMemberId, payStartDate, payEndDate, payDate, createTime) " +
                 "VALUES (?,?,?,?,?)";
-        return update(sql, partyDuesPay.getOrganizationId(), partyDuesPay.getPartyMemberId(),
-                partyDuesPay.getPayStartDate(), partyDuesPay.getPayEndDate(), partyDuesPay.getPayDate(),
+        return update(sql, partyDuesPay.getPersonId(),
+                partyDuesPay.getPayStartTime(), partyDuesPay.getPayEndTime(), partyDuesPay.getPayDate(),
                 new Date());
     }
 
@@ -42,7 +42,7 @@ public class PartyDuesDaoImpl extends BaseDao implements IPartyDuesDao {
         String sql = "UPDATE " + TABLE_NAME + " SET " +
                 "payStartDate=?, payEndDate=?, payDate=?, updateTime=? " +
                 "WHERE id=?";
-        update(sql, partyDuesPay.getPayStartDate(), partyDuesPay.getPayEndDate(),
+        update(sql, partyDuesPay.getPayStartTime(), partyDuesPay.getPayEndTime(),
                 partyDuesPay.getPayDate(), new Date(), partyDuesPay.getId());
     }
 

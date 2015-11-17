@@ -40,14 +40,13 @@
         where id=#{id}
     </delete>
 
-
+    <!-- TODO 联表查询 -->
     <select id="getTrainings" resultMap="com.alan.dm.entity.PartyTraining">
         select * from
         <include refid="TABLE" />
         <where>
-            <if test="organizationId != 0">organizationId=#{con.organization}</if>
-            <if test="activityType != 0">AND activityType=#{con.activityType}</if>
-            <if test="theme != null">AND theme=#{con.theme}</if>
+            <if test="type != 0">AND type=#{con.type}</if>
+            <if test="trainingType != 0">AND trainingType=#{con.trainingType}</if>
             <if test="range != null">
                 AND startTime=BETWEEN #{range.startTime} AND #{range.endTime}
             </if>

@@ -6,6 +6,7 @@ import com.alan.dm.dao.IPartTrainingDao;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.PartyTraining;
 import com.alan.dm.entity.condition.TrainingCondition;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.List;
  * @Date: 2015-11-15
  * @author: fan
  */
+@Repository(value = "partyTrainingDao")
 public class PartyTrainingDaoImpl extends BaseDao implements IPartTrainingDao {
     private static final String TABLE_NAME = "party_training";
 

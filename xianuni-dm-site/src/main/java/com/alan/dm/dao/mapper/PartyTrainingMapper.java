@@ -4,6 +4,7 @@ import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.PartyTraining;
 import com.alan.dm.entity.condition.TrainingCondition;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public interface PartyTrainingMapper {
 
     PartyTraining findOne(int id) throws DMException;
 
-    List<PartyTraining> getTrainings(TrainingCondition condition, Page page) throws DMException;
+    List<PartyTraining> getTrainings(@Param(value = "con") TrainingCondition condition,
+                                     @Param(value = "page") Page page) throws DMException;
 
 }
