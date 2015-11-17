@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.MessageMapper">
+
+    <sql id="TABLE">tb_message</sql>
+
+
+    <insert id="insert" parameterType="com.alan.dm.entity.Message" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO <include refid="TABLE"/>
+        (messageTime, type, title, content, createTime)
+        VALUES(#{messageTime},#{type},#{title},#{content},#{createTime})
+    </insert>
+
+    <update id="update" parameterType="com.alan.dm.entity.Message">
+        update
+        <include refid="TABLE" />
+        <set>
+            <if test="messageTime != null">messageTime=#{messageTime},</if>
+            <if test="type != 0">type=#{type},</if>
+            <if test="title != null">title=#{title},</if>
+            <if test="content != null">content=#{content},</if>
+            <if test="updateTime != null">updateTime=#{updateTime}</if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="com.alan.dm.entity.Message">
+        delete from
+        <include refid="TABLE" />
+        where id=#{id}
+    </delete>
+
+    <select id="getMessages" resultMap="com.alan.dm.entity.Message">
+        select * from
+        <include refid="TABLE" />
+        <where>
+            <if test="organizationId != 0">organizationId=#{organization}</if>
+            <if test="title != null">AND title LIKE #{title}</if>
+            <if test="messageTime != null">
+                AND messageTime BETWEEN {range.startTime} AND {range.endTime}
+            </if>
+        </where>
+        ORDER BY messageTime DESC LIMIT #{page.page}, #{page.limit}
+    </select>
+
+    <select id="findOne"  parameterType="int" resultMap="com.alan.dm.entity.Message">
+        select * from
+        <include refid="TABLE" />
+        where id=#{id}
+    </select>
+</mapper>

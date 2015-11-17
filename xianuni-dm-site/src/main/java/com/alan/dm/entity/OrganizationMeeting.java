@@ -15,7 +15,7 @@ public class OrganizationMeeting {
     private Date endTime; // 会议结束时间
     private String location; // 会议地点
     private String theme; // 会议主题
-    private String compere; // 主持人
+    private int compere; // 主持人
     private int shouldNumberOfPeople; // 应到人数
     private int realNumberOfPeople; // 实到人数
     private String content; // 主要内容
@@ -79,11 +79,11 @@ public class OrganizationMeeting {
         this.theme = theme;
     }
 
-    public String getCompere() {
+    public int getCompere() {
         return compere;
     }
 
-    public void setCompere(String compere) {
+    public void setCompere(int compere) {
         this.compere = compere;
     }
 

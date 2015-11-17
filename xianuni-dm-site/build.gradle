@@ -12,6 +12,9 @@ dependencies {
     compile ('commons-dbcp:commons-dbcp:1.4')
     compile ('commons-dbutils:commons-dbutils:1.6')
     compile ('mysql:mysql-connector-java:5.1.36')
+    compile ('org.mybatis:mybatis-spring:1.2.3')
+    compile ('org.springframework:spring-jdbc:4.2.0.RELEASE')
+    compile ('org.mybatis:mybatis:3.3.0')
 
     testCompile ('org.springframework:spring-test:4.2.0.RELEASE')
     testCompile ('junit:junit:4.12')
