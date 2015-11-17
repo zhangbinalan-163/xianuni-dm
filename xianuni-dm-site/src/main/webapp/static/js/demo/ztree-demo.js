@@ -18,9 +18,9 @@ $(function () {
                 page: 1
             }).trigger("reloadGrid");
         },
-        bindEvents: function(){
+        bindEvents: function () {
             var self = this;
-            $('#searchBtn4').on('click', function(){
+            $('#searchBtn4').on('click', function () {
                 self.fetchData({
                     name: $('#searchName4').val().trim(),
                     age: $('#searchAge4').val().trim()
@@ -76,7 +76,7 @@ $(function () {
                     url: "../static/data/treeAll2.json",
                     dataFilter: self.filter,
                     type: "get",
-                    autoParam:["id", "name", "level"]
+                    autoParam: ["id", "name", "level"]
                 },
                 view: {
                     showIcon: false
@@ -102,7 +102,6 @@ $(function () {
         }
 
     }).init();
-
 
 
     /* 基本 示例*/
@@ -158,9 +157,9 @@ $(function () {
                 page: 1
             }).trigger("reloadGrid");
         },
-        bindEvents: function(){
+        bindEvents: function () {
             var self = this;
-            $('#searchBtn').on('click', function(){
+            $('#searchBtn').on('click', function () {
                 self.fetchData({
                     name: $('#searchName').val().trim(),
                     age: $('#searchAge').val().trim()
@@ -198,11 +197,14 @@ $(function () {
     }).init();
     var tree2 = ({
         init: function () {
+            this.rMenu = $("#rMenu");
             $.fn.zTree.init($("#treeDemo2"), this.config());
+            this.zTree = $.fn.zTree.getZTreeObj("treeDemo2");
+            this.bindMenuEvents();
         },
         config: function () {
             var self = this;
-            return this.setting = {
+            return self.setting = {
                 data: {
                     simpleData: {
                         enable: true,
@@ -221,15 +223,93 @@ $(function () {
                     showIcon: false
                 },
                 callback: {
-                    onClick: self.updateTable
+                    onClick: self.updateTable,
+                    onRightClick: self.onRightClick.bind(self),
+                    beforeRename: self.beforeRename.bind(self)
                 }
+            }
+        },
+        onRightClick: function (event, treeId, treeNode) {
+            if (!treeNode && event.target.tagName.toLowerCase() != "button" && $(event.target).parents("a").length == 0) {
+                this.zTree.cancelSelectedNode();
+                this.showRMenu("root", event.clientX, event.clientY);
+            } else if (treeNode && !treeNode.noMenu) {
+                this.zTree.selectNode(treeNode);
+                this.showRMenu("node", event.clientX, event.clientY);
+            }
+        },
+        showRMenu: function (type, x, y) {
+            var self = this;
+            if (type == "root") {
+                self.rMenu.children(".m_del").hide();
+            } else {
+                self.rMenu.children(".m_del").show();
+            }
+            self.rMenu.css({"top": (window.scrollY + y) + "px", "left": x + "px", "visibility": "visible"})
+                .show();
+
+            $("body").bind("mousedown", self.onBodyMouseDown.bind(this));
+        },
+        hideRMenu: function () {
+            var self = this;
+            if (self.rMenu) self.rMenu.css({"visibility": "hidden"});
+            $("body").unbind("mousedown", self.onBodyMouseDown.bind(this));
+        },
+        onBodyMouseDown: function (event) {
+            if (!(event.target.id == "rMenu" || $(event.target).parents("#rMenu").length > 0)) {
+                this.rMenu.css({"visibility": "hidden"});
+            }
+        },
+        bindMenuEvents: function () {
+            var self = this;
+            var zTree = self.zTree;
+            self.rMenu.on('click', '.m_add', function () {
+                self.hideRMenu();
+                // todo 请求服务端
+                var newNode = { name: "newNode 1"};
+                if (zTree.getSelectedNodes()[0]) {
+                    zTree.addNodes(zTree.getSelectedNodes()[0], newNode);
+                } else {
+                    zTree.addNodes(null, newNode);
+                }
+            });
+            self.rMenu.on('click', '.m_del', function () {
+                self.hideRMenu();
+                var nodes = zTree.getSelectedNodes();
+                var removeNode = function () {
+                    // todo 请求服务端
+                    zTree.removeNode(nodes[0]);
+                };
+                if (nodes && nodes.length > 0) {
+                    if (nodes[0].children && nodes[0].children.length > 0) {
+                        var msg = "将删除包含的所有分组？";
+                        if (confirm(msg) == true) {
+                            removeNode();
+                        }
+                    } else {
+                        removeNode();
+                    }
+                }
+            });
+            self.rMenu.on('click', '.m_rename', function () {
+                self.hideRMenu();
+                var nodes = zTree.getSelectedNodes();
+                if (nodes && nodes.length > 0) {
+                    zTree.editName(nodes[0]);
+                }
+            })
+        },
+        beforeRename: function (treeId, treeNode, newName, isCancel) {
+            // todo 请求服务端接口
+            if (!isCancel && treeNode.name != newName) {
+                alert(treeNode.name + '修改为' + newName);
             }
         },
         updateTable: function (event, treeId, treeNode) {
             //if (!treeNode.isParent) {
-                table2.fetchData({
-                    catId: treeNode.id
-                })
+            table2.fetchData({
+                catId: treeNode.id
+            })
             //}
         },
         filter: function (treeId, parentNode, childNodes) {
