@@ -9,6 +9,7 @@ import java.util.Date;
  */
 public class PartyTraining {
     private int id;
+    private int type; // 培训类型 1-党员培训 2-学习记录 3-专题教育
     private String title; // 培训标题
     private int trainingType; // 培训类别
     private int organizationId; // 组织机构ID
@@ -27,6 +28,14 @@ public class PartyTraining {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getTitle() {

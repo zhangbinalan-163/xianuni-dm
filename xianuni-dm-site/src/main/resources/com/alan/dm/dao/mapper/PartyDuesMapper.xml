@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.PartyDuesMapper">
+
+    <sql id="A_TABLE">party_dues_pay</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+        <result property="type" column="personType"/>
+        <result property="status" column="personStatus"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <resultMap id="A_INFO" type="com.alan.dm.entity.PartyDuesPay">
+        <id property="id" column="dueId" />
+        <result property="payStartTime" column="payStartTime"/>
+        <result property="payEndTime" column="payEndTime"/>
+        <result property="payTime" column="payTime"/>
+        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+    </resultMap>
+
+    <select id="getByCondition" resultMap="A_INFO">
+        SELECT
+        A.id as dueId,
+        A.personId as personId,
+        A.payStartTime as payStartTime,
+        A.payEndTime as payEndTime,
+        A.payTime as payTime,
+        P.name as personName,
+        P.number as personNumber,
+        P.type as personType,
+        P.status as personStatus,
+        O.id as orgId,
+        O.name as orgName
+
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
+        <where>
+            <if test="condition.orgId != null">P.orgId=#{condition.orgId}</if>
+            <if test="condition.startDate != null">AND P.payTime <![CDATA[>]]> #{condition.startDate}</if>
+            <if test="condition.endDate != null">AND P.payTime <![CDATA[<]]> #{condition.endDate}</if>
+            <if test="condition.number != null">
+                <bind name="pattern" value="condition.number+ '%'" />
+                AND P.number LIKE #{pattern}
+            </if>
+        </where>
+        ORDER BY dueId DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
+        <where>
+            <if test="condition.orgId != null">P.orgId=#{condition.orgId}</if>
+            <if test="condition.startDate != null">AND P.payTime <![CDATA[>]]> #{condition.startDate}</if>
+            <if test="condition.endDate != null">AND P.payTime <![CDATA[<]]> #{condition.endDate}</if>
+            <if test="condition.number != null">
+                <bind name="pattern" value="condition.number+ '%'" />
+                AND P.number LIKE #{pattern}
+            </if>
+        </where>
+    </select>
+
+</mapper>
