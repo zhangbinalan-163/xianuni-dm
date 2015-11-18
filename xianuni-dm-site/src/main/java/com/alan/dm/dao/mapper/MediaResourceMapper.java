@@ -1,9 +1,9 @@
 package com.alan.dm.dao.mapper;
 
-import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.MediaResource;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.condition.MediaCondition;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,6 +16,10 @@ public interface MediaResourceMapper {
     void delete(MediaResource mediaResource);
     void update(MediaResource mediaResource);
     MediaResource findOne(int id);
-    List<MediaResource> getMedias(MediaCondition condition, Page page);
+
+    List<MediaResource> getByCondition(@Param(value = "condition") MediaCondition condition,
+                                       @Param(value = "page") Page page);
+
+    int countByCondition(@Param(value = "condition") MediaCondition condition);
 
 }

@@ -6,11 +6,11 @@ package com.alan.dm.entity.condition;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class TrainingCondition {
+public class EduTrainingCondition {
     private int type; // 培训类型 1-党员培训 2-学习记录 3-专题教育
     private int trainingType; // 培训类别
-    private int[] organizationIds; // 组织名称ID数组
-    private String organization; // 组织名称
+    private int orgId; // 组织名称ID
+    private String orgName; // 组织名称
 
     public int getType() {
         return type;
@@ -28,21 +28,19 @@ public class TrainingCondition {
         this.trainingType = trainingType;
     }
 
-    public int[] getOrganizationIds() {
-        return organizationIds;
+    public int getOrgId() {
+        return orgId;
     }
 
-    public void setOrganizationIds(int[] organizationIds) {
-        this.organizationIds = organizationIds;
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
     }
 
-    public String getOrganization() {
-        return organization;
+    public String getOrgName() {
+        return orgName;
     }
 
-    public void setOrganization(String organization) {
-        this.organization = organization;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
-
-
 }

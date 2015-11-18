@@ -6,7 +6,7 @@ package com.alan.dm.entity.condition;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class MeetingCondition {
+public class OrgMeetingCondition {
     private int organizationId; // 党支部ID
     private int activityType; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-三会一课
     private String theme; // 主题

@@ -17,5 +17,8 @@ public interface IMediaResourceDao {
     void delete(MediaResource mediaResource) throws DMException;
     void update(MediaResource mediaResource) throws DMException;
     MediaResource findOne(int id) throws DMException;
-    List<MediaResource> getMedias(MediaCondition condition, Page page) throws DMException;
+
+    List<MediaResource> getByCondition(MediaCondition condition, Page page);
+
+    int countByCondition(MediaCondition condition);
 }

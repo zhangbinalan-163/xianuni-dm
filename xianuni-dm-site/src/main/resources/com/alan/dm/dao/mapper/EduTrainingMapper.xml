@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.EduTrainingMapper">
+
+    <sql id="A_TABLE">tb_party_normal</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+    </resultMap>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="A_INFO" type="com.alan.dm.entity.EduTraining">
+        <id property="id" column="id" />
+        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+        <association property="org" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <select id="getByCondition" resultMap="A_INFO">
+        SELECT
+        A.id,
+        A.title,
+        A.trainingType,
+        A.startTime,
+        A.endTime,
+        A.period,
+        A.trainingObject,
+        A.content,
+        A.harvest,
+        A.opinion,
+        P.name as personName,
+        P.number as personNumber,
+        O.name as orgName
+
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        LEFT JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
+        <where>
+            A.type=#{condition.type}
+            <if test="condition.orgId != 0">AND A.orgId=#{condition.orgId}</if>
+            <if test="condition.trainingType != 0">AND A.trainingType=#{condition.trainingType}</if>
+            <if test="condition.orgName != null">
+                <bind name="pattern" value="'%' +condition.orgName+ '%'" />
+                AND P.number LIKE #{pattern}
+            </if>
+        </where>
+        ORDER BY id DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        LEFT JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
+        <where>
+            A.type=#{condition.type}
+            <if test="condition.orgId != 0">AND A.orgId=#{condition.orgId}</if>
+            <if test="condition.trainingType != 0">AND A.trainingType=#{condition.trainingType}</if>
+            <if test="condition.orgName != null">
+                <bind name="pattern" value="'%' +condition.orgName+ '%'" />
+                AND P.number LIKE #{pattern}
+            </if>
+        </where>
+    </select>
+
+</mapper>

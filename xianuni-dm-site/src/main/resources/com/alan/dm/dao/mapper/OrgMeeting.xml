@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.OrgMeetingMapper">
+
+    <sql id="A_TABLE">tb_org_meeting</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+        <result property="type" column="personType"/>
+    </resultMap>
+
+    <resultMap id="A_INFO" type="com.alan.dm.entity.OrgMeeting">
+        <id property="id" column="id" />
+        <association property="compere" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+    </resultMap>
+
+    <select id="getByCondition" resultMap="A_INFO">
+        SELECT
+        A.id,
+        A.activity,
+        A.meetingType,
+        A.startTime,
+        A.endTime,
+        A.location,
+        A.theme,
+        A.shouldNumberOfPeople,
+        A.realNumberOfPeople,
+        A.content,
+        A.attendancePeople,
+        A.absencePeople,
+        A.filePath,
+        A.personId as personId,
+        P.name as personName,
+        P.number as personNumber,
+        P.type as personType
+
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        <where>
+            <if test="condition.organizationId != null">A.orgId=#{condition.organizationId}</if>
+            <if test="condition.activityType != null">AND A.activityType=#{condition.activityType}</if>
+            <if test="condition.theme != null">
+                <bind name="pattern" value="'%' +condition.theme+ '%'" />
+                AND A.theme LIKE #{pattern}
+            </if>
+        </where>
+        ORDER BY meetingId DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        <where>
+            <if test="condition.organizationId != null">A.orgId=#{condition.organizationId}</if>
+            <if test="condition.activityType != null">AND A.activityType=#{condition.activityType}</if>
+            <if test="condition.theme != null">
+                <bind name="pattern" value="'%' +condition.theme+ '%'" />
+                AND A.theme LIKE #{pattern}
+            </if>
+        </where>
+    </select>
+
+    <delete id="delete" parameterType="com.alan.dm.entity.OrgMeeting">
+        DELETE
+        FROM <include refid="A_TABLE"/>
+        WHERE id=#{id}
+    </delete>
+
+</mapper>

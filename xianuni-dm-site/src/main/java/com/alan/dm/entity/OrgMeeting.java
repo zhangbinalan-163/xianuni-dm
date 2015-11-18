@@ -3,25 +3,28 @@ package com.alan.dm.entity;
 import java.util.Date;
 
 /**
- * 会议信息
+ * 组织活动会议信息
  * @Date: 2015-11-14
  * @author: fan
  */
-public class OrganizationMeeting {
+public class OrgMeeting {
     private int id;
     private int activity; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-三会一课
+    private Orgnization orgnization; // 组织关系
     private int meetingType; // 会议类型
     private Date startTime; // 会议开始时间
     private Date endTime; // 会议结束时间
     private String location; // 会议地点
     private String theme; // 会议主题
-    private int compere; // 主持人
+    private Person compere; // 主持人
     private int shouldNumberOfPeople; // 应到人数
     private int realNumberOfPeople; // 实到人数
     private String content; // 主要内容
     private String filePath; // 附件地址
     private String attendancePeople; // 出勤人员
     private String absencePeople; // 缺勤人员
+    private Date createTime; //
+    private Date updateTime; //
 
     public int getId() {
         return id;
@@ -79,11 +82,11 @@ public class OrganizationMeeting {
         this.theme = theme;
     }
 
-    public int getCompere() {
+    public Person getCompere() {
         return compere;
     }
 
-    public void setCompere(int compere) {
+    public void setCompere(Person compere) {
         this.compere = compere;
     }
 
@@ -133,5 +136,29 @@ public class OrganizationMeeting {
 
     public void setAbsencePeople(String absencePeople) {
         this.absencePeople = absencePeople;
+    }
+
+    public Orgnization getOrgnization() {
+        return orgnization;
+    }
+
+    public void setOrgnization(Orgnization orgnization) {
+        this.orgnization = orgnization;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

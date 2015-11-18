@@ -11,7 +11,7 @@ public class MediaCondition {
     private int mediaType; // 媒体类型
     private String mediaName; // 媒体名称
     private Date uploadTime; // 上传日期
-    private boolean forbidden; // 禁用
+    private Boolean forbidden; // 禁用
 
     public int getMediaType() {
         return mediaType;
@@ -37,11 +37,11 @@ public class MediaCondition {
         this.uploadTime = uploadTime;
     }
 
-    public boolean isForbidden() {
+    public Boolean isForbidden() {
         return forbidden;
     }
 
-    public void setForbidden(boolean forbidden) {
+    public void setForbidden(Boolean forbidden) {
         this.forbidden = forbidden;
     }
 }
