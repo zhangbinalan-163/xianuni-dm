@@ -8,13 +8,8 @@ import java.util.Date;
  */
 public class OrgReward {
 
-    private static final int LEVEL_SCHOOLE=0;
-    private static final int LEVEL_CITY=1;
-    private static final int LEVEL_PROVINCE=2;
-    private static final int LEVEL_COUNTRY=3;
-
     private int id;
-    private int orgId;
+    private Orgnization orgnization;
     private String name;
     private String desc;
     private int type;
@@ -27,14 +22,6 @@ public class OrgReward {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(int orgId) {
-        this.orgId = orgId;
     }
 
     public String getName() {
@@ -75,5 +62,13 @@ public class OrgReward {
 
     public void setRewardTime(Date rewardTime) {
         this.rewardTime = rewardTime;
+    }
+
+    public Orgnization getOrgnization() {
+        return orgnization;
+    }
+
+    public void setOrgnization(Orgnization orgnization) {
+        this.orgnization = orgnization;
     }
 }

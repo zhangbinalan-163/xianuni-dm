@@ -8,7 +8,8 @@ import java.util.Date;
  */
 public class IntentionInfo {
     private int id;
-    private int personId;
+    private Person person;
+
     private int trainHour;
     private Date meetTime;
     private String meetContent;
@@ -35,12 +36,12 @@ public class IntentionInfo {
         this.id = id;
     }
 
-    public int getPersonId() {
-        return personId;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPersonId(int personId) {
-        this.personId = personId;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public int getTrainHour() {

@@ -10,7 +10,7 @@ public class Person {
     private int id;
     private String name;
     private int status;//TODO
-    private int orgId;//党组织ID
+    private Orgnization orgnization;//党组织
     private int type;//0-学生 1-教工
     private String number;//学工号
     private String idNumber;//身份证号
@@ -144,11 +144,11 @@ public class Person {
         this.updateTime = updateTime;
     }
 
-    public int getOrgId() {
-        return orgId;
+    public Orgnization getOrgnization() {
+        return orgnization;
     }
 
-    public void setOrgId(int orgId) {
-        this.orgId = orgId;
+    public void setOrgnization(Orgnization orgnization) {
+        this.orgnization = orgnization;
     }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.OrgRewardMapper">
+
+    <sql id="OUT_TABLE">tb_org_reward</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="OUT_INFO" type="com.alan.dm.entity.OrgReward">
+        <id property="id" column="id"/>
+        <result property="name" column="rewardName"/>
+        <result property="rewardTime" column="rewardTime"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <select id="getByCondition" resultMap="OUT_INFO">
+        SELECT O.id AS id,O.orgId AS orgId,P.name AS orgName,O.rewardTime AS rewardTime,O.name as rewardName
+        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
+        ON O.orgId=P.id
+        <where>
+            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.name != null">
+                <bind name="pattern" value="condition.name+ '%'" />
+            </if>
+            <if test="condition.name != null">AND O.name LIKE #{pattern}</if>
+        </where>
+        ORDER BY rewardTime DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
+        ON O.orgId=P.id
+        <where>
+            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.name != null">
+                <bind name="pattern" value="condition.name+ '%'" />
+            </if>
+            <if test="condition.name != null">AND O.name LIKE #{pattern}</if>
+        </where>
+    </select>
+
+</mapper>

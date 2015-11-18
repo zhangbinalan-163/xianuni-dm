@@ -84,7 +84,7 @@
 		<property name="mapperLocations" value="classpath*:com/alan/dm/dao/mapper/*.xml" />
 		<property name="plugins">
 			<array>
-				<bean id="tableSegInterceptor" class="com.alan.dm.dao.mapper.SQLStatisticInterceptor"/>
+				<bean id="tableSegInterceptor" class="com.alan.dm.dao.plugin.SQLStatisticInterceptor"/>
 			</array>
 		</property>
 	</bean>
@@ -94,8 +94,48 @@
 	</bean>
 
 	<!-- mapper定义 -->
-	<bean id="partyMemberMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.alan.dm.dao.mapper.PartyMemberMapper" />
+	<bean id="activitistInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.ActivitistInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="applierInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.ApplierInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="intentionInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.IntentionInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="normalInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.NormalInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="personInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.PersonInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="prepareInfoMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.PrepareInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="adminMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.AdminMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="orgnizationMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.OrgnizationMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="orgRewardMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.OrgRewardMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="partyDuesMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.PartyDuesMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="relationTransferMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.RelationTransferMapper" />
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 </beans>

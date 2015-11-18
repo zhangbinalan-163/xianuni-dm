@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.OrgnizationMapper">
+
+    <sql id="TABLE">tb_orgnization</sql>
+
+    <resultMap id="INFO" type="com.alan.dm.entity.Orgnization"></resultMap>
+
+    <select id="getByParentOrg" resultMap="INFO">
+        SELECT *
+        FROM  <include refid="TABLE" />
+        WHERE parent=#{parentId}
+        ORDER BY createTime DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countSubOrg" resultType="Integer">
+        select count(*)
+        from <include refid="TABLE" />
+        WHERE parent=#{parentId}
+    </select>
+
+    <select id="getById" resultMap="INFO">
+        SELECT *
+        FROM  <include refid="TABLE" />
+        WHERE id=#{id}
+    </select>
+</mapper>

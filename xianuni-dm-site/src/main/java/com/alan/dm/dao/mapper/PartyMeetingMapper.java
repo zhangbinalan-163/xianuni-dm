@@ -13,14 +13,13 @@ import java.util.List;
  * @author: fan
  */
 public interface PartyMeetingMapper {
-    int insert(OrganizationMeeting organizationMeeting) throws DMException;
+    int insert(OrganizationMeeting organizationMeeting);
+    void delete(OrganizationMeeting organizationMeeting);
 
-    void delete(OrganizationMeeting organizationMeeting) throws DMException;
+    void update(OrganizationMeeting organizationMeeting);
 
-    void update(OrganizationMeeting organizationMeeting) throws DMException;
-
-    OrganizationMeeting findOne(int id) throws DMException;
+    OrganizationMeeting findOne(int id);
 
     List<OrganizationMeeting> getMeetings(@Param(value = "con") MeetingCondition condition,
-                                          @Param(value = "page") Page page) throws DMException;
+                                          @Param(value = "page") Page page);
 }

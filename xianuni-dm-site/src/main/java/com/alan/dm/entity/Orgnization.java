@@ -14,7 +14,7 @@ public class Orgnization {
     private int id;//ID
     private String name;//
     private int parent;//直接上级组织的ID
-    private boolean isParent;//是否是有下属组织
+    private int isParent;//是否是有下属组织
     private int status=NORMAL;//状态
     private Date createTime;//创建时间
     private Date updateTime;//更新时间
@@ -85,11 +85,11 @@ public class Orgnization {
         this.parent = parent;
     }
 
-    public boolean isParent() {
+    public int getIsParent() {
         return isParent;
     }
 
-    public void setIsParent(boolean isParent) {
+    public void setIsParent(int isParent) {
         this.isParent = isParent;
     }
 }

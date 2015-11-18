@@ -1,6 +1,5 @@
 package com.alan.dm.entity.condition;
 
-import com.alan.dm.entity.DateRange;
 
 /**
  * 教育培训查询条件
@@ -11,7 +10,6 @@ public class TrainingCondition {
     private int trainingType; // 培训类别
     private int[] organizationIds; // 组织名称ID数组
     private String organization; // 组织名称
-    private DateRange range; // 时间范围
 
     public int getTrainingType() {
         return trainingType;
@@ -37,11 +35,5 @@ public class TrainingCondition {
         this.organization = organization;
     }
 
-    public DateRange getRange() {
-        return range;
-    }
 
-    public void setRange(DateRange range) {
-        this.range = range;
-    }
 }

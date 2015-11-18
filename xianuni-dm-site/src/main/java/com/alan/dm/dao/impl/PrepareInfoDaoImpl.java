@@ -1,24 +1,33 @@
 package com.alan.dm.dao.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.BaseDao;
-import com.alan.dm.dao.IActivitistInfoDao;
-import com.alan.dm.dao.IPrepareDao;
-import com.alan.dm.entity.ActivitistInfo;
-import com.alan.dm.entity.condition.PrepareInfo;
+import com.alan.dm.dao.IPrepareInfoDao;
+import com.alan.dm.dao.mapper.PrepareInfoMapper;
+import com.alan.dm.entity.Page;
+import com.alan.dm.entity.PrepareInfo;
+import com.alan.dm.entity.condition.PersonCondition;
+import com.alan.dm.entity.condition.PrepareInfoCondition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Created by zhangbinalan on 15/11/16.
  */
 @Repository(value = "prepareInfoDao")
-public class PrepareInfoDaoImpl extends BaseDao implements IPrepareDao {
+public class PrepareInfoDaoImpl implements IPrepareInfoDao {
 
-    private static final String tableName="tb_party_probationary";
+    @Autowired
+    private PrepareInfoMapper prepareInfoMapper;
 
     @Override
-    public PrepareInfo getByPerson(int personId) throws DMException {
-        String sql="select * from "+tableName+" where personId=?";
-        return getBean(sql,PrepareInfo.class,personId);
+    public List<PrepareInfo> getByCondition(PrepareInfoCondition condition, Page page) throws DMException {
+        return prepareInfoMapper.getByCondition(condition,page);
+    }
+
+    @Override
+    public int countByCondition(PrepareInfoCondition condition) throws DMException {
+        return prepareInfoMapper.countByCondition(condition);
     }
 }

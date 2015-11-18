@@ -2,7 +2,11 @@ package com.alan.dm.service;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.IntentionInfo;
+import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
+import com.alan.dm.entity.condition.IntentionInfoCondition;
+
+import java.util.List;
 
 /**
  *
@@ -11,9 +15,19 @@ import com.alan.dm.entity.Person;
 public interface IIntentionService {
     /**
      *
-     * @param person
+     * @param condition
+     * @param page
      * @return
      * @throws DMException
      */
-    IntentionInfo getByPerson(Person person) throws DMException;
+    List<IntentionInfo> getByCondition(IntentionInfoCondition condition,Page page) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
+    int countByCondition(IntentionInfoCondition condition)throws DMException;
+
 }

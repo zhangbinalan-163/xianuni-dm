@@ -59,7 +59,7 @@ public class OrgnizationController extends BaseController{
 		Orgnization parentOrg=new Orgnization();
 		parentOrg.setId(1);
 		Page pageInfo=new Page();
-		pageInfo.setCurrent(page);
+		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
 		int subCount = orgnizationService.countSubOrg(parentOrg);
 		List<Orgnization> subOrgList=orgnizationService.getOrgByParent(parentOrg,pageInfo);
@@ -110,18 +110,18 @@ public class OrgnizationController extends BaseController{
 					JSONObject orgObject=new JSONObject();
 					orgObject.put("id",orgnization.getId());
 					orgObject.put("name",orgnization.getName());
-					orgObject.put("isParent",orgnization.isParent());
+					orgObject.put("isParent",orgnization.getIsParent()==1);
 					orgObject.put("open",true);
 					orgObject.put("pId", -1);
 					orgArray.add(orgObject);
-					if(orgnization.isParent()){
+					if(orgnization.getIsParent()==1){
 						List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization,null);
 						if(subOrgList!=null){
 							for(Orgnization subOrg:subOrgList){
 								JSONObject subOrgObject=new JSONObject();
 								subOrgObject.put("id",subOrg.getId());
 								subOrgObject.put("name",subOrg.getName());
-								subOrgObject.put("isParent",subOrg.isParent());
+								subOrgObject.put("isParent",subOrg.getIsParent()==1);
 								subOrgObject.put("pId",orgnization.getId());
 								orgArray.add(subOrgObject);
 							}
@@ -138,7 +138,7 @@ public class OrgnizationController extends BaseController{
 						JSONObject subOrgObject=new JSONObject();
 						subOrgObject.put("id",subOrg.getId());
 						subOrgObject.put("name",subOrg.getName());
-						subOrgObject.put("isParent",subOrg.isParent());
+						subOrgObject.put("isParent",subOrg.getIsParent()==1);
 						subOrgObject.put("pId",orgnization.getId());
 						orgArray.add(subOrgObject);
 					}

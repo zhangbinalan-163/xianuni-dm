@@ -25,13 +25,7 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
 
     @Override
     public List<Orgnization> getOrgByParent(Orgnization parentOrg,Page page) throws DMException {
-        int pageNumber=-1;
-        int size=-1;
-        if(page!=null){
-            pageNumber=page.getCurrent();
-            size=page.getSize();
-        }
-        return orgnizationDao.getByParentOrg(parentOrg.getId(),pageNumber,size);
+        return orgnizationDao.getByParentOrg(parentOrg.getId(),page);
     }
 
     @Override

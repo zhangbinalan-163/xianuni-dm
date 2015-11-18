@@ -15,6 +15,24 @@ import java.util.Date;
 public class TimeUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeUtils.class);
+    /**
+     * 将日期转换成字符串
+     * @param date
+     * @return
+     */
+    public static String convertToTimeString(Date date) {
+        if(date == null) {
+            return "";
+        }
+        try {
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String reportDate = df.format(date);
+            return reportDate;
+        } catch (Exception e) {
+            LOGGER.warn("convert data to string fail");
+            return "";
+        }
+    }
 
     /**
      * 将日期转换成字符串

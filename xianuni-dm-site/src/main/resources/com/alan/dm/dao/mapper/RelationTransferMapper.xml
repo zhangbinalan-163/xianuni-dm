@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.RelationTransferMapper">
+
+    <sql id="A_TABLE">relation_transfer</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+    </resultMap>
+
+    <resultMap id="A_INFO" type="com.alan.dm.entity.RelationTransferInfo">
+        <id property="id" column="transferId" />
+        <result property="transferTime" column="transferTime"/>
+        <result property="transferType" column="transferType"/>
+        <result property="fromOrgId" column="fromOrgId"/>
+        <result property="fromOrgName" column="fromOrgName"/>
+        <result property="toOrgName" column="toOrgName"/>
+        <result property="toOrgId" column="toOrgId"/>
+        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+    </resultMap>
+
+    <select id="getByCondition" resultMap="A_INFO">
+        SELECT
+          A.id as transferId,
+          A.transferType as transferType,
+          A.personId as personId,
+          A.fromOrgId as fromOrgId,
+          A.fromOrgName as fromOrgName,
+          A.toOrgId as toOrgId,
+          A.toOrgName as toOrgName,
+          P.name as personName,
+          P.number as personNumber
+        FROM  <include refid="A_TABLE" /> A
+          LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        <where>
+            <if test="condition.fromOrgId != null">A.fromOrgId=#{condition.fromOrgId}</if>
+            <if test="condition.toOrgId != null">AND A.toOrgId=#{condition.toOrgId}</if>
+            <if test="condition.number != null">
+                <bind name="pattern" value="condition.number+ '%'" />
+                AND P.number LIKE #{pattern}
+            </if>
+            <if test="condition.types != null">
+                AND A.transferType IN
+                <foreach collection="condition.types" item="type" index="index"
+                         open="(" close=")" separator=",">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY transferId DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="A_TABLE" /> A
+        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        <where>
+            <if test="condition.fromOrgId != null">A.fromOrgId=#{condition.fromOrgId}</if>
+            <if test="condition.toOrgId != null">AND A.toOrgId=#{condition.toOrgId}</if>
+            <if test="condition.number != null">
+                <bind name="pattern" value="condition.number+ '%'" />
+                AND P.number LIKE #{pattern}
+            </if>
+            <if test="condition.types != null">
+                AND A.transferType IN
+                <foreach collection="condition.types" item="type" index="index"
+                         open="(" close=")" separator=",">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

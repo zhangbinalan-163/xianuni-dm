@@ -12,14 +12,14 @@ import java.util.List;
  * @author: fan
  */
 public interface PartyTrainingMapper {
-    int insert(PartyTraining trainingInfo) throws DMException;
+    int insert(PartyTraining trainingInfo) ;
 
-    void delete(PartyTraining trainingInfo) throws DMException;
+    void delete(PartyTraining trainingInfo) ;
 
-    void update(PartyTraining trainingInfo) throws DMException;
+    void update(PartyTraining trainingInfo) ;
 
-    PartyTraining findOne(int id) throws DMException;
+    PartyTraining findOne(int id) ;
 
-    List<PartyTraining> getTrainings(TrainingCondition condition, Page page) throws DMException;
+    List<PartyTraining> getTrainings(TrainingCondition condition, Page page) ;
 
 }

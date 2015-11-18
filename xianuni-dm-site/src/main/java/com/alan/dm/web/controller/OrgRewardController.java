@@ -34,18 +34,18 @@ public class OrgRewardController extends BaseController{
 
 	@RequestMapping("/list.do")
 	@ResponseBody
-	public String orglist(HttpServletRequest httpServletRequest) throws Exception {
+	public String rewardList(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer limit = request.getInt("rows", 10);
 		Integer page = request.getInt("page", 1);
-		Integer orgId=request.getInt("orgId",-1);
+		Integer orgId=request.getInt("orgId",0);
 		String name=request.getString("name", null);
 
 		Page pageInfo=new Page();
-		pageInfo.setCurrent(page);
+		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
 		OrgRewardCondition condition=new OrgRewardCondition();
-		if(orgId!=-1){
+		if(orgId!=0){
 			condition.setOrgId(orgId);
 		}
 		if(!StringUtils.isEmpty(name)){
@@ -66,12 +66,11 @@ public class OrgRewardController extends BaseController{
 				subOrgObject.put("id", reward.getId());
 				List<String> cellList=new ArrayList<String>();
 				cellList.add(String.valueOf(reward.getId()));
-				Orgnization orgInfo = orgnizationService.getOrgById(reward.getOrgId());
-				cellList.add(orgInfo.getName());
+				cellList.add(reward.getOrgnization().getName());
 				cellList.add(reward.getName());
+				cellList.add(OrgRewardType.getInstance(reward.getType()).getName());
 				cellList.add(TimeUtils.convertToDateString(reward.getRewardTime()));
 				cellList.add(OrgRewardLevel.getInstance(reward.getLevel()).getName());
-				cellList.add(OrgRewardType.getInstance(reward.getType()).getName());
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}

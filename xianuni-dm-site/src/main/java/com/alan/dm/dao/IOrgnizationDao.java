@@ -2,6 +2,7 @@ package com.alan.dm.dao;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Orgnization;
+import com.alan.dm.entity.Page;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public interface IOrgnizationDao {
      * @return
      * @throws DMException
      */
-    List<Orgnization> getByParentOrg(int parentId, int page, int size) throws DMException;
+    List<Orgnization> getByParentOrg(int parentId,Page page) throws DMException;
 
     /**
      * 查询党组织信息

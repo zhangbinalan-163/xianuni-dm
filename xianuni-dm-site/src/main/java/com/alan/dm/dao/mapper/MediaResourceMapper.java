@@ -12,10 +12,10 @@ import java.util.List;
  * @author: fan
  */
 public interface MediaResourceMapper {
-    int insert(MediaResource mediaResource) throws DMException;
-    void delete(MediaResource mediaResource) throws DMException;
-    void update(MediaResource mediaResource) throws DMException;
-    MediaResource findOne(int id) throws DMException;
-    List<MediaResource> getMedias(MediaCondition condition, Page page) throws DMException;
+    int insert(MediaResource mediaResource);
+    void delete(MediaResource mediaResource);
+    void update(MediaResource mediaResource);
+    MediaResource findOne(int id);
+    List<MediaResource> getMedias(MediaCondition condition, Page page);
 
 }

@@ -8,7 +8,8 @@ import java.util.Date;
  */
 public class ActivitistInfo {
     private int id;
-    private int personId;
+    private Person person;
+
     private Date evaluationTime;
     private String evaluationContent;
     private Date meetTime;
@@ -25,12 +26,12 @@ public class ActivitistInfo {
         this.id = id;
     }
 
-    public int getPersonId() {
-        return personId;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPersonId(int personId) {
-        this.personId = personId;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public Date getEvaluationTime() {

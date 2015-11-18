@@ -1,6 +1,5 @@
 package com.alan.dm.entity.condition;
 
-import com.alan.dm.entity.DateRange;
 
 /**
  * 通知查询条件
@@ -8,17 +7,9 @@ import com.alan.dm.entity.DateRange;
  * @author: fan
  */
 public class MessageCondition {
-    private DateRange range; // 时间范围
     private String title; // 标题
     private int organizationId; // 党支部ID
 
-    public DateRange getRange() {
-        return range;
-    }
-
-    public void setRange(DateRange range) {
-        this.range = range;
-    }
 
     public String getTitle() {
         return title;

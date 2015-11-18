@@ -1,8 +1,8 @@
 package com.alan.dm.entity.condition;
 
-import com.alan.dm.entity.DateRange;
 
 import java.util.Date;
+
 
 /**
  * 党费管理查询
@@ -10,31 +10,40 @@ import java.util.Date;
  * @author: fan
  */
 public class PartyDuesCondition {
-    private DateRange range; // 缴费日期
-    private int[] partyMemberIds; // 党员ID列表
-    private String name; // 党员姓名
+    private Date startDate; // 开始日期
+    private Date endDate; // 结束日期
+    private Integer orgId;
+    private String number;
 
-    public DateRange getRange() {
-        return range;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setRange(DateRange range) {
-        this.range = range;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public int[] getPartyMemberIds() {
-        return partyMemberIds;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setPartyMemberIds(int[] partyMemberIds) {
-        this.partyMemberIds = partyMemberIds;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
-    public String getName() {
-        return name;
+    public Integer getOrgId() {
+        return orgId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setOrgId(Integer orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 }

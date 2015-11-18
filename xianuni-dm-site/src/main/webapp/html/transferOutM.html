@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../static/css/plugins/jsTree/style.min.css" rel="stylesheet">
+    <!-- jqgrid-->
+    <link href="../static/css/plugins/jqgrid/ui.jqgrid.css?0820" rel="stylesheet">
+    <!-- zTree -->
+    <link href="../static/css/plugins/zTree/metroStyle/metroStyle.css" rel="stylesheet">
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>党组织结构</h5>
+                </div>
+                <div class="ibox-content">
+                    <ul id="orgTree" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>转出历史</h5>
+                </div>
+                <div class="ibox-content">
+                    <form role="form" class="form-inline form-group">
+                        <div class="form-group">
+                            <input type="text" placeholder="请输入学工号" id="number" class="form-control">
+                        </div>
+                        <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
+                    </form>
+                    <div class="jqGrid_wrapper">
+                        <table id="list"></table>
+                        <div id="pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../static/js/content.js?v=1.0.0"></script>
+
+<!-- jqGrid -->
+<script src="../static/js/plugins/jqgrid/i18n/grid.locale-cn.js?0820"></script>
+<script src="../static/js/plugins/jqgrid/jquery.jqGrid.min.js?0820"></script>
+
+<!-- zTree plugin javascript -->
+<script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        var table = ({
+            init: function () {
+                this.$el = $("#list");
+                this.orgId = '0';
+                this.render();
+                this.bindEvents();
+                return this
+            },
+            fetchData: function (data) {
+                this.orgId = data.orgId || this.orgId;
+                this.$el.jqGrid("setGridParam", {
+                    postData: data,
+                    page: 1
+                }).trigger("reloadGrid");
+            },
+            bindEvents: function(){
+                var self = this;
+                $('#searchBtn').on('click', function(){
+                    self.fetchData({
+                        number: $('#number').val().trim()
+                    })
+                })
+            },
+            render: function () {
+                this.$el.jqGrid(
+                        {
+                            url: '/xianuni-dm/relation/transfer/outList.do',
+                            datatype: "json",
+                            autowidth: true,
+                            shrinkToFit: true,
+                            colNames: ['ID', '姓名', '学工号','转出组织','转入组织', '操作时间','操作类型'],
+                            colModel: [
+                                {name: 'id', index: 'id',hidden:true},
+                                {name: 'name', index: 'name',width: 60, align: "left"},
+                                {name: 'number', index: 'number',width: 60, align: "left"},
+                                {name: 'fromOrg', index: 'fromOrg',width: 60, align: "left"},
+                                {name: 'toOrg', index: 'toOrg',width: 60, align: "left"},
+                                {name: 'time', index: 'time',width: 60, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left"}
+                            ],
+                            rowNum: 10,
+                            rowList: [10, 20, 30],
+                            pager: '#pager',
+                            sortname: 'id',
+                            mtype: "get",
+                            height: 400,
+                            viewrecords: true
+                        })
+                        .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
+            }
+        }).init();
+
+        var tree = ({
+            init: function () {
+                $.fn.zTree.init($("#orgTree"), this.config());
+            },
+            config: function () {
+                var self = this;
+                return this.setting = {
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: 0
+                        }
+                    },
+                    async: {
+                        enable: true,
+                        url: "/xianuni-dm/orgnization/orgtree.do",
+                        dataFilter: self.filter,
+                        type: "get",
+                        autoParam:["id", "name", "level"]
+                    },
+                    view: {
+                        showIcon: false
+                    },
+                    callback: {
+                        onClick: self.updateTable
+                    }
+                }
+            },
+            updateTable: function (event, treeId, treeNode) {
+                table.fetchData({
+                    orgId: treeNode.id
+                })
+            },
+            filter: function (treeId, parentNode, childNodes) {
+//                if (!childNodes) return null;
+//                for (var i = 0, l = childNodes.length; i < l; i++) {
+//                    childNodes[i].name = 'Test>' + childNodes[i].name;
+//                }
+                return childNodes;
+            }
+
+        }).init();
+
+        // Add responsive to jqGrid
+        $(window).bind('resize', function () {
+            var width = $('.jqGrid_wrapper').width();
+            $('#list').setGridWidth(width);
+        });
+    });
+</script>
+</body>
+</html>

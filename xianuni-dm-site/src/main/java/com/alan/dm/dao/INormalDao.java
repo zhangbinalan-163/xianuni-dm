@@ -1,8 +1,11 @@
 package com.alan.dm.dao;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.entity.IntentionInfo;
 import com.alan.dm.entity.NormalInfo;
+import com.alan.dm.entity.Page;
+import com.alan.dm.entity.condition.NormalInfoCondition;
+
+import java.util.List;
 
 /**
  *
@@ -11,9 +14,18 @@ import com.alan.dm.entity.NormalInfo;
 public interface INormalDao {
     /**
      *
-     * @param personId
+     * @param condition
+     * @param page
      * @return
      * @throws DMException
      */
-    NormalInfo getByPerson(int personId) throws DMException;
+    List<NormalInfo> getByCondition(NormalInfoCondition condition,Page page) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
+    int countByCondition(NormalInfoCondition condition)throws DMException;
 }

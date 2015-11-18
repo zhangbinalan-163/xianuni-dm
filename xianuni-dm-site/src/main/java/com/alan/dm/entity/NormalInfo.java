@@ -8,11 +8,20 @@ import java.util.Date;
  */
 public class NormalInfo {
     private int id;
+    private Person person;
     private int applyTime;
     private String approval;
     private String branchApproval;
     private String schoolApproval;
     private Date createTime;
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
 
     public int getId() {
         return id;

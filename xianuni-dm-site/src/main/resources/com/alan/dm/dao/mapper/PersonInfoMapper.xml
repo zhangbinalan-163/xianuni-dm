@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.PersonInfoMapper">
+
+    <sql id="OUT_TABLE">tb_person</sql>
+    <sql id="TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="OUT_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="id"/>
+        <result property="name" column="personName"/>
+        <result property="createTime" column="createTime"/>
+        <result property="number" column="number"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <select id="getByCondition" resultMap="OUT_INFO">
+        SELECT
+          O.id AS id,
+          P.name AS orgName,
+          P.id AS orgId,
+          O.name AS personName,
+          O.createTime AS createTime,
+          O.number AS number
+        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
+        ON O.orgId=P.id
+        <where>
+            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+            </if>
+            <if test="condition.number != null">AND O.number LIKE #{patternNumber}</if>
+            <if test="condition.name != null">
+                <bind name="patternName" value="condition.name+ '%'" />
+            </if>
+            <if test="condition.name != null">AND O.name LIKE #{patternName}</if>
+        </where>
+        ORDER BY id desc
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        select count(*)
+        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
+        ON O.orgId=P.id
+        <where>
+            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+            </if>
+            <if test="condition.number != null">AND O.number LIKE #{patternNumber}</if>
+            <if test="condition.name != null">
+                <bind name="patternName" value="condition.name+ '%'" />
+            </if>
+            <if test="condition.name != null">AND O.name LIKE #{patternName}</if>
+        </where>
+    </select>
+
+</mapper>
