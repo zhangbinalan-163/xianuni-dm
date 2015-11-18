@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -29,9 +30,42 @@ public class OrgRewardController extends BaseController{
 	@Resource(name = "orgRewardService")
 	private IOrgRewardService orgRewardService;
 
-	@Resource(name = "orgnizationService")
-	private IOrgnizationService orgnizationService;
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/delete.do")
+	@ResponseBody
+	public String delete(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		String[] ids=request.getStringArray("id",",");
+		List<Integer> idList = new ArrayList<Integer>();
+		for(String id:ids){
+			idList.add(Integer.parseInt(id));
+		}
+		try{
+			orgRewardService.deleteBatch(idList);
+		}catch (Exception e){
+			LOGGER.error("delete reward list fail,ids={}",request.getString("id"));
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("status", false);
+			jsonObject.put("msg","删除失败");
+			return JsonUtils.fromObject(jsonObject);
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("status",true);
+		return JsonUtils.fromObject(jsonObject);
 
+	}
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/list.do")
 	@ResponseBody
 	public String rewardList(HttpServletRequest httpServletRequest) throws Exception {

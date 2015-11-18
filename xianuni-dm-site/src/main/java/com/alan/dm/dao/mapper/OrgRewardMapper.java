@@ -25,4 +25,10 @@ public interface OrgRewardMapper {
      * @throws DMException
      */
     int countByCondition(@Param(value="condition")OrgRewardCondition condition);
+
+    /**
+     *
+     * @param id
+     */
+    void delete(@Param(value="id")int id);
 }

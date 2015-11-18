@@ -39,7 +39,9 @@
                         <div class="form-group">
                             <input type="text" placeholder="请输入奖惩标题" id="name" class="form-control">
                         </div>
-                        <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
+                        <button id="searchBtn" class="btn btn-primary" type="button">搜索</button>
+                        <button id="addButn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span class="bold">新增</span>
+                        </button>
                     </form>
                     <div class="jqGrid_wrapper">
                         <table id="list"></table>
@@ -73,12 +75,14 @@
             init: function () {
                 this.$el = $("#list");
                 this.orgId = '0';
+                this.orgName='';
                 this.render();
                 this.bindEvents();
                 return this
             },
             fetchData: function (data) {
                 this.orgId = data.orgId || this.orgId;
+                this.orgName = data.orgName || this.orgName;
                 this.$el.jqGrid("setGridParam", {
                     postData: data,
                     page: 1
@@ -114,9 +118,25 @@
                             sortname: 'id',
                             mtype: "get",
                             height: 400,
-                            viewrecords: true
+                            viewrecords: true,
+                            multiselect: true
                         })
-                        .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
+                        .jqGrid('navGrid', '#pager',
+                            { edit: false, add: false, del: true,deltitle:'删除',search:false},
+                            {},
+                            {},
+                            {   reloadAfterSubmit:true,
+                                url: '/xianuni-dm/reward/delete.do',
+                                afterSubmit : function(response, postdata) {
+                                    var json = eval('('+response.responseText+')');
+                                    if(json.status){
+                                        return [true,''];
+                                    }else{
+                                        return [false,json.msg];
+                                    }
+                                }
+                            }
+                        );
             }
         }).init();
 
@@ -152,14 +172,11 @@
             },
             updateTable: function (event, treeId, treeNode) {
                 table.fetchData({
-                    orgId: treeNode.id
+                    orgId: treeNode.id,
+                    orgName:treeNode.name
                 })
             },
             filter: function (treeId, parentNode, childNodes) {
-//                if (!childNodes) return null;
-//                for (var i = 0, l = childNodes.length; i < l; i++) {
-//                    childNodes[i].name = 'Test>' + childNodes[i].name;
-//                }
                 return childNodes;
             }
 

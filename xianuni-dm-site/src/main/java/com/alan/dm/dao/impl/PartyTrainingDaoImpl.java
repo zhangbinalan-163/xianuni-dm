@@ -5,6 +5,7 @@ import com.alan.dm.dao.IPartTrainingDao;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.PartyTraining;
 import com.alan.dm.entity.condition.TrainingCondition;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @Date: 2015-11-15
  * @author: fan
  */
+@Repository(value = "partyTrainingDao")
 public class PartyTrainingDaoImpl implements IPartTrainingDao {
     @Override
     public int insert(PartyTraining trainingInfo) throws DMException {

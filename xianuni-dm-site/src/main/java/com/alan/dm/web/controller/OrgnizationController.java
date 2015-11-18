@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,40 +51,24 @@ public class OrgnizationController extends BaseController{
 		return JsonUtils.fromObject(orgObject);
 	}
 
-	@RequestMapping("/orglist.do")
+	@RequestMapping("/info.do")
 	@ResponseBody
 	public String orglist(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		Integer limit = request.getInt("rows", 10);
-		Integer page = request.getInt("page", 1);
-		Orgnization parentOrg=new Orgnization();
-		parentOrg.setId(1);
-		Page pageInfo=new Page();
-		pageInfo.setCurrent((page-1)*limit);
-		pageInfo.setSize(limit);
-		int subCount = orgnizationService.countSubOrg(parentOrg);
-		List<Orgnization> subOrgList=orgnizationService.getOrgByParent(parentOrg,pageInfo);
+		Integer orgId = request.getInt("orgId", 0);
+
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("page",page);
-		jsonObject.put("total",subCount==0?0:subCount/limit+1);
-		jsonObject.put("records",subCount);
-		JSONArray rowsArray=new JSONArray();
-		if(subOrgList!=null){
-			for(Orgnization subOrg:subOrgList){
-				JSONObject subOrgObject=new JSONObject();
-				subOrgObject.put("id", subOrg.getId());
-				List<String> cellList=new ArrayList<String>();
-				cellList.add(String.valueOf(subOrg.getId()));
-				cellList.add(subOrg.getName());
-				cellList.add(TimeUtils.convertToDateString(subOrg.getCreateTime()));
-				cellList.add(TimeUtils.convertToDateString(subOrg.getUpdateTime()));
-				cellList.add(TimeUtils.convertToDateString(subOrg.getElectionTime()));
-				cellList.add(subOrg.getDesc());
-				subOrgObject.put("cell", cellList);
-				rowsArray.add(subOrgObject);
-			}
+		jsonObject.put("success",true);
+		if(orgnization!=null){
+			JSONObject dataObject=new JSONObject();
+			dataObject.put("name",orgnization.getName());
+			dataObject.put("createTime", TimeUtils.convertToTimeString(orgnization.getCreateTime()));
+			dataObject.put("updateTime", TimeUtils.convertToTimeString(orgnization.getUpdateTime()));
+			dataObject.put("hasSub", orgnization.getIsParent()!=0?"是":"否");
+			dataObject.put("orgId", orgnization.getId());
+			jsonObject.put("data",dataObject);
 		}
-		jsonObject.put("rows",rowsArray);
 		return JsonUtils.fromObject(jsonObject);
 	}
 
@@ -93,14 +78,17 @@ public class OrgnizationController extends BaseController{
 	public String orgtree(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer parentId=request.getInt("id", -1);
+		boolean withAll = request.getBoolean("withAll",true);
 		JSONArray orgArray=new JSONArray();
 		if(parentId==-1){
-			JSONObject allObject=new JSONObject();
-			allObject.put("id",0);
-			allObject.put("name","全部党组织");
-			allObject.put("isParent",false);
-			allObject.put("pId", -1);
-			orgArray.add(allObject);
+			if(withAll){
+				JSONObject allObject=new JSONObject();
+				allObject.put("id",0);
+				allObject.put("name","全部党组织");
+				allObject.put("isParent",true);
+				allObject.put("pId", -1);
+				orgArray.add(allObject);
+			}
 			//最外层
 			Orgnization parentOrg=new Orgnization();
 			parentOrg.setId(-1);
@@ -132,7 +120,7 @@ public class OrgnizationController extends BaseController{
 		}else{
 			Orgnization orgnization=orgnizationService.getOrgById(parentId);
 			if(orgnization!=null){
-				List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization,null);
+				List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, null);
 				if(subOrgList!=null){
 					for(Orgnization subOrg:subOrgList){
 						JSONObject subOrgObject=new JSONObject();

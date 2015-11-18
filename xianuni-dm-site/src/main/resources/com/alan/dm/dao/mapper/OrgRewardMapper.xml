@@ -49,4 +49,9 @@
         </where>
     </select>
 
+    <delete id="delete">
+        DELETE
+        FROM <include refid="OUT_TABLE"/>
+        WHERE id = #{id};
+    </delete>
 </mapper>

@@ -22,6 +22,7 @@ import java.util.List;
  */
 @Service(value = "trainingService")
 public class TrainingServiceImpl implements ITrainingService {
+
     @Resource(name = "partyTrainingDao")
     private IPartTrainingDao partTrainingDao;
 

@@ -1,8 +1,6 @@
 package com.alan.dm.web.controller;
 
 import com.alan.dm.common.util.JsonUtils;
-import com.alan.dm.entity.DateRange;
-import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.PartyTraining;
 import com.alan.dm.entity.condition.TrainingCondition;
@@ -63,7 +61,6 @@ public class TrainingController extends BaseController {
             trainingService.modifyTraining(training);
         }
 
-
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("statusCode", 200);
         jsonObject.put("message", "success");
@@ -112,7 +109,7 @@ public class TrainingController extends BaseController {
         Date startTime = request.getDate("startTime");
         Date endTime = request.getDate("endTime");
         if(startTime != null && endTime != null) {
-            condition.setRange(new DateRange(startTime, endTime));
+            //condition.setRange(new DateRange(startTime, endTime));
         }
         condition.setOrganization(request.getString("organization", null));
 
@@ -121,7 +118,7 @@ public class TrainingController extends BaseController {
 
         List<JSONObject> list = null;
         if(trainingList != null && !trainingList.isEmpty()) {
-            list = new ArrayList<>();
+            list = new ArrayList<JSONObject>();
             for(PartyTraining training : trainingList) {
                 JSONObject object = new JSONObject();
                 object.put("title", training.getTitle());

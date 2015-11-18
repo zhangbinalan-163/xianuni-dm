@@ -99,6 +99,10 @@ public class Request {
         }
         return str;
     }
+    public String[] getStringArray(String key,String split) throws DMException {
+        String val=getString(key);
+        return val.split(split);
+    }
 
     public String[] getStringArray(String key) throws DMException {
         String[] arr = httpServletRequest.getParameterValues(key);
@@ -138,5 +142,12 @@ public class Request {
 
     public boolean getBoolean(String key) {
         return "true".equals(httpServletRequest.getParameter(key));
+    }
+    public boolean getBoolean(String key,boolean defV) {
+        String str = httpServletRequest.getParameter(key);
+        if (StringUtils.isEmpty(str)) {
+            return defV;
+        }
+        return getBoolean(key);
     }
 }

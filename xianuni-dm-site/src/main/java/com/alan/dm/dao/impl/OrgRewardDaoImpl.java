@@ -31,7 +31,7 @@ public class OrgRewardDaoImpl implements IOrgRewardDao{
 
     @Override
     public void delete(OrgReward orgReward) throws DMException {
-
+        orgRewardMapper.delete(orgReward.getId());
     }
 
     @Override

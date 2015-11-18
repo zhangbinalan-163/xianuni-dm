@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../static/css/plugins/jsTree/style.min.css" rel="stylesheet">
+    <link href="../static/css/plugins/iCheck/custom.css" rel="stylesheet">
+
+    <link href="../static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+
+    <!-- zTree -->
+    <link href="../static/css/plugins/zTree/metroStyle/metroStyle.css" rel="stylesheet">
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>党组织结构</h5>
+                </div>
+                <div class="ibox-content">
+                    <ul id="orgTree" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>党组织信息</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="get" class="form-horizontal">
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><small>党组织名称</small></label>
+                            <div class="col-sm-5">
+                                <input id="orgName" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" id="data_1">
+                            <label class="col-sm-2 control-label"><small>创建时间</small></label>
+                            <div class="col-sm-5 input-group date">
+                                <input id="createTime" type="text" class="form-control">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><small>修改时间</small></label>
+                            <div class="col-sm-5">
+                                <input id="updateTime" type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><small>是否有下属组织</small></label>
+                            <div class="col-sm-5">
+                                <p id="hasSub" class="form-control-static"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-5">
+                                <button id="updateBtn" class="btn btn-primary" type="button">修改</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../static/js/content.js?v=1.0.0"></script>
+<!-- iCheck -->
+<script src="../static/js/plugins/iCheck/icheck.min.js"></script>
+<!-- zTree plugin javascript -->
+<script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
+<!-- Data picker -->
+<script src="../static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        $('#data_1 .input-group.date').datepicker({
+            todayBtn: "linked",
+            keyboardNavigation: false,
+            forceParse: false,
+            calendarWeeks: true,
+            autoclose: true
+        });
+
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green'
+        });
+
+        var orgInfo = ({
+            init: function () {
+                this.orgId = '0';
+                this.bindEvents();
+                return this
+            },
+            fetchData: function (data) {
+                this.orgId = data.orgId;
+                $.ajax( {
+                    url:'/xianuni-dm/orgnization/info.do',
+                    data:{
+                        orgId : this.orgId
+                    },
+                    type:'get',
+                    cache:false,
+                    dataType:'json',
+                    success:function(data) {
+                        if(data.success){
+                            $('#orgName').val(data.data.name);
+                            $('#createTime').val(data.data.createTime);
+                            $('#updateTime').val(data.data.updateTime);
+                            $('#hasSub').html(data.data.hasSub);
+                        }else{
+                            alert("异常！");
+                        }
+                    },
+                    error : function() {
+                        alert("异常！");
+                    }
+                });
+            },
+            updateData: function (data) {
+                this.orgId = data.orgId || this.orgId;
+
+            },
+            bindEvents: function(){
+                var self = this;
+                $('#updateBtn').on('click', function(){
+                    self.updateData({
+                        number: $('#number').val().trim()
+                    })
+                })
+            }
+        }).init();
+
+        var tree = ({
+            init: function () {
+                $.fn.zTree.init($("#orgTree"), this.config());
+            },
+            config: function () {
+                var self = this;
+                return this.setting = {
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: 0
+                        }
+                    },
+                    async: {
+                        enable: true,
+                        url: "/xianuni-dm/orgnization/orgtree.do?withAll=false",
+                        dataFilter: self.filter,
+                        type: "get",
+                        autoParam:["id", "name", "level"]
+                    },
+                    view: {
+                        showIcon: false
+                    },
+                    callback: {
+                        onClick: self.updateTable
+                    }
+                }
+            },
+            updateTable: function (event, treeId, treeNode) {
+                orgInfo.fetchData({
+                    orgId: treeNode.id
+                })
+            },
+            filter: function (treeId, parentNode, childNodes) {
+                return childNodes;
+            }
+        }).init();
+    });
+
+</script>
+</body>
+</html>

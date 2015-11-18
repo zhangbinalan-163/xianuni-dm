@@ -16,7 +16,6 @@ import java.util.List;
  */
 @Service(value = "orgRewardService")
 public class OrgRewardServiceImpl implements IOrgRewardService{
-
     @Resource(name = "orgRewardDao")
     private IOrgRewardDao orgRewardDao;
 
@@ -33,5 +32,14 @@ public class OrgRewardServiceImpl implements IOrgRewardService{
     @Override
     public int countByCondition(OrgRewardCondition condition) throws DMException {
         return orgRewardDao.countByCondition(condition);
+    }
+
+    @Override
+    public void deleteBatch(List<Integer> idList) throws DMException {
+        for(Integer id:idList){
+            OrgReward  reward=new OrgReward();
+            reward.setId(id);
+            orgRewardDao.delete(reward);
+        }
     }
 }
