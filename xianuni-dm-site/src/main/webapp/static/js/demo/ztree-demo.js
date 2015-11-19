@@ -159,12 +159,50 @@ $(function () {
         },
         bindEvents: function () {
             var self = this;
+            // 搜索
             $('#searchBtn').on('click', function () {
                 self.fetchData({
                     name: $('#searchName').val().trim(),
                     age: $('#searchAge').val().trim()
                 })
-            })
+            });
+            // 新增 todo
+            $('#addBtn').on('click', function () {
+                // 选中的节点
+                var node = tree2.zTree && tree2.zTree.getSelectedNodes()[0];
+                if(!node){
+                    layer.alert('请选择一个节点', {icon: 6});
+                    return
+                }
+                layer.open({
+                    type: 1, //page层
+                    area: ['500px', '300px'],
+                    title: '在节点<strong>' + node.name +'</strong>下创建新记录',
+                    shade: 0.6, //遮罩透明度
+                    shift: 5, //0-6的动画形式，-1不开启
+                    btn: ['创建', '取消'],
+                    content: '<form class="form-horizontal" style="padding: 30px">' +
+                        '<div class="form-group">' +
+                        '<label class="control-label col-sm-2">名称</label>' +
+                        '<div class="col-sm-10"><input type="text" id="p_name" class="form-control"/></div>' +
+                        '</div>' +
+                        '</form>',
+                    yes: function(index){
+                        // todo 读取表单信息 调用创建接口
+                        var name = $('#p_name').val().trim();
+                        // todo 创建成功后 更新树 或者单独更新或加入节点
+                        // tree2.refresh();
+                        if(!name){
+                            return
+                        }
+                        layer.alert('创建成功>' + name, {icon: 1});
+                        layer.close(index);
+                    },
+                    no: function(index){
+                        layer.close(index);
+                    }
+                });
+            });
         },
         render: function () {
 
@@ -201,6 +239,7 @@ $(function () {
             $.fn.zTree.init($("#treeDemo2"), this.config());
             this.zTree = $.fn.zTree.getZTreeObj("treeDemo2");
             this.bindMenuEvents();
+            return this;
         },
         config: function () {
             var self = this;
