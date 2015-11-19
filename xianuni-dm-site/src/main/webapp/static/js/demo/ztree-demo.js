@@ -302,34 +302,31 @@ $(function () {
         bindMenuEvents: function () {
             var self = this;
             var zTree = self.zTree;
+            $('#J_addNode').on('click', function(e){
+                e.preventDefault();
+                self.actionAdd();
+            });
+            // 新建按钮
             self.rMenu.on('click', '.m_add', function () {
                 self.hideRMenu();
-                // todo 请求服务端
-                var newNode = { name: "newNode 1"};
-                if (zTree.getSelectedNodes()[0]) {
-                    zTree.addNodes(zTree.getSelectedNodes()[0], newNode);
-                } else {
-                    zTree.addNodes(null, newNode);
-                }
+                self.actionAdd();
             });
+            // 删除按钮
             self.rMenu.on('click', '.m_del', function () {
                 self.hideRMenu();
                 var nodes = zTree.getSelectedNodes();
-                var removeNode = function () {
-                    // todo 请求服务端
-                    zTree.removeNode(nodes[0]);
-                };
                 if (nodes && nodes.length > 0) {
                     if (nodes[0].children && nodes[0].children.length > 0) {
                         var msg = "将删除包含的所有分组？";
                         if (confirm(msg) == true) {
-                            removeNode();
+                            self.actionRemove(nodes[0]);
                         }
                     } else {
-                        removeNode();
+                        self.actionRemove(nodes[0]);
                     }
                 }
             });
+            // 重命名按钮
             self.rMenu.on('click', '.m_rename', function () {
                 self.hideRMenu();
                 var nodes = zTree.getSelectedNodes();
@@ -339,17 +336,16 @@ $(function () {
             })
         },
         beforeRename: function (treeId, treeNode, newName, isCancel) {
-            // todo 请求服务端接口
+
             if (!isCancel && treeNode.name != newName) {
-                alert(treeNode.name + '修改为' + newName);
+                this.actionUpdate(name);
             }
         },
+        // 刷新表格数据
         updateTable: function (event, treeId, treeNode) {
-            //if (!treeNode.isParent) {
             table2.fetchData({
                 catId: treeNode.id
-            })
-            //}
+            });
         },
         filter: function (treeId, parentNode, childNodes) {
             if (!childNodes) return null;
@@ -358,6 +354,56 @@ $(function () {
                 childNodes[i].open = true;
             }
             return childNodes;
+        },
+        // 删除节点
+        actionRemove: function(node){
+            // todo 请求服务端接口
+            zTree.removeNode(node);
+
+        },
+        // 增加节点
+        actionAdd: function(node){
+            var zTree = this.zTree;
+            var node = zTree.getSelectedNodes()[0];
+            var title = node ? '在父节点' + node.name + '下创建子节点' : '创建根节点';
+            layer.open({
+                type: 1, //page层
+                area: ['360px', '160px'],
+                title: title,
+                shade: 0.6, //遮罩透明度
+                shift: 5, //0-6的动画形式，-1不开启
+                btn: ['添加', '取消'],
+                content: '<form class="form-horizontal" style="padding: 15px 15px 0">' +
+                    '<div class="form-group">' +
+                    '<label class="control-label col-sm-3">名称</label>' +
+                    '<div class="col-sm-9"><input type="text" id="p_name" class="form-control"/></div>' +
+                    '</div>' +
+                    '</form>',
+                yes: function(index){
+                    // todo 读取表单信息 调用创建接口 获取新建节点的id
+                    var name = $('#p_name').val().trim();
+                    if(!name){
+                        return
+                    }
+                    var newNode = { name: name , id: '服务器返回todo'};
+                    if (node) {
+                        zTree.addNodes(node, newNode);
+                    } else {
+                        zTree.addNodes(null, newNode);
+                    }
+                    // 更新节点
+                    layer.close(index);
+                },
+                no: function(index){
+                    layer.close(index);
+                }
+            });
+        },
+        // 更新节点
+        actionUpdate: function(node, newName){
+            var id = node.id;
+            // todo 请求服务端接口
+            alert('修改为' + newName);
         }
 
     }).init();
