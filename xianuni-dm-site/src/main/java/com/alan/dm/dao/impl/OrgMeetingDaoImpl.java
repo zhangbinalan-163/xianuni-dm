@@ -24,17 +24,17 @@ public class OrgMeetingDaoImpl implements IOrgMeetingDao {
 
     @Override
     public int insert(OrgMeeting orgMeeting) throws DMException {
-        return 0;
+        return orgMeetingMapper.insert(orgMeeting);
     }
 
     @Override
     public void delete(OrgMeeting orgMeeting) throws DMException {
-
+        orgMeetingMapper.delete(orgMeeting);
     }
 
     @Override
     public void update(OrgMeeting orgMeeting) throws DMException {
-
+        orgMeetingMapper.update(orgMeeting);
     }
 
     @Override

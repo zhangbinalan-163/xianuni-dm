@@ -23,17 +23,17 @@ public class OrgMeetingServiceImpl implements IOrgMeetingService {
 
     @Override
     public int addMeeting(OrgMeeting orgMeeting) throws DMException {
-        return 0;
+        return orgMeetingDao.insert(orgMeeting);
     }
 
     @Override
-    public void delete(int id) throws DMException {
-
+    public void delete(OrgMeeting orgMeeting) throws DMException {
+        orgMeetingDao.delete(orgMeeting);
     }
 
     @Override
     public void update(OrgMeeting orgMeeting) throws DMException {
-
+        orgMeetingDao.update(orgMeeting);
     }
 
     @Override

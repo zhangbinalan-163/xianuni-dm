@@ -34,13 +34,45 @@ public class OrgMeetingController extends BaseController {
     @Resource(name = "orgMeetingService")
     private IOrgMeetingService orgMeetingService;
 
+    @RequestMapping("/addOrUpdate.do")
+    @ResponseBody
+    public String addOrUpdate(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+
+        // todo request parser
+        int orgMeetingId = request.getInt("id", 0);
+        try {
+            OrgMeeting orgMeeting = new OrgMeeting();
+            //  todo set
+            if(orgMeetingId == 0) {
+                orgMeetingId = orgMeetingService.addMeeting(orgMeeting);
+            } else {
+                orgMeetingService.update(orgMeeting);
+            }
+        } catch (Exception e) {
+            LOGGER.error("insert org meeting fail");
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("status", false);
+            jsonObject.put("msg","新增或更新失败");
+            return JsonUtils.fromObject(jsonObject);
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status", true);
+        jsonObject.put("orgMeetingId", orgMeetingId);
+        return JsonUtils.fromObject(jsonObject);
+    }
+
     @RequestMapping("/delete.do")
     @ResponseBody
     public String delete(HttpServletRequest httpServletRequest) throws Exception {
         Request request = getRequest(httpServletRequest);
         int id = request.getInt("id");
         try{
-            orgMeetingService.delete(id);
+            if(id != 0) {
+                OrgMeeting orgMeeting = new OrgMeeting();
+                orgMeeting.setId(id);
+                orgMeetingService.delete(orgMeeting);
+            }
         }catch (Exception e){
             LOGGER.error("delete meeting fail,id={}", id);
             JSONObject jsonObject=new JSONObject();

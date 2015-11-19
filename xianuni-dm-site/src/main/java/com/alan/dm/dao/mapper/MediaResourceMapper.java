@@ -12,9 +12,9 @@ import java.util.List;
  * @author: fan
  */
 public interface MediaResourceMapper {
-    int insert(MediaResource mediaResource);
+    int insert(@Param(value = "media") MediaResource mediaResource);
     void delete(MediaResource mediaResource);
-    void update(MediaResource mediaResource);
+    void update(@Param(value = "media") MediaResource mediaResource);
     MediaResource findOne(int id);
 
     List<MediaResource> getByCondition(@Param(value = "condition") MediaCondition condition,

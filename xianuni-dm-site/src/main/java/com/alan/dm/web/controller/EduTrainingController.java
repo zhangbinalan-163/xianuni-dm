@@ -36,6 +36,62 @@ public class EduTrainingController extends BaseController {
     @Resource(name = "eduTrainingService")
     private IEduTrainingService eduTrainingService;
 
+    @RequestMapping("/addOrUpdateTraining.do")
+    @ResponseBody
+    public String addOrUpdateTraining(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+
+        // todo request parser
+        int trainingId = request.getInt("id", 0);
+        try {
+            EduTraining eduTraining = new EduTraining();
+            //  todo set
+            if(trainingId == 0) {
+                trainingId = eduTrainingService.addTraining(eduTraining);
+            } else {
+                eduTrainingService.modifyTraining(eduTraining);
+            }
+        } catch (Exception e) {
+            LOGGER.error("insert edu training fail");
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("status", false);
+            jsonObject.put("msg","新增或更新失败");
+            return JsonUtils.fromObject(jsonObject);
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status", true);
+        jsonObject.put("trainingId", trainingId);
+        return JsonUtils.fromObject(jsonObject);
+    }
+
+    @RequestMapping("/addOrUpdateMedia.do")
+    @ResponseBody
+    public String addOrUpdateMedia(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+
+        // todo request parser
+        int mediaId = request.getInt("id", 0);
+        try {
+            MediaResource mediaResource = new MediaResource();
+            //  todo set
+            if(mediaId == 0) {
+                mediaId = eduTrainingService.addMediaResource(mediaResource);
+            } else {
+                eduTrainingService.modifyMediaResource(mediaResource);
+            }
+        } catch (Exception e) {
+            LOGGER.error("insert media resource fail");
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("status", false);
+            jsonObject.put("msg","新增或更新失败");
+            return JsonUtils.fromObject(jsonObject);
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("status", true);
+        jsonObject.put("mediaId", mediaId);
+        return JsonUtils.fromObject(jsonObject);
+    }
+
     @RequestMapping("/deleteTraining.do")
     @ResponseBody
     public String deleteTraining(HttpServletRequest httpServletRequest) throws Exception {

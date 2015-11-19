@@ -22,7 +22,7 @@ public class EduTrainingDaoImpl implements IEduTrainingDao {
 
     @Override
     public int insert(EduTraining trainingInfo) throws DMException {
-        return 0;
+        return eduTrainingMapper.insert(trainingInfo);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class EduTrainingDaoImpl implements IEduTrainingDao {
 
     @Override
     public void update(EduTraining trainingInfo) throws DMException {
-
+        eduTrainingMapper.update(trainingInfo);
     }
 
     @Override
