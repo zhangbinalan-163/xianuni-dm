@@ -41,4 +41,19 @@ public interface IOrgnizationService {
      * @throws DMException
      */
     int countSubOrg(Orgnization parentOrg) throws DMException;
+
+    /**
+     *
+     * @param orgnization
+     * @throws DMException
+     */
+    void createOrg(Orgnization orgnization) throws DMException;
+
+    /**
+     *
+     * @param orgnization
+     * @throws DMException
+     */
+    void updateOrg(Orgnization orgnization) throws DMException;
+
 }
