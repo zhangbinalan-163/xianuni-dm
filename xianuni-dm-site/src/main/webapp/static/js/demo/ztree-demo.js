@@ -261,10 +261,14 @@ $(function () {
                 view: {
                     showIcon: false
                 },
+                edit: {
+                    enable: true
+                },
                 callback: {
                     onClick: self.updateTable,
                     onRightClick: self.onRightClick.bind(self),
-                    beforeRename: self.beforeRename.bind(self)
+                    beforeRename: self.beforeRename.bind(self),
+                    beforeRemove: self.beforeRemove.bind(self)
                 }
             }
         },
@@ -314,17 +318,7 @@ $(function () {
             // 删除按钮
             self.rMenu.on('click', '.m_del', function () {
                 self.hideRMenu();
-                var nodes = zTree.getSelectedNodes();
-                if (nodes && nodes.length > 0) {
-                    if (nodes[0].children && nodes[0].children.length > 0) {
-                        var msg = "将删除包含的所有分组？";
-                        if (confirm(msg) == true) {
-                            self.actionRemove(nodes[0]);
-                        }
-                    } else {
-                        self.actionRemove(nodes[0]);
-                    }
-                }
+                self.actionRemove(zTree.getSelectedNodes()[0]);
             });
             // 重命名按钮
             self.rMenu.on('click', '.m_rename', function () {
@@ -336,10 +330,13 @@ $(function () {
             })
         },
         beforeRename: function (treeId, treeNode, newName, isCancel) {
-
             if (!isCancel && treeNode.name != newName) {
-                this.actionUpdate(name);
+                this.actionUpdate(name, newName);
             }
+        },
+        beforeRemove: function (treeId, treeNode) {
+            this.actionRemove(treeNode);
+            return false;
         },
         // 刷新表格数据
         updateTable: function (event, treeId, treeNode) {
@@ -357,9 +354,19 @@ $(function () {
         },
         // 删除节点
         actionRemove: function(node){
-            // todo 请求服务端接口
-            zTree.removeNode(node);
-
+            var zTree = this.zTree;
+            if (node.children && node.children.length > 0) {
+                var msg = "将删除包含的所有分组？";
+                if (confirm(msg) == true) {
+                    remove();
+                }
+            } else {
+                remove();
+            }
+            function remove(){
+                // todo 请求服务端接口
+                zTree.removeNode(node);
+            }
         },
         // 增加节点
         actionAdd: function(node){
