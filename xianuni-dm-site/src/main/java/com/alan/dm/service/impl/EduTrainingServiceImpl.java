@@ -32,12 +32,12 @@ public class EduTrainingServiceImpl implements IEduTrainingService {
 
     @Override
     public int addTraining(EduTraining trainingInfo) throws DMException {
-        return 0;
+        return eduTrainingDao.insert(trainingInfo);
     }
 
     @Override
     public int addMediaResource(MediaResource mediaResource) throws DMException {
-        return 0;
+        return mediaResourceDao.insert(mediaResource);
     }
 
     @Override
@@ -52,12 +52,12 @@ public class EduTrainingServiceImpl implements IEduTrainingService {
 
     @Override
     public void modifyTraining(EduTraining trainingInfo) throws DMException {
-
+        eduTrainingDao.update(trainingInfo);
     }
 
     @Override
     public void modifyMediaResource(MediaResource mediaResource) throws DMException {
-
+        mediaResourceDao.update(mediaResource);
     }
 
     @Override

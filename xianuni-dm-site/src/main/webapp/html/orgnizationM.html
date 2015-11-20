@@ -7,10 +7,6 @@
     <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
     <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="../static/css/plugins/jsTree/style.min.css" rel="stylesheet">
-    <link href="../static/css/plugins/iCheck/custom.css" rel="stylesheet">
-
-    <link href="../static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
-
     <!-- zTree -->
     <link href="../static/css/plugins/zTree/metroStyle/metroStyle.css" rel="stylesheet">
     <link href="../static/css/animate.css" rel="stylesheet">
@@ -37,6 +33,7 @@
                     <h5>党组织信息</h5>
                 </div>
                 <div class="ibox-content">
+                    <button id="addBtn" class="btn btn-primary" type="button">新增下属组织</button>
                     <form method="get" class="form-horizontal">
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
@@ -46,18 +43,17 @@
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group" id="data_1">
+                        <div class="form-group">
                             <label class="col-sm-2 control-label"><small>创建时间</small></label>
-                            <div class="col-sm-5 input-group date">
-                                <input id="createTime" type="text" class="form-control">
-                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            <div class="col-sm-5">
+                                <p id="createTime" class="form-control-static"></p>
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><small>修改时间</small></label>
                             <div class="col-sm-5">
-                                <input id="updateTime" type="text" class="form-control">
+                                <p id="updateTime" class="form-control-static"></p>
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
@@ -71,6 +67,7 @@
                             <label class="col-sm-2 control-label"></label>
                             <div class="col-sm-5">
                                 <button id="updateBtn" class="btn btn-primary" type="button">修改</button>
+                                <button id="deleteBtn" class="btn btn-danger" type="button">删除</button>
                             </div>
                         </div>
                     </form>
@@ -87,28 +84,15 @@
 
 <!-- 自定义js -->
 <script src="../static/js/content.js?v=1.0.0"></script>
-<!-- iCheck -->
-<script src="../static/js/plugins/iCheck/icheck.min.js"></script>
+
 <!-- zTree plugin javascript -->
 <script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
-<!-- Data picker -->
-<script src="../static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+
+<!-- layer javascript -->
+<script src="../static/js/plugins/layer/layer.min.js"></script>
 
 <script>
-
     $(document).ready(function () {
-        $('#data_1 .input-group.date').datepicker({
-            todayBtn: "linked",
-            keyboardNavigation: false,
-            forceParse: false,
-            calendarWeeks: true,
-            autoclose: true
-        });
-
-        $('.i-checks').iCheck({
-            checkboxClass: 'icheckbox_square-green',
-            radioClass: 'iradio_square-green'
-        });
 
         var orgInfo = ({
             init: function () {
@@ -129,9 +113,9 @@
                     success:function(data) {
                         if(data.success){
                             $('#orgName').val(data.data.name);
-                            $('#createTime').val(data.data.createTime);
-                            $('#updateTime').val(data.data.updateTime);
-                            $('#hasSub').html(data.data.hasSub);
+                            $('#createTime').html(data.data.createTime);
+                            $('#updateTime').html(data.data.updateTime);
+                            $('#hasSub').html(data.data.isParent);
                         }else{
                             alert("异常！");
                         }
@@ -141,23 +125,152 @@
                     }
                 });
             },
-            updateData: function (data) {
-                this.orgId = data.orgId || this.orgId;
 
-            },
             bindEvents: function(){
-                var self = this;
+                $('#deleteBtn').on('click', function(){
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    var msg ="确认删除吗?";
+                    if (node.children && node.children.length > 0) {
+                        msg="将删除该组织的所有下属党组织，是否删除？";
+                    }
+                    var index=layer.confirm(msg, {
+                        btn: ['确定','取消'],
+                        shade: false
+                    }, function(){
+                        layer.close(index);
+                        $.ajax( {
+                            url:'/xianuni-dm/orgnization/delete.do',
+                            data:{
+                                orgId : node.id
+                            },
+                            type:'get',
+                            cache:false,
+                            dataType:'json',
+                            success:function(data) {
+                                if(data.success){
+                                    tree.zTree.removeNode(node);
+                                    $('#orgName').val('');
+                                    $('#createTime').html('');
+                                    $('#updateTime').html('');
+                                    $('#hasSub').html('');
+                                    layer.alert('删除党组织信息成功>' + node.name, {icon: 1});
+                                }else{
+                                    layer.alert('删除党组织信息失败>'+data.msg, {icon: 5});
+                                }
+                            },
+                            error : function() {
+                                alert("异常");
+                            }
+                        });
+                    }, function(){
+                        layer.close(index);
+                    });
+                });
+
                 $('#updateBtn').on('click', function(){
-                    self.updateData({
-                        number: $('#number').val().trim()
-                    })
-                })
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    var orgName=$('#orgName').val().trim()
+                    if(!orgName){
+                        layer.alert('党组织名称不能为空', {icon: 5});
+                        return;
+                    }
+                    $.ajax( {
+                        url:'/xianuni-dm/orgnization/update.do',
+                        data:{
+                            orgId : node.id,
+                            orgName : orgName
+                        },
+                        type:'get',
+                        cache:false,
+                        dataType:'json',
+                        success:function(data) {
+                            if(data.success){
+                                node.name=orgName;
+                                tree.zTree.updateNode(node);
+                                layer.alert('修改党组织信息成功>' + orgName, {icon: 1});
+                            }else{
+                                layer.alert('修改党组织信息失败>'+data.msg, {icon: 5});
+                            }
+                        },
+                        error : function() {
+                            alert("异常");
+                        }
+                    });
+                });
+
+                $('#addBtn').on('click', function () {
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    layer.open({
+                        type: 1, //page层
+                        area: ['500px', '300px'],
+                        title: '创建<strong>' + node.name +'</strong>的下属党组织',
+                        shade: 0.6, //遮罩透明度
+                        shift: 5, //0-6的动画形式，-1不开启
+                        btn: ['创建', '取消'],
+                        content: '<form class="form-horizontal" style="padding: 30px">' +
+                        '<div class="form-group">' +
+                        '<label class="control-label col-sm-2">名称</label>' +
+                        '<div class="col-sm-10"><input type="text" id="p_name" class="form-control"/></div>' +
+                        '</div>' +
+                        '</form>',
+                        yes: function(index){
+                            var name = $('#p_name').val().trim();
+                            if(!name){
+                                layer.alert('党组织名称不能为空', {icon: 5});
+                                return;
+                            }
+                            $.ajax( {
+                                url:'/xianuni-dm/orgnization/add.do',
+                                data:{
+                                    orgId : node.id,
+                                    orgName : name
+                                },
+                                type:'get',
+                                cache:false,
+                                dataType:'json',
+                                success:function(data) {
+                                    if(data.success){
+                                        var newNode = { name: name , id: data.id};
+                                        tree.zTree.addNodes(node, newNode);
+                                        layer.alert('创建党组织成功>' + name, {icon: 1});
+                                        layer.close(index);
+                                    }else{
+                                        layer.alert('创建党组织失败！'+data.msg, {icon: 5});
+                                    }
+                                },
+                                error : function() {
+                                    layer.alert('创建党组织失败', {icon: 5});
+                                }
+                            });
+                        },
+                        no: function(index){
+                            layer.close(index);
+                        }
+                    });
+                });
             }
         }).init();
 
         var tree = ({
             init: function () {
                 $.fn.zTree.init($("#orgTree"), this.config());
+                this.zTree = $.fn.zTree.getZTreeObj("orgTree");
+                return this;
             },
             config: function () {
                 var self = this;

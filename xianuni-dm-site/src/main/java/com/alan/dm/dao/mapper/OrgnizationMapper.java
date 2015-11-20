@@ -35,4 +35,20 @@ public interface OrgnizationMapper {
      * @throws DMException
      */
     Orgnization getById(@Param(value="id") int id);
+
+    /**
+     *
+     * @param orgnization
+     */
+    void update(@Param(value="orgnization")Orgnization orgnization);
+    /**
+     *
+     * @param orgnization
+     */
+    void insert(@Param(value="orgnization")Orgnization orgnization);
+    /**
+     *
+     * @param orgnization
+     */
+    void delete(@Param(value="orgnization")Orgnization orgnization);
 }

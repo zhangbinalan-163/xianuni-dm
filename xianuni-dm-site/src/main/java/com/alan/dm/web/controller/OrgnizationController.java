@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -37,18 +38,85 @@ public class OrgnizationController extends BaseController{
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		String orgIds = request.getString("orgIds");
-		String[] orgIdArray = orgIds.split(",");
-		for(String orgId:orgIdArray){
-			Orgnization orgnization = orgnizationService.getOrgById(Integer.parseInt(orgId));
-			if(orgnization!=null){
-				//orgnizationService.deleteOrg(orgnization,true);
-			}
+		Integer orgId = request.getInt("orgId");
+
+		Orgnization orgnization=new Orgnization();
+		orgnization.setId(orgId);
+		//级联删除所有节点
+		orgnizationService.deleteOrg(orgnization,true);
+		//设置父节点是否还为空
+		Orgnization parentOrg=orgnizationService.getOrgById(orgnization.getParent());
+		if(parentOrg!=null&&orgnizationService.countSubOrg(parentOrg)==0){
+			parentOrg.setHasSon(false);
+			orgnizationService.updateOrg(parentOrg);
 		}
 		JSONObject orgObject=new JSONObject();
-		orgObject.put("statusCode",200);
-		orgObject.put("message","success");
+		orgObject.put("success", 200);
+		orgObject.put("msg", "success");
 		return JsonUtils.fromObject(orgObject);
+	}
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/update.do")
+	@ResponseBody
+	public String update(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId = request.getInt("orgId");
+		String orgName=request.getString("orgName");
+		Orgnization orgnization = orgnizationService.getOrgById(orgId);
+		JSONObject orgObject=new JSONObject();
+		if(orgnization==null){
+			orgObject.put("success",false);
+			orgObject.put("msg","部门不存在");
+			return JsonUtils.fromObject(orgObject);
+		}else{
+			orgnization.setName(orgName);
+			orgnizationService.updateOrg(orgnization);
+			orgObject.put("success", 200);
+			orgObject.put("msg", "success");
+			return JsonUtils.fromObject(orgObject);
+		}
+	}
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/add.do")
+	@ResponseBody
+	public String add(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId = request.getInt("orgId");
+		String orgName=request.getString("orgName");
+		Orgnization parentOrg = orgnizationService.getOrgById(orgId);
+		JSONObject orgObject=new JSONObject();
+		if(parentOrg==null){
+			orgObject.put("success",false);
+			orgObject.put("msg","父部门不存在");
+			return JsonUtils.fromObject(orgObject);
+		}else{
+			Orgnization orgnization=new Orgnization();
+			orgnization.setParent(parentOrg.getId());
+			orgnization.setCreateTime(new Date());
+			orgnization.setHasSon(false);
+			orgnization.setName(orgName);
+			orgnizationService.createOrg(orgnization);
+
+			//
+			parentOrg.setHasSon(true);
+			orgnizationService.updateOrg(parentOrg);
+
+			orgObject.put("success", 200);
+			orgObject.put("id",orgnization.getId());
+			orgObject.put("msg", "success");
+			return JsonUtils.fromObject(orgObject);
+		}
 	}
 
 	@RequestMapping("/info.do")
@@ -65,7 +133,7 @@ public class OrgnizationController extends BaseController{
 			dataObject.put("name",orgnization.getName());
 			dataObject.put("createTime", TimeUtils.convertToTimeString(orgnization.getCreateTime()));
 			dataObject.put("updateTime", TimeUtils.convertToTimeString(orgnization.getUpdateTime()));
-			dataObject.put("hasSub", orgnization.getIsParent()!=0?"是":"否");
+			dataObject.put("isParent", orgnization.isHasSon()?"是":"否");
 			dataObject.put("orgId", orgnization.getId());
 			jsonObject.put("data",dataObject);
 		}
@@ -98,18 +166,18 @@ public class OrgnizationController extends BaseController{
 					JSONObject orgObject=new JSONObject();
 					orgObject.put("id",orgnization.getId());
 					orgObject.put("name",orgnization.getName());
-					orgObject.put("isParent",orgnization.getIsParent()==1);
+					orgObject.put("isHasSon",orgnization.isHasSon());
 					orgObject.put("open",true);
 					orgObject.put("pId", -1);
 					orgArray.add(orgObject);
-					if(orgnization.getIsParent()==1){
+					if(orgnization.isHasSon()){
 						List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization,null);
 						if(subOrgList!=null){
 							for(Orgnization subOrg:subOrgList){
 								JSONObject subOrgObject=new JSONObject();
 								subOrgObject.put("id",subOrg.getId());
 								subOrgObject.put("name",subOrg.getName());
-								subOrgObject.put("isParent",subOrg.getIsParent()==1);
+								subOrgObject.put("isParent",subOrg.isHasSon());
 								subOrgObject.put("pId",orgnization.getId());
 								orgArray.add(subOrgObject);
 							}
@@ -126,7 +194,7 @@ public class OrgnizationController extends BaseController{
 						JSONObject subOrgObject=new JSONObject();
 						subOrgObject.put("id",subOrg.getId());
 						subOrgObject.put("name",subOrg.getName());
-						subOrgObject.put("isParent",subOrg.getIsParent()==1);
+						subOrgObject.put("isParent",subOrg.isHasSon());
 						subOrgObject.put("pId",orgnization.getId());
 						orgArray.add(subOrgObject);
 					}

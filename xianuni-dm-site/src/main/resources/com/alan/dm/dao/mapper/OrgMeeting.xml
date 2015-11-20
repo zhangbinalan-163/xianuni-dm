@@ -20,6 +20,42 @@
         <association property="compere" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
 
+    <insert id="insert" parameterType="com.alan.dm.entity.OrgMeeting" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="orgMeeting.id">
+        INSERT INTO <include refid="A_TABLE"/>
+        (activity,orgId,meetingType,startTime,endTime,location,theme,compere,
+        shouldNumberOfPeople,realNumberOfPeople,content,filePath,attendancePeople,
+        absencePeople,createTime)
+        VALUES(#{orgMeeting.activity},#{orgMeeting.orgnization.id},#{orgMeeting.meetingType},
+        #{orgMeeting.startTime},#{orgMeeting.endTime},#{orgMeeting.location},#{orgMeeting.theme},
+        #{orgMeeting.compere.id},#{orgMeeting.shouldNumberOfPeople},#{orgMeeting.realNumberOfPeople},
+        #{orgMeeting.content},#{orgMeeting.filePath},#{orgMeeting.attendancePeople},
+        #{orgMeeting.absencePeople},#{orgMeeting.createTime})
+    </insert>
+
+    <update id="update" parameterType="com.alan.dm.entity.OrgMeeting">
+        update
+        <include refid="A_TABLE" />
+        <set>
+            <if test="orgMeeting.activity != 0">activity=#{orgMeeting.activity},</if>
+            <if test="orgMeeting.orgId != 0">orgId=#{orgMeeting.orgnization.id},</if>
+            <if test="orgMeeting.meetingType != 0">meetingType=#{orgMeeting.meetingType},</if>
+            <if test="orgMeeting.startTime != null">startTime=#{orgMeeting.startTime},</if>
+            <if test="orgMeeting.endTime != null">endTime=#{orgMeeting.endTime},</if>
+            <if test="orgMeeting.location != null">location=#{orgMeeting.location},</if>
+            <if test="orgMeeting.theme != null">theme=#{orgMeeting.theme},</if>
+            <if test="orgMeeting.compere != null">compere=#{orgMeeting.compere.id},</if>
+            <if test="orgMeeting.shouldNumberOfPeople != 0">shouldNumberOfPeople=#{orgMeeting.shouldNumberOfPeople},</if>
+            <if test="orgMeeting.realNumberOfPeople != 0">realNumberOfPeople=#{orgMeeting.realNumberOfPeople},</if>
+            <if test="orgMeeting.content != null">content=#{orgMeeting.content},</if>
+            <if test="orgMeeting.filePath != null">filePath=#{orgMeeting.filePath},</if>
+            <if test="orgMeeting.attendancePeople != null">attendancePeople=#{orgMeeting.attendancePeople},</if>
+            <if test="orgMeeting.absencePeople != null">absencePeople=#{orgMeeting.absencePeople},</if>
+            <if test="orgMeeting.updateTime != null">updateTime=#{orgMeeting.updateTime}</if>
+        </set>
+        where id=#{orgMeeting.id}
+    </update>
+
     <select id="getByCondition" resultMap="A_INFO">
         SELECT
         A.id,

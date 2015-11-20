@@ -12,11 +12,11 @@ import java.util.List;
  * @author: fan
  */
 public interface EduTrainingMapper {
-    int insert(EduTraining trainingInfo) ;
+    int insert(@Param(value = "training") EduTraining trainingInfo) ;
 
     void delete(EduTraining trainingInfo) ;
 
-    void update(EduTraining trainingInfo) ;
+    void update(@Param(value = "training") EduTraining trainingInfo) ;
 
     EduTraining findOne(int id) ;
 

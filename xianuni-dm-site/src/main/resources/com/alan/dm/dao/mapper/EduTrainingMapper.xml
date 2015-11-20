@@ -25,6 +25,38 @@
         <association property="org" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
     </resultMap>
 
+    <insert id="insert" parameterType="com.alan.dm.entity.EduTraining" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="training.id">
+        INSERT INTO <include refid="A_TABLE"/>
+        (type,title,trainingType,orgId,startTime,endTime,period,trainingObject,
+        content,personId,harvest,opinion,createTime)
+        VALUES(#{training.type},#{training.title},#{training.trainingType},
+        #{training.organization.id},#{training.startTime},#{training.endTime},#{training.period},
+        #{training.trainingObject},#{training.content},#{training.person.id},
+        #{training.harvest},#{training.opinion},#{training.createTime})
+    </insert>
+
+    <update id="update" parameterType="com.alan.dm.entity.EduTraining">
+        update
+        <include refid="A_TABLE" />
+        <set>
+            <if test="training.type != 0">type=#{training.type},</if>
+            <if test="training.title != null">title=#{training.title},</if>
+            <if test="training.trainingType != 0">trainingType=#{training.trainingType},</if>
+            <if test="training.organization != null">orgId=#{training.organization.id},</if>
+            <if test="training.startTime != null">startTime=#{training.startTime},</if>
+            <if test="training.endTime != null">endTime=#{training.endTime},</if>
+            <if test="training.period != 0">period=#{training.period},</if>
+            <if test="training.trainingObject != null">trainingObject=#{training.trainingObject},</if>
+            <if test="training.person != null">compere=#{training.person.id},</if>
+            <if test="training.content != null">content=#{training.content},</if>
+            <if test="training.harvest != null">harvest=#{training.harvest},</if>
+            <if test="training.opinion != null">opinion=#{training.opinion},</if>
+            <if test="training.updateTime != null">updateTime=#{training.updateTime}</if>
+        </set>
+        where id=#{training.id}
+    </update>
+
     <select id="getByCondition" resultMap="A_INFO">
         SELECT
         A.id,
@@ -74,5 +106,11 @@
             </if>
         </where>
     </select>
+
+    <delete id="delete" parameterType="com.alan.dm.entity.EduTraining">
+        DELETE
+        FROM <include refid="A_TABLE"/>
+        WHERE id=#{id}
+    </delete>
 
 </mapper>

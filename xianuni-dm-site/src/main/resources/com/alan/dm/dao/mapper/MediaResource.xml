@@ -8,6 +8,28 @@
 
     <resultMap id="INFO" type="com.alan.dm.entity.MediaResource"></resultMap>
 
+    <insert id="insert" parameterType="com.alan.dm.entity.MediaResource" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="media.id">
+        INSERT INTO <include refid="A_TABLE"/>
+        (name,type,forbidden,uploadDate,description,resourcePath)
+        VALUES(#{media.name},#{media.type},#{media.forbidden},
+        #{media.uploadDate},#{media.description},#{media.resourcePath})
+    </insert>
+
+    <update id="update" parameterType="com.alan.dm.entity.MediaResource">
+        update
+        <include refid="A_TABLE" />
+        <set>
+            <if test="media.name != null">name=#{media.name},</if>
+            <if test="media.type != 0">type=#{media.type},</if>
+            forbidden=#{media.forbidden},
+            <if test="media.uploadDate != null">uploadDate=#{media.uploadDate},</if>
+            <if test="media.description != null">description=#{media.description},</if>
+            <if test="media.resourcePath != null">resourcePath=#{media.resourcePath}</if>
+        </set>
+        where id=#{media.id}
+    </update>
+
     <select id="getByCondition" resultMap="INFO">
         SELECT
         A.id,

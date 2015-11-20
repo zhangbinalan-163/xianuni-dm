@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,27 +40,30 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
     }
 
     @Override
+    public void createOrg(Orgnization orgnization) throws DMException {
+        orgnization.setCreateTime(new Date());
+        orgnizationDao.insert(orgnization);
+    }
+
+    @Override
+    public void updateOrg(Orgnization orgnization) throws DMException {
+        orgnization.setUpdateTime(new Date());
+        orgnizationDao.update(orgnization);
+    }
+
+    @Override
     public void deleteOrg(Orgnization orgnization, boolean withSubOrgs) throws DMException {
         if(withSubOrgs){
             //先删除子节点
             List<Orgnization> subOrgs = getOrgByParent(orgnization, null);
             if(subOrgs!=null){
                 for(Orgnization subOrg:subOrgs){
-                    if(countSubOrg(subOrg)>0){
-                        //删除子节点
-                        deleteOrg(subOrg,true);
-                    }
+                    deleteOrg(subOrg,withSubOrgs);
                 }
             }
         }
         //删除党组织
         orgnizationDao.delete(orgnization);
         LOG.info("delete orgnization success,orgId={},orgName={}", orgnization.getId(), orgnization.getName());
-        //设置父节点是否还为空
-        Orgnization parentOrg=new Orgnization();
-        parentOrg.setId(orgnization.getParent());
-        if(countSubOrg(parentOrg)==0){
-            //修改 TODO
-        }
     }
 }

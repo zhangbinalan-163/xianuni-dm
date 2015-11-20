@@ -24,7 +24,7 @@ public class MediaResourceDaoImpl implements IMediaResourceDao {
 
     @Override
     public int insert(MediaResource mediaResource) throws DMException {
-        return 0;
+        return mediaResourceMapper.insert(mediaResource);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MediaResourceDaoImpl implements IMediaResourceDao {
 
     @Override
     public void update(MediaResource mediaResource) throws DMException {
-
+        mediaResourceMapper.update(mediaResource);
     }
 
     @Override

@@ -13,10 +13,10 @@ import java.util.List;
  * @author: fan
  */
 public interface OrgMeetingMapper {
-    int insert(OrgMeeting orgMeeting);
+    int insert(@Param(value = "orgMeeting") OrgMeeting orgMeeting);
     void delete(OrgMeeting orgMeeting);
 
-    void update(OrgMeeting orgMeeting);
+    void update(@Param(value = "orgMeeting") OrgMeeting orgMeeting);
 
     OrgMeeting findOne(int id);
 

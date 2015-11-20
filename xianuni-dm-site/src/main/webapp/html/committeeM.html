@@ -78,6 +78,7 @@
                 return this
             },
             fetchData: function (data) {
+                data = data || {};
                 this.orgId = data.orgId || this.orgId;
                 this.$el.jqGrid("setGridParam", {
                     postData: data,

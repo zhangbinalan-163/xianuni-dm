@@ -8,6 +8,25 @@
 
     <resultMap id="INFO" type="com.alan.dm.entity.Orgnization"></resultMap>
 
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="orgnization.id">
+        INSERT INTO
+        <include refid="TABLE"/>
+        (name,status,parent,hasSon,createTime,orgDesc)
+        VALUES(#{orgnization.name},#{orgnization.status},#{orgnization.parent},#{orgnization.hasSon},#{orgnization.createTime},#{orgnization.orgDesc})
+    </insert>
+
+    <update id="update">
+        update
+        <include refid="TABLE" />
+        set name=#{orgnization.name},status=#{orgnization.status},parent=#{orgnization.parent},hasSon=#{orgnization.hasSon},updateTime=#{orgnization.updateTime},orgDesc=#{orgnization.orgDesc}
+        where id=#{orgnization.id}
+    </update>
+
+    <delete id="delete">
+        delete from <include refid="TABLE" />
+        where id=#{orgnization.id}
+    </delete>
+
     <select id="getByParentOrg" resultMap="INFO">
         SELECT *
         FROM  <include refid="TABLE" />

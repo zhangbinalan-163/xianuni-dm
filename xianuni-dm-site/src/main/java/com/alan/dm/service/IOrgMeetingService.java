@@ -24,10 +24,10 @@ public interface IOrgMeetingService {
 
     /**
      * 删除组织会议
-     * @param id
+     * @param orgMeeting
      * @throws DMException
      */
-    void delete(int id) throws DMException;
+    void delete(OrgMeeting orgMeeting) throws DMException;
 
     /**
      * 更新组织会议

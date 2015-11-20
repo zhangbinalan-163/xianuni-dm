@@ -23,16 +23,17 @@ public class OrgnizationDaoimpl implements IOrgnizationDao{
 
     @Override
     public void insert(Orgnization orgnization) throws DMException {
-
+        orgnizationMapper.insert(orgnization);
     }
 
     @Override
     public void delete(Orgnization orgnization) throws DMException {
+        orgnizationMapper.delete(orgnization);
 
     }
     @Override
     public void update(Orgnization orgnization) throws DMException {
-        //TODO
+        orgnizationMapper.update(orgnization);
     }
 
     @Override

@@ -14,12 +14,12 @@ public class Orgnization {
     private int id;//ID
     private String name;//
     private int parent;//直接上级组织的ID
-    private int isParent;//是否是有下属组织
+    private boolean hasSon;//是否是有下属组织
     private int status=NORMAL;//状态
     private Date createTime;//创建时间
     private Date updateTime;//更新时间
     private Date electionTime;//上次换届时间
-    private String desc;//描述
+    private String orgDesc;//描述
 
     public int getId() {
         return id;
@@ -69,12 +69,12 @@ public class Orgnization {
         this.electionTime = electionTime;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getOrgDesc() {
+        return orgDesc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setOrgDesc(String orgDesc) {
+        this.orgDesc = orgDesc;
     }
 
     public int getParent() {
@@ -85,11 +85,11 @@ public class Orgnization {
         this.parent = parent;
     }
 
-    public int getIsParent() {
-        return isParent;
+    public boolean isHasSon() {
+        return hasSon;
     }
 
-    public void setIsParent(int isParent) {
-        this.isParent = isParent;
+    public void setHasSon(boolean hasSon) {
+        this.hasSon = hasSon;
     }
 }
