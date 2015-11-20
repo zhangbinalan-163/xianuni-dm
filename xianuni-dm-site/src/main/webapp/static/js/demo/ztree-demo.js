@@ -246,6 +246,7 @@ $(function () {
                         $('.J_edit').on('click', function () {
                             var id = $(this).data('id');
                             // todo 根据id获取数据 打开编辑弹窗
+                            var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
                             layer.open({
                                 type: 1, //page层
                                 area: ['360px', '160px'],
