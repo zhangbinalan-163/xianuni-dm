@@ -170,14 +170,14 @@ $(function () {
             $('#addBtn').on('click', function () {
                 // 选中的节点
                 var node = tree2.zTree && tree2.zTree.getSelectedNodes()[0];
-                if(!node){
+                if (!node) {
                     layer.alert('请选择一个节点', {icon: 6});
                     return
                 }
                 layer.open({
                     type: 1, //page层
                     area: ['500px', '300px'],
-                    title: '在节点<strong>' + node.name +'</strong>下创建新记录',
+                    title: '在节点<strong>' + node.name + '</strong>下创建新记录',
                     shade: 0.6, //遮罩透明度
                     shift: 5, //0-6的动画形式，-1不开启
                     btn: ['创建', '取消'],
@@ -187,38 +187,40 @@ $(function () {
                         '<div class="col-sm-10"><input type="text" id="p_name" class="form-control"/></div>' +
                         '</div>' +
                         '</form>',
-                    yes: function(index){
+                    yes: function (index) {
                         // todo 读取表单信息 调用创建接口
                         var name = $('#p_name').val().trim();
                         // todo 创建成功后 更新树 或者单独更新或加入节点
                         // tree2.refresh();
-                        if(!name){
+                        if (!name) {
                             return
                         }
                         layer.alert('创建成功>' + name, {icon: 1});
                         layer.close(index);
                     },
-                    no: function(index){
+                    no: function (index) {
                         layer.close(index);
                     }
                 });
             });
         },
         render: function () {
+            var self = this;
 
-            this.$el.jqGrid(
+            self.$el.jqGrid(
                 {
                     url: '../static/data/jqgrid1.json',
                     datatype: "json",
-                    colNames: ['No', 'Date', 'Client', 'Amount', 'Tax', 'Total', 'Notes'],
+                    colNames: ['No', 'Date', 'Client', 'Amount', 'Tax', 'Total', 'Notes', 'Actions'],
                     colModel: [
-                        {name: 'id', index: 'id', width: 55},
+                        {name: 'id', index: 'id', width: 50},
                         {name: 'invdate', index: 'invdate', width: 90},
                         {name: 'name', index: 'name asc, invdate', width: 100},
                         {name: 'amount', index: 'amount', width: 80, align: "right"},
                         {name: 'tax', index: 'tax', width: 80, align: "right"},
                         {name: 'total', index: 'total', width: 80, align: "right"},
-                        {name: 'note', index: 'note', width: 150, sortable: false}
+                        {name: 'note', index: 'note', width: 100, sortable: false},
+                        {name: 'actions', index: 'actions', width: 120, align: "center"},
                     ],
                     rowNum: 10,
                     rowList: [10, 20, 30],
@@ -228,7 +230,53 @@ $(function () {
                     height: 300,
                     viewrecords: true,
                     sortorder: "desc",
-                    caption: "JSON 实例"
+                    caption: "JSON 实例",
+                    // 自定义事件
+                    gridComplete: function () {
+                        var ids = self.$el.jqGrid('getDataIDs');
+                        for (var i = 0; i < ids.length; i++) {
+                            var id = ids[i],
+                                a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>',
+                                b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
+                            self.$el.jqGrid('setRowData', ids[i],
+                                {
+                                    actions: [a, b].join(' ')
+                                });
+                        }
+                        $('.J_edit').on('click', function () {
+                            var id = $(this).data('id');
+                            // todo 根据id获取数据 打开编辑弹窗
+                            layer.open({
+                                type: 1, //page层
+                                area: ['360px', '160px'],
+                                title: '编辑信息',
+                                shade: 0.6, //遮罩透明度
+                                shift: 5, //0-6的动画形式，-1不开启
+                                btn: ['更新', '取消'],
+                                content: '<form class="form-horizontal" style="padding: 15px 15px 0">' +
+                                    '<div class="form-group">' +
+                                    '<label class="control-label col-sm-3">名称</label>' +
+                                    '<div class="col-sm-9"><input type="text" id="p_name" class="form-control"/></div>' +
+                                    '</div>' +
+                                    '</form>',
+                                yes: function (index) {
+                                    // todo 读取表单信息 调用创建接口
+                                    var name = $('#p_name').val().trim();
+                                    layer.close(index);
+                                    // todo 请求服务端编辑 成功后重新获取列表
+                                    self.fetchData();
+                                },
+                                no: function (index) {
+                                    layer.close(index);
+                                }
+                            });
+                        })
+                        $('.J_delete').on('click', function () {
+                            var id = $(this).data('id');
+                            // todo 请求服务端删除 成功后重新获取列表
+                            self.fetchData();
+                        })
+                    }
                 })
                 .jqGrid('navGrid', '#pager2', {edit: false, add: false, del: false});
         }
@@ -306,7 +354,7 @@ $(function () {
         bindMenuEvents: function () {
             var self = this;
             var zTree = self.zTree;
-            $('#J_addNode').on('click', function(e){
+            $('#J_addNode').on('click', function (e) {
                 e.preventDefault();
                 self.actionAdd();
             });
@@ -353,7 +401,7 @@ $(function () {
             return childNodes;
         },
         // 删除节点
-        actionRemove: function(node){
+        actionRemove: function (node) {
             var zTree = this.zTree;
             if (node.children && node.children.length > 0) {
                 var msg = "将删除包含的所有分组？";
@@ -363,13 +411,13 @@ $(function () {
             } else {
                 remove();
             }
-            function remove(){
+            function remove() {
                 // todo 请求服务端接口
                 zTree.removeNode(node);
             }
         },
         // 增加节点
-        actionAdd: function(node){
+        actionAdd: function (node) {
             var zTree = this.zTree;
             var node = zTree.getSelectedNodes()[0];
             var title = node ? '在父节点' + node.name + '下创建子节点' : '创建根节点';
@@ -386,13 +434,13 @@ $(function () {
                     '<div class="col-sm-9"><input type="text" id="p_name" class="form-control"/></div>' +
                     '</div>' +
                     '</form>',
-                yes: function(index){
+                yes: function (index) {
                     // todo 读取表单信息 调用创建接口 获取新建节点的id
                     var name = $('#p_name').val().trim();
-                    if(!name){
+                    if (!name) {
                         return
                     }
-                    var newNode = { name: name , id: '服务器返回todo'};
+                    var newNode = { name: name, id: '服务器返回todo'};
                     if (node) {
                         zTree.addNodes(node, newNode);
                     } else {
@@ -401,13 +449,13 @@ $(function () {
                     // 更新节点
                     layer.close(index);
                 },
-                no: function(index){
+                no: function (index) {
                     layer.close(index);
                 }
             });
         },
         // 更新节点
-        actionUpdate: function(node, newName){
+        actionUpdate: function (node, newName) {
             var id = node.id;
             // todo 请求服务端接口
             alert('修改为' + newName);
