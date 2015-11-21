@@ -17,7 +17,7 @@ public interface IPersonInfoDao {
      * @param condition
      * @param page
      * @return
-     * @throws DMException
+     * @throws DMException˙
      */
     List<Person> getByCondition(PersonCondition condition,Page page) throws DMException;
 
@@ -28,4 +28,11 @@ public interface IPersonInfoDao {
      * @throws DMException
      */
     int countByCondition(PersonCondition condition) throws DMException;
+
+    /**
+     *
+     * @param person
+     * @throws DMException
+     */
+    void insertPerson(Person person) throws DMException;
 }

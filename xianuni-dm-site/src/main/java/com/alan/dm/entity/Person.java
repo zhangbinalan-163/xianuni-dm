@@ -23,6 +23,15 @@ public class Person {
     private int profession;//职称
     private Date createTime;
     private Date updateTime;
+    private String personDesc;
+
+    public String getPersonDesc() {
+        return personDesc;
+    }
+
+    public void setPersonDesc(String personDesc) {
+        this.personDesc = personDesc;
+    }
 
     public int getId() {
         return id;

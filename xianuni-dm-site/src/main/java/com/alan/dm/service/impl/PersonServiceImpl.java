@@ -9,6 +9,7 @@ import com.alan.dm.service.IPersonService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,7 +18,6 @@ import java.util.List;
  */
 @Service(value = "personService")
 public class PersonServiceImpl implements IPersonService{
-
     @Resource(name = "personInfoDao")
     private IPersonInfoDao personInfoDao;
 
@@ -29,5 +29,11 @@ public class PersonServiceImpl implements IPersonService{
     @Override
     public int countByCondition(PersonCondition condition) throws DMException {
         return personInfoDao.countByCondition(condition);
+    }
+
+    @Override
+    public void createPerson(Person person) throws DMException {
+        person.setCreateTime(new Date());
+        personInfoDao.insertPerson(person);
     }
 }

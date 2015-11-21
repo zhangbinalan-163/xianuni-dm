@@ -40,7 +40,9 @@
                             <input type="text" placeholder="请输入姓名" id="name" class="form-control">
                             <input type="text" placeholder="请输入学工号" id="number" class="form-control">
                         </div>
-                        <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
+                        <button id="searchBtn" class="btn btn-primary" type="button">搜索</button>
+                        <button id="addBtn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="testSpan" class="bold">新增</span>
+                        </button>
                     </form>
                     <div class="jqGrid_wrapper">
                         <table id="list"></table>
@@ -66,6 +68,12 @@
 
 <!-- zTree plugin javascript -->
 <script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
+
+<!-- layer javascript -->
+<script src="../static/js/plugins/layer/layer.min.js"></script>
+<!-- layerDate plugin javascript -->
+<script src="../static/js/plugins/layer/laydate/laydate.js"></script>
+
 <script>
     $(document).ready(function () {
         $.jgrid.defaults.styleUI = 'Bootstrap';
@@ -92,7 +100,131 @@
                         name: $('#name').val().trim(),
                         number: $('#number').val().trim()
                     })
-                })
+                });
+                $('#addBtn').on('click', function () {
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node||node.id==0){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    layer.open({
+                        type: 2,
+                        content: 'person/add.html',
+                        area: ['100%', '100%'],
+                        maxmin: false,
+                        title: '创建<strong>' + node.name +'</strong>的基础人员信息',
+                        shade: 0.6, //遮罩透明度
+                        shift: 5, //0-6的动画形式，-1不开启
+                        btn: ['创建', '取消'],
+                        yes: function(index){
+                            var inputs=layer.getChildFrame('body',index).find('input');
+                            var name,number,idNumber,birth,desc,nation,degree,sex,type;
+                            for(var i=0; i<inputs.length; i++){
+                                var inputName=inputs[i].id;
+                                var inputValue=inputs[i].value;
+                                if(inputName=='pName'){
+                                    if(!inputValue){
+                                        layer.alert('名字不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    name=inputValue;
+                                }
+                                if(inputName=='pNumber'){
+                                    if(!inputValue){
+                                        layer.alert('学工号不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    number=inputValue;
+                                }
+                                if(inputName=='pIdNumber'){
+                                    if(!inputValue){
+                                        layer.alert('身份证不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    idNumber=inputValue;
+                                }
+                                if(inputName=='pBirth'){
+                                    if(!inputValue){
+                                        layer.alert('出生日期不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    birth=inputValue;
+                                }
+                            }
+                            var selects=layer.getChildFrame('body',index).find('select');
+                            for(var i=0; i<selects.length; i++){
+                                var inputName=selects[i].id;
+                                var inputValue=selects[i].value;
+                                if(inputName=='pNation'){
+                                    if(!inputValue){
+                                        layer.alert('民族不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    nation=inputValue;
+                                }
+                                if(inputName=='pDegree'){
+                                    if(!inputValue){
+                                        layer.alert('学历不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    degree=inputValue;
+                                }
+                                if(inputName=='pSex'){
+                                    if(!inputValue){
+                                        layer.alert('性别不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    sex=inputValue;
+                                }
+                                if(inputName=='pType'){
+                                    if(!inputValue){
+                                        layer.alert('类别不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    type=inputValue;
+                                }
+                            }
+                            var textareas=layer.getChildFrame('body',index).find('textarea');
+                            for(var i=0; i<textareas.length; i++){
+                                var inputName=textareas[i].id;
+                                var inputValue=textareas[i].value;
+                                if(inputName=='pDesc'){
+                                    desc=inputValue;
+                                }
+                            }
+                            $.ajax( {
+                                url:'/xianuni-dm/person/basicAdd.do',
+                                data:{
+                                    orgId : node.id,
+                                    name:name,
+                                    type:type,
+                                    nation:nation,
+                                    degree:degree,
+                                    sex:sex,
+                                    desc:desc,
+                                    birth:birth,
+                                    number:number,
+                                    idNumber:idNumber
+                                },
+                                type:'post',
+                                dataType:'json',
+                                success:function(data) {
+                                    if(data.success){
+                                        layer.alert('添加奖基础信息成功', {icon: 1});
+                                        layer.close(index);
+                                        self.fetchData({});
+                                    }else{
+                                        layer.alert('添加奖基础信息失败！'+data.msg, {icon: 5});
+                                    }
+                                },
+                                error : function() {
+                                    layer.alert('添加奖基础信息失败', {icon: 5});
+                                }
+                            });
+                        }
+                    });
+                });
             },
             render: function () {
                 this.$el.jqGrid(
@@ -116,15 +248,33 @@
                             sortname: 'id',
                             mtype: "get",
                             height: 400,
-                            viewrecords: true
+                            viewrecords: true,
+                            multiselect: true
                         })
-                        .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
+                        .jqGrid('navGrid', '#pager',
+                        { edit: false, add: false, del: true,deltitle:'删除',search:false},
+                        {},
+                        {},
+                        {   reloadAfterSubmit:true,
+                            url: '/xianuni-dm/person/delete.do',
+                            afterSubmit : function(response, postdata) {
+                                var json = eval('('+response.responseText+')');
+                                if(json.status){
+                                    return [true,''];
+                                }else{
+                                    return [false,json.msg];
+                                }
+                            }
+                        }
+                        );
             }
         }).init();
 
         var tree = ({
             init: function () {
                 $.fn.zTree.init($("#orgTree"), this.config());
+                this.zTree = $.fn.zTree.getZTreeObj("orgTree");
+                return this;
             },
             config: function () {
                 var self = this;
@@ -158,10 +308,6 @@
                 })
             },
             filter: function (treeId, parentNode, childNodes) {
-//                if (!childNodes) return null;
-//                for (var i = 0, l = childNodes.length; i < l; i++) {
-//                    childNodes[i].name = 'Test>' + childNodes[i].name;
-//                }
                 return childNodes;
             }
 

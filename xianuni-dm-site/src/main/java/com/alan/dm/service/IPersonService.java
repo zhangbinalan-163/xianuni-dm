@@ -27,4 +27,11 @@ public interface IPersonService {
      * @throws DMException
      */
     int countByCondition(PersonCondition condition) throws DMException;
+
+    /**
+     *
+     * @param person
+     * @throws DMException
+     */
+    void createPerson(Person person) throws DMException;
 }

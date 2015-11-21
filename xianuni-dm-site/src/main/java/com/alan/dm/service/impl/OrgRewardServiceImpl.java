@@ -42,4 +42,9 @@ public class OrgRewardServiceImpl implements IOrgRewardService{
             orgRewardDao.delete(reward);
         }
     }
+
+    @Override
+    public void addReward(OrgReward orgReward) throws DMException {
+        orgRewardDao.insert(orgReward);
+    }
 }

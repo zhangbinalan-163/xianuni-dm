@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body>
+<form class="form-horizontal">
+    <div class="form-group">
+        <div class="input-group">
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">名称：</label>
+        <div class="col-sm-4">
+            <input id="rewardName" type="url" class="form-control" name="url">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">日期：</label>
+        <div class="col-sm-4">
+            <input readonly class="form-control layer-date" id="rewardTime">
+            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#rewardTime'});"></label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">奖惩类型：</label>
+        <div class="input-group">
+            <div class="col-sm-4">
+                <select id="rewardType" data-placeholder="选择奖励类型" class="chosen-select" style="width:350px;" tabindex="2">
+                    <option value="">选择类型</option>
+                    <option value="0" hassubinfo="true">奖励</option>
+                    <option value="1" hassubinfo="true">惩处</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">奖惩级别：</label>
+        <div class="input-group">
+            <div class="col-sm-4">
+                <select id="rewardLevel"  data-placeholder="选择级别" class="chosen-select" style="width:350px;" tabindex="2">
+                    <option value="">奖惩级别</option>
+                    <option value="0" hassubinfo="true">校级</option>
+                    <option value="1" hassubinfo="true">市级</option>
+                    <option value="2" hassubinfo="true">省级</option>
+                    <option value="3" hassubinfo="true">国家级</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">描述：</label>
+        <div class="col-sm-4">
+            <textarea id="rewardDesc" name="rewardDesc" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+        </div>
+    </div>
+</form>
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- maxlength -->
+<script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var config = {
+            '.chosen-select': {},
+            '.chosen-select-deselect': {
+                allow_single_deselect: true
+            },
+            '.chosen-select-no-single': {
+                disable_search_threshold: 10
+            },
+            '.chosen-select-no-results': {
+                no_results_text: 'Oops, nothing found!'
+            },
+            '.chosen-select-width': {
+                width: "95%"
+            }
+        }
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+
+        $('#rewardDesc').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
+    });
+</script>
+</body>
+</html>

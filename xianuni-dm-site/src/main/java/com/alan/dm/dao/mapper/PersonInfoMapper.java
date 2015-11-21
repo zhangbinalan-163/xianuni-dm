@@ -27,4 +27,10 @@ public interface PersonInfoMapper {
      * @
      */
     int countByCondition(@Param(value="condition")PersonCondition condition);
+
+    /**
+     *
+     * @param person
+     */
+    void insert(@Param(value = "person")Person person);
 }

@@ -11,7 +11,7 @@ public class OrgReward {
     private int id;
     private Orgnization orgnization;
     private String name;
-    private String desc;
+    private String rewardDesc;
     private int type;
     private int level;
     private Date rewardTime;
@@ -32,12 +32,12 @@ public class OrgReward {
         this.name = name;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getRewardDesc() {
+        return rewardDesc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setRewardDesc(String rewardDesc) {
+        this.rewardDesc = rewardDesc;
     }
 
     public int getType() {

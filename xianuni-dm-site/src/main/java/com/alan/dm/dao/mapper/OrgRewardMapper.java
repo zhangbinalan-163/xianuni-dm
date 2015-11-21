@@ -31,4 +31,10 @@ public interface OrgRewardMapper {
      * @param id
      */
     void delete(@Param(value="id")int id);
+
+    /**
+     *
+     * @param orgReward
+     */
+    void insert(@Param(value="reward") OrgReward orgReward);
 }

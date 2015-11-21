@@ -20,6 +20,13 @@
         <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
     </resultMap>
 
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="person.id">
+        INSERT INTO
+        <include refid="OUT_TABLE"/>
+        (orgId,name,status,type,number,idNumber,sex,nation,degree,password,birth,createTime,personDesc)
+        VALUES(#{person.orgnization.id},#{person.name},#{person.status},#{person.type},#{person.number},#{person.idNumber},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},#{person.personDesc})
+    </insert>
+
     <select id="getByCondition" resultMap="OUT_INFO">
         SELECT
           O.id AS id,

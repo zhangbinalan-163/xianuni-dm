@@ -13,6 +13,11 @@ import java.util.List;
  */
 public interface IOrgRewardService {
     /**
+     * 新建记录
+     * @param orgReward
+     */
+    void addReward(OrgReward orgReward) throws DMException;
+    /**
      * 批量删除
      * @param idList
      * @throws DMException

@@ -54,4 +54,11 @@
         FROM <include refid="OUT_TABLE"/>
         WHERE id = #{id};
     </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="reward.id">
+        INSERT INTO
+        <include refid="OUT_TABLE"/>
+        (orgId,name,rewardTime,type,level,rewardDesc)
+        VALUES(#{reward.orgnization.id},#{reward.name},#{reward.rewardTime},#{reward.type},#{reward.level},#{reward.rewardDesc})
+    </insert>
 </mapper>

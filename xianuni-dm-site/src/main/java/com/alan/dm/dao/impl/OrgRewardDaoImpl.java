@@ -21,7 +21,7 @@ public class OrgRewardDaoImpl implements IOrgRewardDao{
 
     @Override
     public void insert(OrgReward orgReward) throws DMException {
-
+        orgRewardMapper.insert(orgReward);
     }
 
     @Override

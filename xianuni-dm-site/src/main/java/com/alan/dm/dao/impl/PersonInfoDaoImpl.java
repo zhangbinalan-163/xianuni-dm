@@ -17,7 +17,6 @@ import java.util.List;
  */
 @Repository(value = "personInfoDao")
 public class PersonInfoDaoImpl implements IPersonInfoDao {
-
     @Autowired
     private PersonInfoMapper personInfoMapper;
 
@@ -29,5 +28,10 @@ public class PersonInfoDaoImpl implements IPersonInfoDao {
     @Override
     public int countByCondition(PersonCondition condition) throws DMException {
         return personInfoMapper.countByCondition(condition);
+    }
+
+    @Override
+    public void insertPerson(Person person) throws DMException {
+        personInfoMapper.insert(person);
     }
 }

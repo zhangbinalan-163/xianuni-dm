@@ -166,7 +166,7 @@ public class OrgnizationController extends BaseController{
 					JSONObject orgObject=new JSONObject();
 					orgObject.put("id",orgnization.getId());
 					orgObject.put("name",orgnization.getName());
-					orgObject.put("isHasSon",orgnization.isHasSon());
+					orgObject.put("isParent",orgnization.isHasSon());
 					orgObject.put("open",true);
 					orgObject.put("pId", -1);
 					orgArray.add(orgObject);

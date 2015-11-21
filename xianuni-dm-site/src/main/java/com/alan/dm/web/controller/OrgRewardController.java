@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -29,6 +30,48 @@ public class OrgRewardController extends BaseController{
 
 	@Resource(name = "orgRewardService")
 	private IOrgRewardService orgRewardService;
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/add.do")
+	@ResponseBody
+	public String add(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		String name=request.getString("rewardName");
+		String desc=request.getString("rewardDesc", null);
+		int type=request.getInt("rewardType", OrgRewardType.REWARD.getId());
+		int level=request.getInt("rewardLevel", OrgRewardLevel.SCHOOLE.getId());
+		Date time=request.getDate("rewardTime");
+		int orgId=request.getInt("orgId");
+
+		OrgReward orgReward=new OrgReward();
+		orgReward.setRewardDesc(desc);
+		orgReward.setLevel(level);
+		orgReward.setName(name);
+		orgReward.setRewardTime(time);
+		orgReward.setType(type);
+		Orgnization orgnization=new Orgnization();
+		orgnization.setId(orgId);
+		orgReward.setOrgnization(orgnization);
+
+		try{
+			orgRewardService.addReward(orgReward);
+
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success",true);
+			return JsonUtils.fromObject(jsonObject);
+		}catch (Exception e){
+			LOGGER.error("add reward fail,rewardName={}",name,e);
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", false);
+			jsonObject.put("msg","添加失败");
+			return JsonUtils.fromObject(jsonObject);
+		}
+	}
 
 	/**
 	 *

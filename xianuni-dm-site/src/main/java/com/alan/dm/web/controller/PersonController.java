@@ -7,6 +7,7 @@ import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.*;
 import com.alan.dm.entity.PrepareInfo;
 import com.alan.dm.service.*;
+import com.alan.dm.service.impl.PersonServiceImpl;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -47,6 +49,133 @@ public class PersonController extends BaseController{
 	@Resource(name = "orgnizationService")
 	private IOrgnizationService orgnizationService;
 
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/basicAdd.do")
+	@ResponseBody
+	public String add(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId = request.getInt("orgId");
+		String name=request.getString("name");
+		String idnumber=request.getString("idNumber");
+		String number=request.getString("number");
+		String desc=request.getString("desc", null);
+		int type=request.getInt("type", PersonType.STUDENT.getId());
+		int nation=request.getInt("nation", 0);
+		int degree=request.getInt("degree", 0);
+		int sex=request.getInt("sex", 0);
+		int profession=request.getInt("profession", 0);
+		Date birth=request.getDate("birth");
+
+		Orgnization orgnization = new Orgnization();
+		orgnization.setId(orgId);
+
+		Person person=new Person();
+		person.setOrgnization(orgnization);
+		person.setName(name);
+		person.setIdNumber(idnumber);
+		person.setNumber(number);
+		person.setType(type);
+		person.setBirth(birth);
+		person.setDegree(degree);
+		person.setStatus(PersonStatus.NO.getId());
+		person.setNation(nation);
+		person.setPersonDesc(desc);
+		person.setSex(sex);
+		person.setProfession(profession);
+
+		try{
+			personService.createPerson(person);
+
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success",true);
+			return JsonUtils.fromObject(jsonObject);
+		}catch (Exception e){
+			LOGGER.error("add person fail,name={}",name,e);
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", false);
+			jsonObject.put("msg","添加失败");
+			return JsonUtils.fromObject(jsonObject);
+		}
+	}
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/normalQuery.do")
+	@ResponseBody
+	public String normalQuery(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId=request.getInt("orgId", 0);
+		String number=request.getString("number", null);
+		PersonCondition condition=new PersonCondition();
+		if(orgId!=0){
+			condition.setOrgId(orgId);
+		}
+		if(!StringUtils.isEmpty(number)){
+			condition.setNumber(number);
+		}
+		List<Person> personList=personService.getByCondition(condition,null);
+
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject keyObject=new JSONObject();
+				keyObject.put("personId",person.getId());
+				keyObject.put("personName",person.getName());
+				keyObject.put("personNumber", person.getNumber());
+				rowsArray.add(keyObject);
+			}
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("code",200);
+		jsonObject.put("message","success");
+		jsonObject.put("value",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/basicQuery.do")
+	@ResponseBody
+	public String basicQuery(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId=request.getInt("orgId", 0);
+		String number=request.getString("number", null);
+		PersonCondition condition=new PersonCondition();
+		if(orgId!=0){
+			condition.setOrgId(orgId);
+		}
+		if(!StringUtils.isEmpty(number)){
+			condition.setNumber(number);
+		}
+		List<Person> personList=personService.getByCondition(condition,null);
+
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject keyObject=new JSONObject();
+				keyObject.put("personId",person.getId());
+				keyObject.put("personName",person.getName());
+				keyObject.put("personNumber", person.getNumber());
+				rowsArray.add(keyObject);
+			}
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("code",200);
+		jsonObject.put("message","success");
+		jsonObject.put("value",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
 	/**
 	 * 获取基本信息列表
 	 * @param httpServletRequest
