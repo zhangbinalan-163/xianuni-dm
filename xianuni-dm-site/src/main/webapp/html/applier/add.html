@@ -24,7 +24,7 @@
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
             <div class="input-group">
-                <input type="text" class="form-control" id="testNoBtn">
+                <input type="text" class="form-control" id="pNumber">
                 <div class="input-group-btn">
                     <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
                         <span class="caret"></span>
@@ -33,7 +33,7 @@
                     </ul>
                 </div>
             </div>
-            <span class="help-block m-b-none">请从基础人员库中查询</span>
+            <span class="help-block m-b-none">请从本党支部基础人员库中查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -63,7 +63,7 @@
                     </ul>
                 </div>
             </div>
-            <span class="help-block m-b-none">请从党员库中查询</span>
+            <span class="help-block m-b-none">请从本党支部党员库中查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -117,7 +117,7 @@
             $(selector).chosen(config[selector]);
         }
 
-        $('#rewardDesc').maxlength({
+        $('#talkContent').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,
@@ -128,7 +128,7 @@
             message: '已输入 %charsTyped%/最多输入%charsTotal%'
         });
 
-        $("#testNoBtn").bsSuggest({
+        $("#pNumber").bsSuggest({
             url: "/xianuni-dm/person/basicQuery.do?orgId="+getOrgTag()+"&number=",
             getDataMethod:"url",
             effectiveFields: ["personNumber", "personName"],

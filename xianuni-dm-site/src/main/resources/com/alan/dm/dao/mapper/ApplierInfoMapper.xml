@@ -28,6 +28,13 @@
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
 
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="applier.id">
+        INSERT INTO
+        <include refid="A_TABLE"/>
+        (personId,createTime,applyTime,talkTime,talkContent,talkerId)
+        VALUES(#{applier.person.id},#{applier.createTime},#{applier.applyTime},#{applier.talkTime},#{applier.talkContent},#{applier.talkerId})
+    </insert>
+
     <select id="getByCondition" resultMap="A_INFO">
         SELECT
         A.id as applierId,

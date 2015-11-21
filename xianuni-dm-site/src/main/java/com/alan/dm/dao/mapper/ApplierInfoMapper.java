@@ -28,4 +28,10 @@ public interface ApplierInfoMapper {
      * @
      */
     int countByCondition(@Param(value="condition") ApplierInfoCondition condition);
+
+    /**
+     *
+     * @param applierInfo
+     */
+    void insert(@Param(value="applier")ApplierInfo applierInfo);
 }

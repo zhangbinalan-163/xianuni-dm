@@ -33,4 +33,18 @@ public interface PersonInfoMapper {
      * @param person
      */
     void insert(@Param(value = "person")Person person);
+
+    /**
+     *
+     * @param number
+     * @return
+     */
+    Person getByNumber(@Param(value = "number")String number);
+
+    /**
+     * 
+     * @param personId
+     * @param status
+     */
+    void setStatus(@Param(value = "personId")int personId,@Param(value = "status") int status);
 }

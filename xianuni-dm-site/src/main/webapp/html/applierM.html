@@ -115,17 +115,10 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var name,number,idNumber,birth,desc,nation,degree,sex,type;
+                            var number,talkerId,talkContent,talkTime,applyTime;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
-                                if(inputName=='pName'){
-                                    if(!inputValue){
-                                        layer.alert('名字不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    name=inputValue;
-                                }
                                 if(inputName=='pNumber'){
                                     if(!inputValue){
                                         layer.alert('学工号不能为空', {icon: 5});
@@ -133,89 +126,48 @@
                                     }
                                     number=inputValue;
                                 }
-                                if(inputName=='pIdNumber'){
-                                    if(!inputValue){
-                                        layer.alert('身份证不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    idNumber=inputValue;
+                                if(inputName=='applyTime'){
+                                    applyTime=inputValue;
                                 }
-                                if(inputName=='pBirth'){
-                                    if(!inputValue){
-                                        layer.alert('出生日期不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    birth=inputValue;
+                                if(inputName=='talkerId'){
+                                    talkerId=inputValue;
                                 }
-                            }
-                            var selects=layer.getChildFrame('body',index).find('select');
-                            for(var i=0; i<selects.length; i++){
-                                var inputName=selects[i].id;
-                                var inputValue=selects[i].value;
-                                if(inputName=='pNation'){
-                                    if(!inputValue){
-                                        layer.alert('民族不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    nation=inputValue;
+                                if(inputName=='talkTime'){
+                                    talkTime=inputValue;
                                 }
-                                if(inputName=='pDegree'){
-                                    if(!inputValue){
-                                        layer.alert('学历不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    degree=inputValue;
-                                }
-                                if(inputName=='pSex'){
-                                    if(!inputValue){
-                                        layer.alert('性别不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    sex=inputValue;
-                                }
-                                if(inputName=='pType'){
-                                    if(!inputValue){
-                                        layer.alert('类别不能为空', {icon: 5});
-                                        return;
-                                    }
-                                    type=inputValue;
-                                }
+
                             }
                             var textareas=layer.getChildFrame('body',index).find('textarea');
                             for(var i=0; i<textareas.length; i++){
                                 var inputName=textareas[i].id;
                                 var inputValue=textareas[i].value;
-                                if(inputName=='pDesc'){
-                                    desc=inputValue;
+                                if(inputName=='talkContent'){
+                                    talkContent=inputValue;
                                 }
                             }
                             $.ajax( {
-                                url:'/xianuni-dm/person/basicAdd.do',
+                                url:'/xianuni-dm/person/applierAdd.do',
                                 data:{
                                     orgId : node.id,
-                                    name:name,
-                                    type:type,
-                                    nation:nation,
-                                    degree:degree,
-                                    sex:sex,
-                                    desc:desc,
-                                    birth:birth,
                                     number:number,
-                                    idNumber:idNumber
+                                    applyTime:applyTime,
+                                    talkerId:talkerId,
+                                    talkTime:talkTime,
+                                    talkContent:talkContent
                                 },
                                 type:'post',
                                 dataType:'json',
                                 success:function(data) {
                                     if(data.success){
-                                        layer.alert('添加奖基础信息成功', {icon: 1});
+                                        layer.alert('添加申请人信息成功', {icon: 1});
                                         layer.close(index);
                                         self.fetchData({});
                                     }else{
-                                        layer.alert('添加奖基础信息失败！'+data.msg, {icon: 5});
+                                        layer.alert('添加申请人信息失败！'+data.msg, {icon: 5});
                                     }
                                 },
                                 error : function() {
-                                    layer.alert('添加奖基础信息失败', {icon: 5});
+                                    layer.alert('添加申请人信息失败', {icon: 5});
                                 }
                             });
                         }

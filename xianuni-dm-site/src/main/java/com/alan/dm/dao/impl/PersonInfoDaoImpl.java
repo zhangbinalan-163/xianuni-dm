@@ -5,6 +5,7 @@ import com.alan.dm.dao.IPersonInfoDao;
 import com.alan.dm.dao.mapper.PersonInfoMapper;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
+import com.alan.dm.entity.PersonStatus;
 import com.alan.dm.entity.condition.PersonCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,11 @@ public class PersonInfoDaoImpl implements IPersonInfoDao {
     private PersonInfoMapper personInfoMapper;
 
     @Override
+    public Person getByNumber(String number) throws DMException {
+        return personInfoMapper.getByNumber(number);
+    }
+
+    @Override
     public List<Person> getByCondition(PersonCondition condition, Page page) throws DMException {
         return personInfoMapper.getByCondition(condition,page);
     }
@@ -33,5 +39,10 @@ public class PersonInfoDaoImpl implements IPersonInfoDao {
     @Override
     public void insertPerson(Person person) throws DMException {
         personInfoMapper.insert(person);
+    }
+
+    @Override
+    public void updateStatus(Person person,PersonStatus status) throws DMException {
+        personInfoMapper.setStatus(person.getId(),status.getId());
     }
 }

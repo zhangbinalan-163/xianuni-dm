@@ -28,4 +28,11 @@ public interface IApplierInfoDao {
      * @throws DMException
      */
     int countByCondition(ApplierInfoCondition condition)throws DMException;
+
+    /**
+     *
+     * @param applierInfo
+     * @throws DMException
+     */
+    void insert(ApplierInfo applierInfo) throws DMException;
 }

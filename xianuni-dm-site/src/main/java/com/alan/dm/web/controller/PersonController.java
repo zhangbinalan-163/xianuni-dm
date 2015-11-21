@@ -57,7 +57,7 @@ public class PersonController extends BaseController{
 	 */
 	@RequestMapping("/basicAdd.do")
 	@ResponseBody
-	public String add(HttpServletRequest httpServletRequest) throws Exception {
+	public String basicAdd(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId = request.getInt("orgId");
 		String name=request.getString("name");
@@ -108,6 +108,47 @@ public class PersonController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
+	@RequestMapping("/applierAdd.do")
+	@ResponseBody
+	public String applierAdd(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId = request.getInt("orgId");
+		String number=request.getString("number");
+		String talkContent=request.getString("talkContent", null);
+		Integer talkerId=request.getInt("talkerId", -1);
+		Date talkTime=request.getDate("talkTime", null);
+		Date applyTime=request.getDate("applyTime",null);
+
+		//检查是否学号正确，状态+部门
+		//检查谈话人是否是本部门
+		//添加申请人信息，修改基础人员状态
+		ApplierInfo applierInfo=new ApplierInfo();
+		applierInfo.setApplyTime(applyTime);
+		applierInfo.setTalkContent(talkContent);
+		applierInfo.setTalkerId(talkerId);
+		applierInfo.setTalkTime(talkTime);
+		Person person = personService.getByNumber(number);
+		if(person==null){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success",false);
+			jsonObject.put("msg","该学号不能转为申请人"+number);
+			return JsonUtils.fromObject(jsonObject);
+		}
+		applierInfo.setPerson(person);
+
+		applierService.createApplier(applierInfo);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success",true);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 * 正式党员查询接口
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/normalQuery.do")
 	@ResponseBody
 	public String normalQuery(HttpServletRequest httpServletRequest) throws Exception {
@@ -121,6 +162,7 @@ public class PersonController extends BaseController{
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
+		condition.setStatus(PersonStatus.NORMAL.getId());
 		List<Person> personList=personService.getByCondition(condition,null);
 
 		JSONArray rowsArray=new JSONArray();
@@ -139,8 +181,9 @@ public class PersonController extends BaseController{
 		jsonObject.put("value",rowsArray);
 		return JsonUtils.fromObject(jsonObject);
 	}
+
 	/**
-	 *
+	 * 基础人员查询接口
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -158,6 +201,7 @@ public class PersonController extends BaseController{
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
+		condition.setStatus(PersonStatus.NO.getId());
 		List<Person> personList=personService.getByCondition(condition,null);
 
 		JSONArray rowsArray=new JSONArray();
@@ -205,6 +249,7 @@ public class PersonController extends BaseController{
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
+		condition.setStatus(PersonStatus.NO.getId());
 		int subCount = personService.countByCondition(condition);
 
 		List<Person> personList=personService.getByCondition(condition,pageInfo);

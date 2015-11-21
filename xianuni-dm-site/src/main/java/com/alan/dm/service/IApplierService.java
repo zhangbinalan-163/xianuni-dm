@@ -31,4 +31,11 @@ public interface IApplierService {
      * @throws DMException
      */
     int countByCondition(ApplierInfoCondition condition)throws DMException;
+
+    /**
+     * 
+     * @param applierInfo
+     * @throws DMException
+     */
+    void createApplier(ApplierInfo applierInfo) throws DMException;
 }

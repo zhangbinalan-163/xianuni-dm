@@ -17,6 +17,7 @@
         <result property="name" column="personName"/>
         <result property="createTime" column="createTime"/>
         <result property="number" column="number"/>
+        <result property="status" column="personStatus"/>
         <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
     </resultMap>
 
@@ -27,6 +28,12 @@
         VALUES(#{person.orgnization.id},#{person.name},#{person.status},#{person.type},#{person.number},#{person.idNumber},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},#{person.personDesc})
     </insert>
 
+    <update id="setStatus">
+        UPDATE <include refid="OUT_TABLE"/>
+        SET status=#{status}
+        WHERE id=#{personId}
+    </update>
+
     <select id="getByCondition" resultMap="OUT_INFO">
         SELECT
           O.id AS id,
@@ -34,11 +41,13 @@
           P.id AS orgId,
           O.name AS personName,
           O.createTime AS createTime,
-          O.number AS number
+          O.number AS number,
+          O.status AS personStatus
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
         ON O.orgId=P.id
         <where>
             <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.status != null">AND O.status=#{condition.status}</if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
             </if>
@@ -60,6 +69,7 @@
         ON O.orgId=P.id
         <where>
             <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.status != null">AND O.status=#{condition.status}</if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
             </if>
@@ -71,4 +81,9 @@
         </where>
     </select>
 
+    <select id="getByNumber" resultType="com.alan.dm.entity.Person">
+        SELECT *
+        FROM  <include refid="OUT_TABLE" />
+        WHERE number=#{number}
+    </select>
 </mapper>

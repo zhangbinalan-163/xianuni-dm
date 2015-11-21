@@ -3,6 +3,7 @@ package com.alan.dm.dao;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
+import com.alan.dm.entity.PersonStatus;
 import com.alan.dm.entity.condition.PersonCondition;
 
 import java.util.List;
@@ -35,4 +36,20 @@ public interface IPersonInfoDao {
      * @throws DMException
      */
     void insertPerson(Person person) throws DMException;
+
+    /**
+     *
+     * @param number
+     * @return
+     * @throws DMException
+     */
+    Person getByNumber(String number) throws DMException;
+
+    /**
+     *
+     * @param status
+     * @throws DMException
+     */
+    void updateStatus(Person person,PersonStatus status) throws DMException;
 }
+

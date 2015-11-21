@@ -13,6 +13,13 @@ import java.util.List;
 public interface IPersonService {
     /**
      *
+     * @param number
+     * @return
+     * @throws DMException
+     */
+    Person getByNumber(String number) throws DMException;
+    /**
+     *
      * @param condition
      * @param page
      * @return

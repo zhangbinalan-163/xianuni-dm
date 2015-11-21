@@ -29,4 +29,9 @@ public class ApplierInfoDaoImpl implements IApplierInfoDao {
     public int countByCondition(ApplierInfoCondition condition) throws DMException {
         return applierInfoMapper.countByCondition(condition);
     }
+
+    @Override
+    public void insert(ApplierInfo applierInfo) throws DMException {
+        applierInfoMapper.insert(applierInfo);
+    }
 }

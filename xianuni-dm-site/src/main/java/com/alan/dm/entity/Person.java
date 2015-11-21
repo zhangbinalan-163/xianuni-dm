@@ -11,6 +11,7 @@ public class Person {
     private String name;
     private int status;//TODO
     private Orgnization orgnization;//党组织
+    private int orgId;//
     private int type;//0-学生 1-教工
     private String number;//学工号
     private String idNumber;//身份证号
@@ -159,5 +160,13 @@ public class Person {
 
     public void setOrgnization(Orgnization orgnization) {
         this.orgnization = orgnization;
+    }
+
+    public int getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
     }
 }

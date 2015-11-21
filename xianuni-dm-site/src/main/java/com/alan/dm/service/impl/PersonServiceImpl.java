@@ -18,12 +18,18 @@ import java.util.List;
  */
 @Service(value = "personService")
 public class PersonServiceImpl implements IPersonService{
+
     @Resource(name = "personInfoDao")
     private IPersonInfoDao personInfoDao;
 
     @Override
     public List<Person> getByCondition(PersonCondition condition, Page page) throws DMException {
         return personInfoDao.getByCondition(condition,page);
+    }
+
+    @Override
+    public Person getByNumber(String number) throws DMException {
+        return personInfoDao.getByNumber(number);
     }
 
     @Override
