@@ -19,13 +19,20 @@ public interface IOrgnizationService {
      */
     void deleteOrg(Orgnization orgnization, boolean withSubOrgs) throws DMException;
     /**
-     * 根据父组织获取直属组织列表
+     * 根据父组织获取组织列表
      * @param parentOrg
      * @return
      * @throws DMException
      */
     List<Orgnization> getOrgByParent(Orgnization parentOrg,boolean withAllSub) throws DMException;
 
+    /**
+     * 获取所有上级组织
+     * @param orgnization
+     * @return
+     * @throws DMException
+     */
+    List<Orgnization> getParentOrg(Orgnization orgnization) throws DMException;
     /**
      * 根据ID获取党组织信息
      * @param id

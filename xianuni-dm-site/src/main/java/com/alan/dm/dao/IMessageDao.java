@@ -13,10 +13,51 @@ import java.util.List;
  * @author: fan
  */
 public interface IMessageDao {
-    int insert(Message message) throws DMException;
+    /**
+     *
+     * @param message
+     * @return
+     * @throws DMException
+     */
+    void insert(Message message) throws DMException;
+
+    /**
+     *
+     * @param message
+     * @throws DMException
+     */
     void delete(Message message) throws DMException;
+
+    /**
+     *
+     * @param message
+     * @throws DMException
+     */
     void update(Message message) throws DMException;
-    Message findOne(int id) throws DMException;
-    List<Message> getMessages(MessageCondition condition, Page page) throws DMException;
+
+    /**
+     *
+     * @param id
+     * @return
+     * @throws DMException
+     */
+    Message getById(int id) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @param page
+     * @return
+     * @throws DMException
+     */
+    List<Message> getByCondition(MessageCondition condition, Page page) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
+    int countByCondition(MessageCondition condition) throws DMException;
 }
 

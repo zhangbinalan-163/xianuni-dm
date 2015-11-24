@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.MessageMapper">
+
+    <sql id="OUT_TABLE">tb_message</sql>
+    <sql id="TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="OUT_INFO" type="com.alan.dm.entity.Message">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <result property="toSub" column="toSub"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="message.id">
+        INSERT INTO
+        <include refid="OUT_TABLE"/>
+        (orgId,toSub,title,content,createTime)
+        VALUES(#{message.orgnization.id},#{message.toSub},#{message.title},#{message.content},#{message.createTime})
+    </insert>
+
+    <delete id="delete">
+        DELETE  FROM <include refid="OUT_TABLE"/>
+        WHERE id=#{message.id}
+    </delete>
+
+    <select id="getByCondition" resultMap="OUT_INFO">
+        SELECT
+        O.id AS id,
+        P.name AS orgName,
+        P.id AS orgId,
+        O.title AS title,
+        O.content AS content,
+        O.toSub AS toSub,
+        O.createTime AS createTime
+        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
+        ON O.orgId=P.id
+        <where>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    O.orgId=#{condition.orgId}
+                </if>
+            </if>
+            <if test="condition.toSub != null">AND O.toSub=#{condition.toSub}</if>
+        </where>
+        ORDER BY O.createTime desc
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        select count(*)
+        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
+        ON O.orgId=P.id
+        <where>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    O.orgId=#{condition.orgId}
+                </if>
+            </if>
+            <if test="condition.toSub != null">AND O.toSub=#{condition.toSub}</if>
+        </where>
+    </select>
+
+    <select id="getById" resultType="com.alan.dm.entity.Message">
+        SELECT *
+        FROM  <include refid="OUT_TABLE" />
+        WHERE id=#{id}
+    </select>
+</mapper>

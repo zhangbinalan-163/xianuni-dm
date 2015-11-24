@@ -9,10 +9,12 @@ import java.util.Date;
  */
 public class Message {
     private int id;
-    private Date messageTime; // 日期
-    private String type; // 类型
+    private Date createTime; // 日期
     private String title; // 标题
     private String content; // 内容
+    private int orgId;
+    private Orgnization orgnization;
+    private boolean toSub;//是否对下属所有的子部门可见
 
     public int getId() {
         return id;
@@ -22,24 +24,25 @@ public class Message {
         this.id = id;
     }
 
-    public Date getMessageTime() {
-        return messageTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setMessageTime(Date messageTime) {
-        this.messageTime = messageTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 
     public String getTitle() {
         return title;
+    }
+
+    public Orgnization getOrgnization() {
+        return orgnization;
+    }
+
+    public void setOrgnization(Orgnization orgnization) {
+        this.orgnization = orgnization;
     }
 
     public void setTitle(String title) {
@@ -52,5 +55,21 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public boolean isToSub() {
+        return toSub;
+    }
+
+    public void setToSub(boolean toSub) {
+        this.toSub = toSub;
+    }
+
+    public int getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
     }
 }

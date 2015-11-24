@@ -20,21 +20,21 @@ public interface IMessageService {
      * @return
      * @throws DMException
      */
-    int addMessage(Message message) throws DMException;
+    void createMessage(Message message) throws DMException;
 
     /**
      * 删除消息
-     * @param id
+     * @param message
      * @throws DMException
      */
-    void deleteMessage(int id) throws DMException;
+    void deleteMessage(Message message) throws DMException;
 
     /**
      * 修改消息
      * @param message
      * @throws DMException
      */
-    void modifyMessage(Message message) throws DMException;
+    void updateMessage(Message message) throws DMException;
 
     /**
      * 获取消息
@@ -43,5 +43,13 @@ public interface IMessageService {
      * @return
      * @throws DMException
      */
-    List<Message> getMessage(MessageCondition condition, Page page) throws DMException;
+    List<Message> getMessageByCondtition(MessageCondition condition, Page page) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
+    int countMessageByCondtition(MessageCondition condition) throws DMException;
 }

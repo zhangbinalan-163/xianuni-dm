@@ -82,4 +82,15 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
         //todo 其他信息是否需要删除
         LOG.info("delete orgnization success,orgId={},orgName={}", orgnization.getId(), orgnization.getName());
     }
+
+    @Override
+    public List<Orgnization> getParentOrg(Orgnization orgnization) throws DMException {
+        List<Orgnization> orgnizationList=new ArrayList<>();
+        int parent=orgnization.getParent();
+        while(parent!=-1){
+            Orgnization parentOrg = orgnizationDao.getById(parent);
+            orgnizationList.add(parentOrg);
+        }
+        return orgnizationList;
+    }
 }
