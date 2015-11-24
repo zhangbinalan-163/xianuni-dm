@@ -3,13 +3,13 @@ package com.alan.dm.service.impl;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.dao.IOrgnizationDao;
 import com.alan.dm.entity.Orgnization;
-import com.alan.dm.entity.Page;
 import com.alan.dm.service.IOrgnizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +25,23 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
     private IOrgnizationDao orgnizationDao;
 
     @Override
-    public List<Orgnization> getOrgByParent(Orgnization parentOrg,Page page) throws DMException {
-        return orgnizationDao.getByParentOrg(parentOrg.getId(),page);
+    public List<Orgnization> getOrgByParent(Orgnization parentOrg,boolean withAllSub) throws DMException {
+        //获取直属的组织
+        List<Orgnization> directSubOrgList = orgnizationDao.getByParentOrg(parentOrg.getId());
+        if(!withAllSub){
+            return directSubOrgList;
+        }
+        //级联获取所有的组织，确保千万不要会无限循环啊
+        List<Orgnization> subOrgList=new ArrayList<Orgnization>();
+        if(directSubOrgList!=null){
+            subOrgList.addAll(directSubOrgList);
+            for(Orgnization subOrg:directSubOrgList){
+                if(subOrg.isHasSon()){
+                    subOrgList.addAll(getOrgByParent(subOrg, true));
+                }
+            }
+        }
+        return subOrgList;
     }
 
     @Override
@@ -55,15 +70,16 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
     public void deleteOrg(Orgnization orgnization, boolean withSubOrgs) throws DMException {
         if(withSubOrgs){
             //先删除子节点
-            List<Orgnization> subOrgs = getOrgByParent(orgnization, null);
+            List<Orgnization> subOrgs = getOrgByParent(orgnization,false);
             if(subOrgs!=null){
                 for(Orgnization subOrg:subOrgs){
-                    deleteOrg(subOrg,withSubOrgs);
+                    deleteOrg(subOrg,true);
                 }
             }
         }
         //删除党组织
         orgnizationDao.delete(orgnization);
+        //todo 其他信息是否需要删除
         LOG.info("delete orgnization success,orgId={},orgName={}", orgnization.getId(), orgnization.getName());
     }
 }

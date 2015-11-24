@@ -22,7 +22,18 @@ public class Request {
      * 实际的HTTP响应
      */
     private HttpServletResponse httpServletResponse;
+    /**
+     * 当前登录管理员
+     */
+    private Integer onlineAdminId;
 
+    public Integer getOnlineAdminId() {
+        return onlineAdminId;
+    }
+
+    public void setOnlineAdminId(Integer onlineAdminId) {
+        this.onlineAdminId = onlineAdminId;
+    }
 
     public HttpServletRequest getHttpServletRequest() {
         return httpServletRequest;

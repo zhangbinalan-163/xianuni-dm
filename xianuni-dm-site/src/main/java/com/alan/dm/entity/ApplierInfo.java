@@ -9,12 +9,24 @@ import java.util.Date;
 public class ApplierInfo {
     private int id;
     private Person person;
-
+    private int personId;
     private Date createTime;
+    private Date updateTime;
+
     private Date applyTime;
-    private Date talkTime;
+
     private String talkContent;
+    private Person talker;
     private int talkerId;
+    private Date talkTime;
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public int getId() {
         return id;
@@ -25,7 +37,23 @@ public class ApplierInfo {
     }
 
     public Person getPerson() {
+        if(person==null&&personId!=0){
+            person=new Person();
+            person.setId(personId);
+        }
         return person;
+    }
+
+    public Person getTalker() {
+        if(talker==null&&talkerId!=0){
+            talker=new Person();
+            talker.setId(talkerId);
+        }
+        return talker;
+    }
+
+    public void setTalker(Person talker) {
+        this.talker = talker;
     }
 
     public void setPerson(Person person) {
@@ -65,10 +93,21 @@ public class ApplierInfo {
     }
 
     public int getTalkerId() {
+        if(talkerId==0&&talker!=null){
+            talkerId=talker.getId();
+        }
         return talkerId;
     }
 
     public void setTalkerId(int talkerId) {
         this.talkerId = talkerId;
+    }
+
+    public int getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
     }
 }

@@ -9,14 +9,23 @@ import java.util.Date;
 public class ActivitistInfo {
     private int id;
     private Person person;
+    private int personId;
 
     private Date evaluationTime;
     private String evaluationContent;
     private Date meetTime;
     private String meetContent;
-    private String director;
+    private int director;
     private boolean recorded;
     private Date createTime;
+
+    public int getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
+    }
 
     public int getId() {
         return id;
@@ -27,6 +36,10 @@ public class ActivitistInfo {
     }
 
     public Person getPerson() {
+        if(person==null&&personId!=0){
+            person=new Person();
+            person.setId(personId);
+        }
         return person;
     }
 
@@ -66,11 +79,11 @@ public class ActivitistInfo {
         this.meetContent = meetContent;
     }
 
-    public String getDirector() {
+    public int getDirector() {
         return director;
     }
 
-    public void setDirector(String director) {
+    public void setDirector(int director) {
         this.director = director;
     }
 

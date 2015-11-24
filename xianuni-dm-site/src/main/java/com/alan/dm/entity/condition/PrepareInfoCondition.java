@@ -3,8 +3,7 @@ package com.alan.dm.entity.condition;
 /**
  * 预备党员信息查询条件
  */
-public class PrepareInfoCondition {
-    private Integer orgId;
+public class PrepareInfoCondition extends BaseCondition{
     private String number;
     private Integer status;
 
@@ -22,13 +21,5 @@ public class PrepareInfoCondition {
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    public Integer getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
     }
 }

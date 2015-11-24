@@ -9,13 +9,25 @@ import java.util.Date;
 public class NormalInfo {
     private int id;
     private Person person;
-    private int applyTime;
+    private Date applyTime;
     private String approval;
     private String branchApproval;
     private String schoolApproval;
     private Date createTime;
 
+    private int personId;
+    public int getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
+    }
     public Person getPerson() {
+        if(person==null&&personId!=0){
+            person=new Person();
+            person.setId(personId);
+        }
         return person;
     }
 
@@ -31,11 +43,11 @@ public class NormalInfo {
         this.id = id;
     }
 
-    public int getApplyTime() {
+    public Date getApplyTime() {
         return applyTime;
     }
 
-    public void setApplyTime(int applyTime) {
+    public void setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
     }
 

@@ -3,6 +3,8 @@ package com.alan.dm.dao;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Admin;
 import com.alan.dm.entity.Orgnization;
+import com.alan.dm.entity.Page;
+import com.alan.dm.entity.condition.AdminCondition;
 
 import java.util.List;
 
@@ -41,12 +43,21 @@ public interface IAdminDao {
     Admin getByNumber(String schoolNumber) throws DMException;
 
     /**
-     * 查询指定部门的管理员信息
-     * @param orgnization
+     *
+     * @param condition
+     * @param page
      * @return
      * @throws DMException
      */
-    List<Admin> getByOrg(Orgnization orgnization) throws DMException;
+    List<Admin> getByCondition(AdminCondition condition, Page page) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
+    int countByCondition(AdminCondition condition) throws DMException;
 
     /**
      * 根据ID查询管理员

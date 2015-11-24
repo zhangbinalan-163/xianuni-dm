@@ -158,9 +158,6 @@ public class EduTrainingController extends BaseController {
         if(orgId!=0){
             condition.setOrgId(orgId);
         }
-        if(!StringUtils.isEmpty(orgName)){
-            condition.setOrgName(orgName);
-        }
         condition.setType(type);
         condition.setTrainingType(trainingType);
         int subCount = eduTrainingService.countTrain(condition);

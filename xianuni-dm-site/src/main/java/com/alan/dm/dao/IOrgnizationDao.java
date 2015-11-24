@@ -38,7 +38,7 @@ public interface IOrgnizationDao {
      * @return
      * @throws DMException
      */
-    List<Orgnization> getByParentOrg(int parentId,Page page) throws DMException;
+    List<Orgnization> getByParentOrg(int parentId) throws DMException;
 
     /**
      * 查询党组织信息

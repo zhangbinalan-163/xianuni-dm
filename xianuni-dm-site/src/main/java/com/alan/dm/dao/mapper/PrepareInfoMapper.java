@@ -1,6 +1,7 @@
 package com.alan.dm.dao.mapper;
 
 import com.alan.dm.common.exception.DMException;
+import com.alan.dm.entity.NormalInfo;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.PrepareInfo;
 import com.alan.dm.entity.condition.PersonCondition;
@@ -30,4 +31,33 @@ public interface PrepareInfoMapper {
      * @
      */
     int countByCondition(@Param(value="condition")PrepareInfoCondition condition);
+
+    /**
+     *
+     * @param prepareInfo
+     * @throws DMException
+     */
+    void insert(@Param(value="prepareInfo")PrepareInfo prepareInfo);
+
+    /**
+     *
+     * @param prepareInfo
+     * @throws DMException
+     */
+    void delete(@Param(value="prepareInfo")PrepareInfo prepareInfo);
+
+    /**
+     *
+     * @param prepareId
+     * @return
+     * @throws DMException
+     */
+    PrepareInfo getById(@Param(value="prepareId")int prepareId);
+    /**
+     *
+     * @param personId
+     * @return
+     * @throws DMException
+     */
+    PrepareInfo getByPersonId(@Param(value="personId") int personId);
 }

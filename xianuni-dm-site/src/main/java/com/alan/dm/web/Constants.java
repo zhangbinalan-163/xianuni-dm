@@ -13,8 +13,8 @@ public class Constants {
      */
     public static String COOKIE_NAME="xianuni_dm";
     /**
-     * session里面userid
+     * session里面管理员ID
      */
-    public static String SESSION_USERID_NAME="xianuni_session_uid";
+    public static String SESSION_ADMINID_NAME="xianuni_session_aid";
 
 }

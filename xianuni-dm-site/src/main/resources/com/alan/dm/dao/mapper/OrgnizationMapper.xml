@@ -32,9 +32,6 @@
         FROM  <include refid="TABLE" />
         WHERE parent=#{parentId}
         ORDER BY createTime DESC
-        <if test="page!=null">
-            LIMIT #{page.current}, #{page.size}
-        </if>
     </select>
 
     <select id="countSubOrg" resultType="Integer">

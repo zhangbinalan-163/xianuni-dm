@@ -53,6 +53,7 @@
     </div>
 </div>
 <input type="text" hidden="hidden" id="orgIdTag"/>
+<input type="text" hidden="hidden" id="idTag"/>
 
 <!-- 全局js -->
 <script src="../static/js/jquery.min.js?v=2.1.4"></script>
@@ -76,6 +77,7 @@
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         var table = ({
+
             init: function () {
                 this.$el = $("#list");
                 this.orgId = '0';
@@ -175,13 +177,14 @@
                 });
             },
             render: function () {
+                var self = this;
                 this.$el.jqGrid(
                         {
                             url: '/xianuni-dm/person/applierList.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '申请书提交时间','谈话时间'],
+                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '申请书提交时间','谈话时间','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
@@ -189,7 +192,8 @@
                                 {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
                                 {name: 'applyTime', index: 'applyTime',width: 60, align: "left"},
-                                {name: 'talkTime', index: 'talkTime',width: 60, align: "left"}
+                                {name: 'talkTime', index: 'talkTime',width: 60, align: "left"},
+                                {name: 'actions', index: 'actions', width: 120, align: "center"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
@@ -198,14 +202,79 @@
                             mtype: "get",
                             height: 400,
                             viewrecords: true,
-                            multiselect: true
+                            multiselect: true,
+                            // 自定义事件
+                            gridComplete: function () {
+                                var ids = self.$el.jqGrid('getDataIDs');
+                                for (var i = 0; i < ids.length; i++) {
+                                    var id = ids[i],
+                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>',
+                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
+                                    self.$el.jqGrid('setRowData', ids[i],
+                                            {
+                                                actions: [a, b].join(' ')
+                                            });
+                                }
+                                $('.J_edit').on('click', function () {
+                                    var id = $(this).data('id');
+                                    // todo 根据id获取数据 打开编辑弹窗
+                                    var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    $('#idTag').val(id);
+                                    layer.open({
+                                        type: 2,
+                                        content: 'applier/update.html',
+                                        area: ['100%', '100%'],
+                                        maxmin: false,
+                                        title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的入党申请人信息',
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5, //0-6的动画形式，-1不开启
+                                        btn: ['Sorry，暂时不支持修改', '取消'],
+                                        yes: function (index) {
+                                            //todo
+                                        },
+                                        no: function (index) {
+                                            layer.close(index);
+                                        }
+                                    });
+                                })
+                                $('.J_delete').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var index=layer.confirm('确定要删除该申请人信息吗？转为基础人员', {
+                                        btn: ['确认','取消'], //按钮
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5 //0-6的动画形式，-1不开启
+                                    }, function(){
+                                        $.ajax( {
+                                            url:'/xianuni-dm/person/applier/delete.do',
+                                            data:{
+                                                id :id
+                                            },
+                                            type:'post',
+                                            dataType:'json',
+                                            success:function(data) {
+                                                if(data.status){
+                                                    layer.alert('删除信息成功,转为基础人员', {icon: 1});
+                                                    self.fetchData({});
+                                                }else{
+                                                    layer.alert('删除信息失败！'+data.msg, {icon: 5});
+                                                }
+                                            },
+                                            error : function() {
+                                                layer.alert('删除信息失败', {icon: 5});
+                                            }
+                                        });
+                                    }, function(){
+                                        layer.close(index);
+                                    });
+                                })
+                            }
                         })
                         .jqGrid('navGrid', '#pager',
                         { edit: false, add: false, del: true,deltitle:'删除',search:false},
                         {},
                         {},
                         {   reloadAfterSubmit:true,
-                            url: '/xianuni-dm/applier/delete.do',
+                            url: '/xianuni-dm/person/applier/delete.do',
                             afterSubmit : function(response, postdata) {
                                 var json = eval('('+response.responseText+')');
                                 if(json.status){

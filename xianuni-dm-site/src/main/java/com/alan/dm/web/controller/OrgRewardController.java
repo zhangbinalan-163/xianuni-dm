@@ -4,7 +4,9 @@ import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
+import com.alan.dm.entity.condition.NormalInfoCondition;
 import com.alan.dm.entity.condition.OrgRewardCondition;
+import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgRewardService;
 import com.alan.dm.service.IOrgnizationService;
 import com.alan.dm.web.vo.Request;
@@ -31,6 +33,11 @@ public class OrgRewardController extends BaseController{
 	@Resource(name = "orgRewardService")
 	private IOrgRewardService orgRewardService;
 
+	@Resource(name = "adminService")
+	private IAdminService adminService;
+
+	@Resource(name = "orgnizationService")
+	private IOrgnizationService orgnizationService;
 	/**
 	 *
 	 * @param httpServletRequest
@@ -117,14 +124,41 @@ public class OrgRewardController extends BaseController{
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId",0);
 		String name=request.getString("name", null);
+		boolean containSubOrg=request.getBoolean("containSub", true);
 
+		//如果没有传入orgId，设置为管理员所管理的ORG
+		if(orgId==0){
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin adminInfo = adminService.getById(adminId);
+			if(adminInfo.getType()==Admin.ORG_ADMIN){
+				orgId=adminInfo.getOrgId();
+			}
+		}
+		OrgRewardCondition condition=new OrgRewardCondition();
+		condition.setContainSub(containSubOrg);
+		if(containSubOrg){
+			List<Integer> orgIdList=new ArrayList<Integer>();
+			orgIdList.add(orgId);
+			Orgnization orgnization=null;
+			if(orgId==0){
+				orgnization =new Orgnization();
+				orgnization.setId(-1);
+			}else{
+				orgnization= orgnizationService.getOrgById(orgId);
+			}
+			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+			if(subOrgList!=null){
+				for (Orgnization subOrg:subOrgList){
+					orgIdList.add(subOrg.getId());
+				}
+			}
+			condition.setOrgList(orgIdList);
+		}else{
+			condition.setOrgId(orgId);
+		}
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
-		OrgRewardCondition condition=new OrgRewardCondition();
-		if(orgId!=0){
-			condition.setOrgId(orgId);
-		}
 		if(!StringUtils.isEmpty(name)){
 			condition.setName(name);
 		}

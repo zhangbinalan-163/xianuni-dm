@@ -14,4 +14,72 @@
         WHERE schoolNumber=#{number}
     </select>
 
+    <select id="getById" resultType="com.alan.dm.entity.Admin">
+        SELECT *
+        FROM  <include refid="TABLE" />
+        WHERE id=#{adminId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="admin.id">
+        INSERT INTO
+        <include refid="TABLE"/>
+        (name,schoolNumber,type,status,orgId,password,createTime)
+        VALUES(#{admin.name},#{admin.schoolNumber},#{admin.type},#{admin.status},#{admin.orgId},#{admin.password},#{admin.createTime})
+    </insert>
+
+    <update id="update">
+        update
+        <include refid="TABLE" />
+        set name=#{admin.name},type=#{admin.type},status=#{admin.status},orgId=#{admin.orgId},password=#{admin.password},createTime=#{admin.createTime}
+        where id=#{admin.id}
+    </update>
+
+    <delete id="delete">
+        delete from <include refid="TABLE" />
+        where id=#{admin.id}
+    </delete>
+
+    <select id="getByCondition" resultType="com.alan.dm.entity.Admin">
+        SELECT *
+        FROM  <include refid="TABLE" />
+        <where>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    orgId=#{condition.orgId}
+                </if>
+            </if>
+            <if test="condition.type != null">AND type=#{condition.type}</if>
+        </where>
+        ORDER BY createTime DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        select count(*)
+        from <include refid="TABLE" />
+        <where>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    orgId=#{condition.orgId}
+                </if>
+            </if>
+            <if test="condition.type != null">AND type=#{condition.type}</if>
+        </where>
+    </select>
 </mapper>

@@ -30,9 +30,14 @@
 
     <update id="setStatus">
         UPDATE <include refid="OUT_TABLE"/>
-        SET status=#{status}
+        SET status=#{status},updateTime=#{updateTime}
         WHERE id=#{personId}
     </update>
+
+    <delete id="delete">
+        DELETE  FROM <include refid="OUT_TABLE"/>
+        WHERE id=#{person.id}
+    </delete>
 
     <select id="getByCondition" resultMap="OUT_INFO">
         SELECT
@@ -46,7 +51,18 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    O.orgId=#{condition.orgId}
+                </if>
+            </if>
             <if test="condition.status != null">AND O.status=#{condition.status}</if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
@@ -57,7 +73,7 @@
             </if>
             <if test="condition.name != null">AND O.name LIKE #{patternName}</if>
         </where>
-        ORDER BY id desc
+        ORDER BY O.updateTime desc,O.createTime desc
         <if test="page!=null">
             LIMIT #{page.current}, #{page.size}
         </if>
@@ -68,7 +84,18 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    O.orgId=#{condition.orgId}
+                </if>
+            </if>
             <if test="condition.status != null">AND O.status=#{condition.status}</if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
@@ -85,5 +112,10 @@
         SELECT *
         FROM  <include refid="OUT_TABLE" />
         WHERE number=#{number}
+    </select>
+    <select id="getById" resultType="com.alan.dm.entity.Person">
+        SELECT *
+        FROM  <include refid="OUT_TABLE" />
+        WHERE id=#{id}
     </select>
 </mapper>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body>
+<form method="get" class="form-horizontal">
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>党组织名称</small></label>
+        <div class="col-sm-5">
+            <p id="orgName" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>姓名</small></label>
+        <div class="col-sm-5">
+            <p id="pName" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>人员类型</small></label>
+        <div class="col-sm-5">
+            <p id="pType" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>学工号</small></label>
+        <div class="col-sm-5">
+            <p id="pNumber" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>身份证号</small></label>
+        <div class="col-sm-5">
+            <p id="pIdNumber" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>创建时间</small></label>
+        <div class="col-sm-5">
+            <p id="createTime" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>修改时间</small></label>
+        <div class="col-sm-5">
+            <p id="updateTime" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>性别</small></label>
+        <div class="col-sm-5">
+            <p id="pSex" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>民族</small></label>
+        <div class="col-sm-5">
+            <p id="pNation" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>学历</small></label>
+        <div class="col-sm-5">
+            <p id="pDegree" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>籍贯</small></label>
+        <div class="col-sm-5">
+            <p id="pHometown" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>出生日期</small></label>
+        <div class="col-sm-5">
+            <p id="pBirth" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>职务</small></label>
+        <div class="col-sm-5">
+            <p id="pProfession" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>备注</small></label>
+        <div class="col-sm-5">
+            <p id="pDesc" class="form-control-static"></p>
+        </div>
+    </div>
+</form>
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- maxlength -->
+<script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
+
+<script>
+    $(document).ready(function () {
+        //获取信息
+        var personId=getOrgTag();
+        $.ajax( {
+            url:'/xianuni-dm/person/basicInfo.do',
+            data:{
+                personId : personId
+            },
+            type:'get',
+            cache:false,
+            dataType:'json',
+            success:function(data) {
+                if(data.success){
+                    $('#orgName').html(data.orgName);
+                    $('#createTime').html(data.createTime);
+                    $('#updateTime').html(data.updateTime);
+                    $('#pNumber').html(data.number);
+                    $('#pName').html(data.name);
+                    $('#pType').html(data.type);
+                    $('#pIdNumber').html(data.idNumber);
+                    $('#pSex').html(data.sex);
+                    $('#pNation').html(data.nation);
+                    $('#pDegree').html(data.degree);
+                    $('#pHometown').html(data.hometown);
+                    $('#pBirth').html(data.birth);
+                    $('#pProfession').html(data.profession);
+                    $('#pDesc').html(data.desc);
+                }else{
+                    layer.alert('获取信息失败>'+data.msg, {icon: 5});
+                }
+            },
+            error : function() {
+                alert("异常");
+            }
+        });
+    });
+    function getOrgTag(){
+        return parent.$('#personIdTag').val();
+    }
+</script>
+</body>
+</html>

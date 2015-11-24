@@ -3,8 +3,7 @@ package com.alan.dm.entity.condition;
 /**
  * 信息查询条件
  */
-public class ApplierInfoCondition {
-    private Integer orgId;
+public class ApplierInfoCondition extends BaseCondition{
     private String number;
     private Integer status;
 
@@ -24,11 +23,4 @@ public class ApplierInfoCondition {
         this.number = number;
     }
 
-    public Integer getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
-    }
 }

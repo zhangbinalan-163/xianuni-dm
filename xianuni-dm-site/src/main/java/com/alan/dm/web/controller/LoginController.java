@@ -53,11 +53,13 @@ public class LoginController extends BaseController{
             if(admin==null){
                 JSONObject jsonObject=new JSONObject();
                 jsonObject.put("success",false);
+                jsonObject.put("msg","用户不存在:"+number);
                 return JsonUtils.fromObject(jsonObject);
             }else{
                 if(!password.equals(admin.getPassword())){
                     JSONObject jsonObject=new JSONObject();
                     jsonObject.put("success",false);
+                    jsonObject.put("msg","用户名或密码错误");
                     return JsonUtils.fromObject(jsonObject);
                 }
             }
@@ -68,7 +70,7 @@ public class LoginController extends BaseController{
             httpServletResponse.addCookie(cookieInfo);
             //设置session
             HttpSession session=httpServletRequest.getSession();
-            session.setAttribute(Constants.SESSION_USERID_NAME,String.valueOf(admin.getId()));
+            session.setAttribute(Constants.SESSION_ADMINID_NAME,String.valueOf(admin.getId()));
             //返回结果
             JSONObject jsonObject=new JSONObject();
             jsonObject.put("success",true);
@@ -76,6 +78,7 @@ public class LoginController extends BaseController{
         }else{
             JSONObject jsonObject=new JSONObject();
             jsonObject.put("success",false);
+            jsonObject.put("msg","暂时不支持其他用户登录");
             return JsonUtils.fromObject(jsonObject);
         }
     }
@@ -87,7 +90,7 @@ public class LoginController extends BaseController{
         httpServletResponse.addCookie(cookieInfo);
         //设置session
         HttpSession session=httpServletRequest.getSession();
-        session.removeAttribute(Constants.SESSION_USERID_NAME);
+        session.removeAttribute(Constants.SESSION_ADMINID_NAME);
         return "redirect:/html/login.html";
     }
 }

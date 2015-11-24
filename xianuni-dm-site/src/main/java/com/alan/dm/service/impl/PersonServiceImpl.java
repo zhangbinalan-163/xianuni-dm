@@ -18,7 +18,6 @@ import java.util.List;
  */
 @Service(value = "personService")
 public class PersonServiceImpl implements IPersonService{
-
     @Resource(name = "personInfoDao")
     private IPersonInfoDao personInfoDao;
 
@@ -41,5 +40,15 @@ public class PersonServiceImpl implements IPersonService{
     public void createPerson(Person person) throws DMException {
         person.setCreateTime(new Date());
         personInfoDao.insertPerson(person);
+    }
+
+    @Override
+    public Person getById(int personId) throws DMException {
+        return personInfoDao.getById(personId);
+    }
+
+    @Override
+    public void deletePerson(Person person) throws DMException {
+        personInfoDao.delete(person);
     }
 }

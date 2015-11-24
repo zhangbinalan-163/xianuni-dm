@@ -9,6 +9,7 @@ import java.util.Date;
 public class IntentionInfo {
     private int id;
     private Person person;
+    private int personId;
 
     private int trainHour;
     private Date meetTime;
@@ -19,6 +20,14 @@ public class IntentionInfo {
     private String schoolApproval;
     private Date createTime;
     private boolean publiced;
+
+    public int getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
+    }
 
     public boolean isPubliced() {
         return publiced;
@@ -37,6 +46,10 @@ public class IntentionInfo {
     }
 
     public Person getPerson() {
+        if(person==null&&personId!=0){
+            person=new Person();
+            person.setId(personId);
+        }
         return person;
     }
 

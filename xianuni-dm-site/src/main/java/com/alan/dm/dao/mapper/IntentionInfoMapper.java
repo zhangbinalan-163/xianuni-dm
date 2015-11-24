@@ -2,6 +2,7 @@ package com.alan.dm.dao.mapper;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.IntentionInfo;
+import com.alan.dm.entity.NormalInfo;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.condition.IntentionInfoCondition;
 import org.apache.ibatis.annotations.Param;
@@ -29,4 +30,32 @@ public interface IntentionInfoMapper {
      * @
      */
     int countByCondition(@Param(value="condition") IntentionInfoCondition condition);
+    /**
+     *
+     * @param intentionInfo
+     * @throws DMException
+     */
+    void insert(@Param(value="intentionInfo")IntentionInfo intentionInfo) throws DMException;
+
+    /**
+     *
+     * @param intentionInfo
+     * @throws DMException
+     */
+    void delete(@Param(value="intentionInfo")IntentionInfo intentionInfo) throws DMException;
+
+    /**
+     *
+     * @param intentionId
+     * @return
+     * @throws DMException
+     */
+    IntentionInfo getById(@Param(value="intentionId")int intentionId) throws DMException;
+    /**
+     *
+     * @param personId
+     * @return
+     * @throws DMException
+     */
+    IntentionInfo getByPersonId(@Param(value="personId") int personId);
 }

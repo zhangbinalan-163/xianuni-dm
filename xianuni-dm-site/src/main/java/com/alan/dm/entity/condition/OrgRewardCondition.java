@@ -1,19 +1,10 @@
 package com.alan.dm.entity.condition;
 
 
-public class OrgRewardCondition {
-    private Integer orgId;
+public class OrgRewardCondition extends BaseCondition{
     private String name;
     private Integer type;
     private Integer level;
-
-    public Integer getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
-    }
 
     public String getName() {
         return name;

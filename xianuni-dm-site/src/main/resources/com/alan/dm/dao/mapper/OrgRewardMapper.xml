@@ -24,13 +24,24 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    O.orgId=#{condition.orgId}
+                </if>
+            </if>
             <if test="condition.name != null">
                 <bind name="pattern" value="condition.name+ '%'" />
             </if>
             <if test="condition.name != null">AND O.name LIKE #{pattern}</if>
         </where>
-        ORDER BY rewardTime DESC
+        ORDER BY createTime DESC
         <if test="page!=null">
             LIMIT #{page.current}, #{page.size}
         </if>
@@ -41,7 +52,18 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.orgId != null">O.orgId=#{condition.orgId}</if>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    O.orgId=#{condition.orgId}
+                </if>
+            </if>
             <if test="condition.name != null">
                 <bind name="pattern" value="condition.name+ '%'" />
             </if>

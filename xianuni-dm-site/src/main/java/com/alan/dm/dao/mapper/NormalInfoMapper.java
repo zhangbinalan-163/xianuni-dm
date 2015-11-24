@@ -31,4 +31,32 @@ public interface NormalInfoMapper {
      * @
      */
     int countByCondition(@Param(value="condition") NormalInfoCondition condition);
+    /**
+     *
+     * @param normalInfo
+     * @throws DMException
+     */
+    void insert(@Param(value="normalInfo")NormalInfo normalInfo);
+
+    /**
+     *
+     * @param normalInfo
+     * @throws DMException
+     */
+    void delete(@Param(value="normalInfo") NormalInfo normalInfo);
+
+    /**
+     *
+     * @param normalId
+     * @return
+     * @throws DMException
+     */
+    NormalInfo getById(@Param(value="normalId") int normalId);
+    /**
+     *
+     * @param personId
+     * @return
+     * @throws DMException
+     */
+    NormalInfo getByPersonId(@Param(value="personId") int personId);
 }

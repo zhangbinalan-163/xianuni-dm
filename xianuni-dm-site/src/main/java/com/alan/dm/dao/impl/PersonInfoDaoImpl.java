@@ -10,6 +10,7 @@ import com.alan.dm.entity.condition.PersonCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,6 +21,11 @@ import java.util.List;
 public class PersonInfoDaoImpl implements IPersonInfoDao {
     @Autowired
     private PersonInfoMapper personInfoMapper;
+
+    @Override
+    public Person getById(int id) throws DMException {
+        return personInfoMapper.getById(id);
+    }
 
     @Override
     public Person getByNumber(String number) throws DMException {
@@ -43,6 +49,11 @@ public class PersonInfoDaoImpl implements IPersonInfoDao {
 
     @Override
     public void updateStatus(Person person,PersonStatus status) throws DMException {
-        personInfoMapper.setStatus(person.getId(),status.getId());
+        personInfoMapper.setStatus(person.getId(),status.getId(),person.getUpdateTime());
+    }
+
+    @Override
+    public void delete(Person person) throws DMException {
+        personInfoMapper.delete(person);
     }
 }

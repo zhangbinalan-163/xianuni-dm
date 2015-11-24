@@ -33,7 +33,7 @@
                     </ul>
                 </div>
             </div>
-            <span class="help-block m-b-none">请从本党支部基础人员库中查询</span>
+            <span class="help-block m-b-none">请从本党支部入党申请人库中查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -129,7 +129,7 @@
         });
 
         $("#pNumber").bsSuggest({
-            url: "/xianuni-dm/person/basicQuery.do?orgId="+getOrgTag()+"&number=",
+            url: "/xianuni-dm/person/listQuery.do?status=0&orgId="+getOrgTag()+"&number=",
             getDataMethod:"url",
             effectiveFields: ["personNumber", "personName"],
             effectiveFieldsAlias:{"personName": "姓名","personNumber":"学工号"},
@@ -140,7 +140,7 @@
             //
         });
         $("#talkerId").bsSuggest({
-            url: "/xianuni-dm/person/normalQuery.do?orgId="+getOrgTag()+"&number=",
+            url: "/xianuni-dm/person/listQuery.do?status=5&orgId="+getOrgTag()+"&number=",
             getDataMethod:"url",
             effectiveFields: ["personNumber", "personName"],
             effectiveFieldsAlias:{"personName": "姓名","personNumber":"学工号"},

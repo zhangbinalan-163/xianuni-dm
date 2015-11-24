@@ -37,8 +37,8 @@ public class OrgnizationDaoimpl implements IOrgnizationDao{
     }
 
     @Override
-    public List<Orgnization> getByParentOrg(int parentId,Page page) throws DMException {
-        return orgnizationMapper.getByParentOrg(parentId,page);
+    public List<Orgnization> getByParentOrg(int parentId) throws DMException {
+        return orgnizationMapper.getByParentOrg(parentId);
     }
 
     @Override

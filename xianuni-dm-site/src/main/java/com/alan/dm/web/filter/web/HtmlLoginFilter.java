@@ -29,7 +29,7 @@ public class HtmlLoginFilter implements Filter {
         HttpServletResponse httpServletResponse=(HttpServletResponse)response;
         //先判断session里面是否有登录信息，如果没有，解析cookie
         HttpSession session=httpServletRequest.getSession();
-        String userId=(String)session.getAttribute(Constants.SESSION_USERID_NAME);
+        String userId=(String)session.getAttribute(Constants.SESSION_ADMINID_NAME);
         if(!StringUtils.isEmpty(userId)){
             chain.doFilter(request,response);
         }else{
@@ -39,7 +39,7 @@ public class HtmlLoginFilter implements Filter {
                 if(cookie!=null){
                     if(SessionUtils.validateCookie(cookieInfo,null,null,20*60*1000L)==0){
                         //验证通过
-                        session.setAttribute(Constants.SESSION_USERID_NAME, String.valueOf(cookieInfo.getUserId()));
+                        session.setAttribute(Constants.SESSION_ADMINID_NAME, String.valueOf(cookieInfo.getUserId()));
                         chain.doFilter(request,response);
                         return;
                     }else{

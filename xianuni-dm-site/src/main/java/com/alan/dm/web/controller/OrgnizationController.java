@@ -2,8 +2,9 @@ package com.alan.dm.web.controller;
 
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.TimeUtils;
+import com.alan.dm.entity.Admin;
 import com.alan.dm.entity.Orgnization;
-import com.alan.dm.entity.Page;
+import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgnizationService;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Time;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +27,9 @@ public class OrgnizationController extends BaseController{
 
 	@Resource(name = "orgnizationService")
 	private IOrgnizationService orgnizationService;
+
+	@Resource(name = "adminService")
+	private IAdminService adminService;
 
 	@RequestMapping("/index.do")
 	public String index(){
@@ -40,8 +42,7 @@ public class OrgnizationController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		Integer orgId = request.getInt("orgId");
 
-		Orgnization orgnization=new Orgnization();
-		orgnization.setId(orgId);
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		//级联删除所有节点
 		orgnizationService.deleteOrg(orgnization,true);
 		//设置父节点是否还为空
@@ -146,49 +147,77 @@ public class OrgnizationController extends BaseController{
 	public String orgtree(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer parentId=request.getInt("id", -1);
-		boolean withAll = request.getBoolean("withAll",true);
 		JSONArray orgArray=new JSONArray();
 		if(parentId==-1){
-			if(withAll){
-				JSONObject allObject=new JSONObject();
-				allObject.put("id",0);
-				allObject.put("name","全部党组织");
-				allObject.put("isParent",true);
-				allObject.put("pId", -1);
-				orgArray.add(allObject);
-			}
-			//最外层
-			Orgnization parentOrg=new Orgnization();
-			parentOrg.setId(-1);
-			List<Orgnization> topLevelList = orgnizationService.getOrgByParent(parentOrg,null);
-			if(topLevelList!=null){
-				for(Orgnization orgnization:topLevelList){
+			Orgnization rootOrg=new Orgnization();
+			//获取自己所能管理的所有一级部门
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin admin=adminService.getById(adminId);
+			if(admin==null){
+				return JsonUtils.fromObject(orgArray);
+			} else if(admin.getType()==Admin.ORG_ADMIN){
+				//部门管理员
+				int rootOrgId = admin.getOrgId();
+				if(rootOrgId==0){
+					return JsonUtils.fromObject(orgArray);
+				}
+				rootOrg=orgnizationService.getOrgById(rootOrgId);
+				if(rootOrg!=null){
 					JSONObject orgObject=new JSONObject();
-					orgObject.put("id",orgnization.getId());
-					orgObject.put("name",orgnization.getName());
-					orgObject.put("isParent",orgnization.isHasSon());
+					orgObject.put("id",rootOrg.getId());
+					orgObject.put("name",rootOrg.getName());
+					orgObject.put("isParent",rootOrg.isHasSon());
 					orgObject.put("open",true);
 					orgObject.put("pId", -1);
 					orgArray.add(orgObject);
-					if(orgnization.isHasSon()){
-						List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization,null);
-						if(subOrgList!=null){
-							for(Orgnization subOrg:subOrgList){
-								JSONObject subOrgObject=new JSONObject();
-								subOrgObject.put("id",subOrg.getId());
-								subOrgObject.put("name",subOrg.getName());
-								subOrgObject.put("isParent",subOrg.isHasSon());
-								subOrgObject.put("pId",orgnization.getId());
-								orgArray.add(subOrgObject);
+				}
+				if(rootOrg.isHasSon()){
+					List<Orgnization> subOrgList = orgnizationService.getOrgByParent(rootOrg,false);
+					if(subOrgList!=null){
+						for(Orgnization subOrg:subOrgList){
+							JSONObject subOrgObject=new JSONObject();
+							subOrgObject.put("id",subOrg.getId());
+							subOrgObject.put("name",subOrg.getName());
+							subOrgObject.put("isParent",subOrg.isHasSon());
+							subOrgObject.put("pId",rootOrg.getId());
+							orgArray.add(subOrgObject);
+						}
+					}
+				}
+			}else if(admin.getType()==Admin.SYSTEM_ADMIN){
+				//系统管理员
+				rootOrg.setId(-1);
+				List<Orgnization> topLevelList = orgnizationService.getOrgByParent(rootOrg,false);
+				if(topLevelList!=null){
+					for(Orgnization orgnization:topLevelList){
+						JSONObject orgObject=new JSONObject();
+						orgObject.put("id",orgnization.getId());
+						orgObject.put("name",orgnization.getName());
+						orgObject.put("isParent",orgnization.isHasSon());
+						orgObject.put("open",true);
+						orgObject.put("pId", -1);
+						orgArray.add(orgObject);
+						if(orgnization.isHasSon()){
+							List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization,false);
+							if(subOrgList!=null){
+								for(Orgnization subOrg:subOrgList){
+									JSONObject subOrgObject=new JSONObject();
+									subOrgObject.put("id",subOrg.getId());
+									subOrgObject.put("name",subOrg.getName());
+									subOrgObject.put("isParent",subOrg.isHasSon());
+									subOrgObject.put("pId",orgnization.getId());
+									orgArray.add(subOrgObject);
+								}
 							}
 						}
 					}
 				}
 			}
 		}else{
+			//检查权限 TODO
 			Orgnization orgnization=orgnizationService.getOrgById(parentId);
 			if(orgnization!=null){
-				List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, null);
+				List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization,false);
 				if(subOrgList!=null){
 					for(Orgnization subOrg:subOrgList){
 						JSONObject subOrgObject=new JSONObject();

@@ -2,7 +2,9 @@ package com.alan.dm.dao;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.ActivitistInfo;
+import com.alan.dm.entity.NormalInfo;
 import com.alan.dm.entity.Page;
+import com.alan.dm.entity.Person;
 import com.alan.dm.entity.condition.ActivitistInfoCondition;
 
 import java.util.List;
@@ -28,4 +30,32 @@ public interface IActivitistInfoDao {
      * @throws DMException
      */
     int countByCondition(ActivitistInfoCondition condition)throws DMException;
+    /**
+     *
+     * @param activitistInfo
+     * @throws DMException
+     */
+    void insert(ActivitistInfo activitistInfo) throws DMException;
+
+    /**
+     *
+     * @param activitistInfo
+     * @throws DMException
+     */
+    void delete(ActivitistInfo activitistInfo) throws DMException;
+
+    /**
+     *
+     * @param activitistId
+     * @return
+     * @throws DMException
+     */
+    ActivitistInfo getById(int activitistId) throws DMException;
+    /**
+     *
+     * @param person
+     * @return
+     * @throws DMException
+     */
+    ActivitistInfo getByPerson(Person person) throws DMException;
 }

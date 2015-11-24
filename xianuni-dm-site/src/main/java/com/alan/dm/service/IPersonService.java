@@ -13,6 +13,13 @@ import java.util.List;
 public interface IPersonService {
     /**
      *
+     * @param personId
+     * @return
+     * @throws DMException
+     */
+    Person getById(int personId)throws DMException;
+    /**
+     *
      * @param number
      * @return
      * @throws DMException
@@ -41,4 +48,11 @@ public interface IPersonService {
      * @throws DMException
      */
     void createPerson(Person person) throws DMException;
+
+    /**
+     *
+     * @param person
+     * @throws DMException
+     */
+    void deletePerson(Person person) throws DMException;
 }

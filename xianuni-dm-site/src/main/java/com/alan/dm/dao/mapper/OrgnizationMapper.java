@@ -18,7 +18,7 @@ public interface OrgnizationMapper {
      * @return
      * @throws DMException
      */
-    List<Orgnization> getByParentOrg(@Param(value="parentId") int parentId, @Param(value="page") Page page);
+    List<Orgnization> getByParentOrg(@Param(value="parentId") int parentId);
 
     /**
      * 计算子组织数量

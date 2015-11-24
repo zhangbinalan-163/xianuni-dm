@@ -27,6 +27,31 @@
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
 
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="prepareInfo.id">
+        INSERT INTO
+        <include refid="A_TABLE"/>
+        (personId,approval,branchApproval,schoolApproval,application,meetTime,meetContent,createTime)
+        VALUES(#{prepareInfo.person.id},#{prepareInfo.approval},#{prepareInfo.branchApproval},#{prepareInfo.schoolApproval},#{prepareInfo.application},#{prepareInfo.meetTime},#{prepareInfo.meetContent},#{prepareInfo.createTime})
+    </insert>
+
+    <select id="getById" resultType="com.alan.dm.entity.PrepareInfo">
+        select *
+        FROM <include refid="A_TABLE" />
+        WHERE id=#{prepareId}
+    </select>
+
+    <select id="getByPersonId" resultType="com.alan.dm.entity.PrepareInfo">
+        select *
+        FROM <include refid="A_TABLE" />
+        WHERE personId=#{personId}
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM  <include refid="A_TABLE" />
+        WHERE id=#{prepareInfo.id}
+    </delete>
+
     <select id="getByCondition" resultMap="A_INFO">
         SELECT
         A.id as prepareId,
@@ -41,7 +66,18 @@
         LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
         LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
         <where>
-            <if test="condition.orgId != null">P.orgId=#{condition.orgId}</if>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    P.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    P.orgId=#{condition.orgId}
+                </if>
+            </if>
             <if test="condition.status != null">AND P.status=#{condition.status}</if>
             <if test="condition.number != null">
                 <bind name="pattern" value="condition.number+ '%'" />
@@ -60,7 +96,18 @@
         LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
         LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
         <where>
-            <if test="condition.orgId != null">P.orgId=#{condition.orgId}</if>
+            <if test="condition.containSub != null">
+                <if test="condition.containSub">
+                    P.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="!condition.containSub">
+                    P.orgId=#{condition.orgId}
+                </if>
+            </if>
             <if test="condition.status != null">AND P.status=#{condition.status}</if>
             <if test="condition.number != null">
                 <bind name="pattern" value="condition.number+ '%'" />

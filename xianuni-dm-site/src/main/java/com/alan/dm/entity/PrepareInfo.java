@@ -11,11 +11,33 @@ public class PrepareInfo {
     private Person person;
 
     private String branchApproval;
+    private String approval;
     private String schoolApproval;
     private boolean application;//是否已经提交申请书
     private Date meetTime;
     private String meetContent;
     private Date createTime;
+
+    private int personId;
+    public int getPersonId() {
+        if(person==null&&personId!=0){
+            person=new Person();
+            person.setId(personId);
+        }
+        return personId;
+    }
+
+    public String getApproval() {
+        return approval;
+    }
+
+    public void setApproval(String approval) {
+        this.approval = approval;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
+    }
 
     public int getId() {
         return id;
@@ -26,6 +48,10 @@ public class PrepareInfo {
     }
 
     public Person getPerson() {
+        if(person==null&&personId!=0){
+            person=new Person();
+            person.setId(personId);
+        }
         return person;
     }
 

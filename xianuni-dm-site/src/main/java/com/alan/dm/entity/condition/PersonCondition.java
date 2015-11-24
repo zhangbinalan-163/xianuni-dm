@@ -1,20 +1,19 @@
 package com.alan.dm.entity.condition;
 
+
 /**
  * 个人信息查询条件
  */
-public class PersonCondition {
-    private Integer orgId;
+public class PersonCondition extends BaseCondition{
     private String name;
     private String number;
     private Integer status;
-
-    public Integer getStatus() {
-        return status;
+    public String getName() {
+        return name;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getNumber() {
@@ -25,19 +24,11 @@ public class PersonCondition {
         this.number = number;
     }
 
-    public Integer getOrgId() {
-        return orgId;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

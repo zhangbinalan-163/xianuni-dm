@@ -5,6 +5,7 @@ import com.alan.dm.entity.Person;
 import com.alan.dm.entity.condition.PersonCondition;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,15 +37,27 @@ public interface PersonInfoMapper {
 
     /**
      *
+     * @param person
+     */
+    void delete(@Param(value = "person")Person person);
+
+    /**
+     *
      * @param number
      * @return
      */
     Person getByNumber(@Param(value = "number")String number);
+    /**
+     *
+     * @param id
+     * @return
+     */
+    Person getById(@Param(value = "id")int id);
 
     /**
-     * 
+     *
      * @param personId
      * @param status
      */
-    void setStatus(@Param(value = "personId")int personId,@Param(value = "status") int status);
+    void setStatus(@Param(value = "personId")int personId,@Param(value = "status") int status,@Param(value = "updateTime")Date updateTime);
 }

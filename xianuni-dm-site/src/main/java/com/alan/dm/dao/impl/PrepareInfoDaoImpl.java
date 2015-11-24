@@ -4,6 +4,7 @@ import com.alan.dm.common.exception.DMException;
 import com.alan.dm.dao.IPrepareInfoDao;
 import com.alan.dm.dao.mapper.PrepareInfoMapper;
 import com.alan.dm.entity.Page;
+import com.alan.dm.entity.Person;
 import com.alan.dm.entity.PrepareInfo;
 import com.alan.dm.entity.condition.PersonCondition;
 import com.alan.dm.entity.condition.PrepareInfoCondition;
@@ -17,7 +18,6 @@ import java.util.List;
  */
 @Repository(value = "prepareInfoDao")
 public class PrepareInfoDaoImpl implements IPrepareInfoDao {
-
     @Autowired
     private PrepareInfoMapper prepareInfoMapper;
 
@@ -29,5 +29,25 @@ public class PrepareInfoDaoImpl implements IPrepareInfoDao {
     @Override
     public int countByCondition(PrepareInfoCondition condition) throws DMException {
         return prepareInfoMapper.countByCondition(condition);
+    }
+
+    @Override
+    public void insert(PrepareInfo prepareInfo) throws DMException {
+        prepareInfoMapper.insert(prepareInfo);
+    }
+
+    @Override
+    public void delete(PrepareInfo prepareInfo) throws DMException {
+        prepareInfoMapper.delete(prepareInfo);
+    }
+
+    @Override
+    public PrepareInfo getById(int prepareId) throws DMException {
+        return prepareInfoMapper.getById(prepareId);
+    }
+
+    @Override
+    public PrepareInfo getByPerson(Person person) throws DMException {
+        return prepareInfoMapper.getByPersonId(person.getId());
     }
 }

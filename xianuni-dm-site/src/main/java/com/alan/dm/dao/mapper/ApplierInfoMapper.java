@@ -1,6 +1,8 @@
 package com.alan.dm.dao.mapper;
 
+import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.ApplierInfo;
+import com.alan.dm.entity.NormalInfo;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.condition.ApplierInfoCondition;
 import org.apache.ibatis.annotations.Param;
@@ -34,4 +36,26 @@ public interface ApplierInfoMapper {
      * @param applierInfo
      */
     void insert(@Param(value="applier")ApplierInfo applierInfo);
+
+    /**
+     *
+     * @param applierId
+     */
+    void delete(@Param(value="applierId")int applierId);
+
+    /**
+     *
+     * @param applierId
+     * @return
+     */
+    ApplierInfo getById(@Param(value="applierId")int applierId);
+
+    /**
+     *
+     * @param personId
+     * @return
+     * @throws DMException
+     */
+    ApplierInfo getByPersonId(@Param(value="personId") int personId);
+
 }

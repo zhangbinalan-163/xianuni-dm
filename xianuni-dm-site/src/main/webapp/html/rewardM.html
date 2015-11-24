@@ -196,20 +196,22 @@
                 });
             },
             render: function () {
-                this.$el.jqGrid(
+                var self = this;
+                self.$el.jqGrid(
                         {
                             url: '/xianuni-dm/reward/list.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '主题', '类型', '时间', '级别'],
+                            colNames: ['ID','党组织', '主题', '类型', '时间', '级别','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
                                 {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'time', index: 'time',width: 60, align: "left"},
-                                {name: 'level', index: 'level',width: 60, align: "left"}
+                                {name: 'level', index: 'level',width: 60, align: "left"},
+                                {name: 'actions', index: 'actions', width: 120, align: "center"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
@@ -218,7 +220,80 @@
                             mtype: "get",
                             height: 400,
                             viewrecords: true,
-                            multiselect: true
+                            multiselect: true,
+
+                            // 自定义事件
+                            gridComplete: function () {
+                                var ids = self.$el.jqGrid('getDataIDs');
+                                for (var i = 0; i < ids.length; i++) {
+                                    var id = ids[i],
+                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>',
+                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
+                                    self.$el.jqGrid('setRowData', ids[i],
+                                            {
+                                                actions: [a, b].join(' ')
+                                            });
+                                }
+                                $('.J_edit').on('click', function () {
+                                    var id = $(this).data('id');
+                                    // todo 根据id获取数据 打开编辑弹窗
+                                    var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    layer.open({
+                                        type: 1, //page层
+                                        area: ['360px', '160px'],
+                                        title: '编辑信息',
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5, //0-6的动画形式，-1不开启
+                                        btn: ['更新', '取消'],
+                                        content: '<form class="form-horizontal" style="padding: 15px 15px 0">' +
+                                        '<div class="form-group">' +
+                                        '<label class="control-label col-sm-3">名称</label>' +
+                                        '<div class="col-sm-9"><input type="text" id="p_name" class="form-control"/></div>' +
+                                        '</div>' +
+                                        '</form>',
+                                        yes: function (index) {
+                                            // todo 读取表单信息 调用创建接口
+                                            var name = $('#p_name').val().trim();
+                                            layer.close(index);
+                                            // todo 请求服务端编辑 成功后重新获取列表
+                                            self.fetchData();
+                                        },
+                                        no: function (index) {
+                                            layer.close(index);
+                                        }
+                                    });
+                                })
+                                $('.J_delete').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var index=layer.confirm('确定要删除该奖惩信息吗？', {
+                                        btn: ['确认','取消'], //按钮
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5 //0-6的动画形式，-1不开启
+                                    }, function(){
+                                        $.ajax( {
+                                            url:'/xianuni-dm/reward/delete.do',
+                                            data:{
+                                                id :id
+                                            },
+                                            type:'post',
+                                            dataType:'json',
+                                            success:function(data) {
+                                                if(data.status){
+                                                    layer.alert('删除奖惩信息成功', {icon: 1});
+                                                    self.fetchData({});
+                                                }else{
+                                                    layer.alert('删除奖惩信息失败！'+data.msg, {icon: 5});
+                                                }
+                                            },
+                                            error : function() {
+                                                layer.alert('删除奖惩信息失败', {icon: 5});
+                                            }
+                                        });
+                                    }, function(){
+                                        layer.close(index);
+                                    });
+                                })
+                            }
                         })
                         .jqGrid('navGrid', '#pager',
                             { edit: false, add: false, del: true,deltitle:'删除',search:false},

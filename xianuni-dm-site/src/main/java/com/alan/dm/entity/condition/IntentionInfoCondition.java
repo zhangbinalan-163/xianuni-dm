@@ -3,8 +3,7 @@ package com.alan.dm.entity.condition;
 /**
  * 发展对象信息查询条件
  */
-public class IntentionInfoCondition {
-    private Integer orgId;
+public class IntentionInfoCondition extends BaseCondition{
     private String number;
     private Integer status;
 
@@ -22,13 +21,5 @@ public class IntentionInfoCondition {
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    public Integer getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
     }
 }

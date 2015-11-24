@@ -24,7 +24,7 @@ public interface IOrgnizationService {
      * @return
      * @throws DMException
      */
-    List<Orgnization> getOrgByParent(Orgnization parentOrg, Page page) throws DMException;
+    List<Orgnization> getOrgByParent(Orgnization parentOrg,boolean withAllSub) throws DMException;
 
     /**
      * 根据ID获取党组织信息
@@ -55,5 +55,4 @@ public interface IOrgnizationService {
      * @throws DMException
      */
     void updateOrg(Orgnization orgnization) throws DMException;
-
 }

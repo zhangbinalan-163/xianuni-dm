@@ -6,11 +6,9 @@ package com.alan.dm.entity.condition;
  * @Date: 2015-11-14
  * @author: fan
  */
-public class EduTrainingCondition {
+public class EduTrainingCondition extends BaseCondition{
     private int type; // 培训类型 1-党员培训 2-学习记录 3-专题教育
     private int trainingType; // 培训类别
-    private int orgId; // 组织名称ID
-    private String orgName; // 组织名称
 
     public int getType() {
         return type;
@@ -26,21 +24,5 @@ public class EduTrainingCondition {
 
     public void setTrainingType(int trainingType) {
         this.trainingType = trainingType;
-    }
-
-    public int getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(int orgId) {
-        this.orgId = orgId;
-    }
-
-    public String getOrgName() {
-        return orgName;
-    }
-
-    public void setOrgName(String orgName) {
-        this.orgName = orgName;
     }
 }

@@ -5,10 +5,12 @@ import com.alan.dm.dao.IApplierInfoDao;
 import com.alan.dm.dao.mapper.ApplierInfoMapper;
 import com.alan.dm.entity.ApplierInfo;
 import com.alan.dm.entity.Page;
+import com.alan.dm.entity.Person;
 import com.alan.dm.entity.condition.ApplierInfoCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,7 +18,6 @@ import java.util.List;
  */
 @Repository(value = "applierInfoDao")
 public class ApplierInfoDaoImpl implements IApplierInfoDao {
-
     @Autowired
     private ApplierInfoMapper applierInfoMapper;
 
@@ -32,6 +33,22 @@ public class ApplierInfoDaoImpl implements IApplierInfoDao {
 
     @Override
     public void insert(ApplierInfo applierInfo) throws DMException {
+        applierInfo.setCreateTime(new Date());
         applierInfoMapper.insert(applierInfo);
+    }
+
+    @Override
+    public void delete(ApplierInfo applierInfo) throws DMException {
+        applierInfoMapper.delete(applierInfo.getId());
+    }
+
+    @Override
+    public ApplierInfo getById(int applierId) throws DMException {
+        return applierInfoMapper.getById(applierId);
+    }
+
+    @Override
+    public ApplierInfo getByPerson(Person person) throws DMException {
+        return applierInfoMapper.getByPersonId(person.getId());
     }
 }
