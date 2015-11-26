@@ -6,6 +6,8 @@
 
     <sql id="OUT_TABLE">tb_person</sql>
     <sql id="TABLE">tb_orgnization</sql>
+    <sql id="ADMIN_TABLE">tb_admin</sql>
+    <sql id="COMMITTEE_TABLE">tb_org_committee</sql>
 
     <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
         <id property="id" column="orgId"/>
@@ -51,27 +53,28 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    O.orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    O.orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                O.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
-            <if test="condition.status != null">AND O.status=#{condition.status}</if>
+            <if test="condition.status != null">
+                AND O.status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
+                AND O.number LIKE #{patternNumber}
             </if>
-            <if test="condition.number != null">AND O.number LIKE #{patternNumber}</if>
             <if test="condition.name != null">
                 <bind name="patternName" value="condition.name+ '%'" />
+                AND O.name LIKE #{patternName}
             </if>
-            <if test="condition.name != null">AND O.name LIKE #{patternName}</if>
         </where>
         ORDER BY O.updateTime desc,O.createTime desc
         <if test="page!=null">
@@ -84,27 +87,28 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    O.orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    O.orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                O.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
-            <if test="condition.status != null">AND O.status=#{condition.status}</if>
+            <if test="condition.status != null">
+                AND O.status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
+                AND O.number LIKE #{patternNumber}
             </if>
-            <if test="condition.number != null">AND O.number LIKE #{patternNumber}</if>
             <if test="condition.name != null">
                 <bind name="patternName" value="condition.name+ '%'" />
+                AND O.name LIKE #{patternName}
             </if>
-            <if test="condition.name != null">AND O.name LIKE #{patternName}</if>
         </where>
     </select>
 
@@ -117,5 +121,58 @@
         SELECT *
         FROM  <include refid="OUT_TABLE" />
         WHERE id=#{id}
+    </select>
+
+    <select id="getAdminCandidateList" resultType="com.alan.dm.entity.Person">
+        SELECT *
+        FROM  <include refid="OUT_TABLE" />
+        <where>
+            status=5
+            <if test="orgList != null">
+                AND orgId in
+                <foreach collection="orgList" index="index" item="org" open="("
+                         separator="," close=")">
+                    #{org.id}
+                </foreach>
+            </if>
+            <if test="number != null">
+                <bind name="patternName" value="number+ '%'" />
+                AND number LIKE #{patternName}
+            </if>
+            and number not in(
+              select distinct(schoolNumber)
+              from <include refid="ADMIN_TABLE" />
+            )
+        </where>
+        ORDER BY createTime DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+    <select id="getCommitteeCandidateList" resultType="com.alan.dm.entity.Person">
+        SELECT *
+        FROM  <include refid="OUT_TABLE" />
+        <where>
+            status=5
+            <if test="orgList != null">
+                AND orgId in
+                <foreach collection="orgList" index="index" item="org" open="("
+                         separator="," close=")">
+                    #{org.id}
+                </foreach>
+            </if>
+            <if test="number != null">
+                <bind name="patternName" value="number+ '%'" />
+                AND number LIKE #{patternName}
+            </if>
+            and id not in(
+            select distinct(personId)
+            from <include refid="COMMITTEE_TABLE" />
+            )
+        </where>
+        ORDER BY createTime DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
     </select>
 </mapper>

@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
 
@@ -31,11 +32,11 @@
                 <ul class="nav" id="side-menu">
                     <li class="nav-header">
                         <div class="dropdown profile-element">
-                            <span><img alt="image" class="img-circle" src="../static/img/profile_small.jpg" /></span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <span class="clear">
-                               <span class="block m-t-xs"><strong class="font-bold">Zhangbin Alan</strong></span>
-                                <span class="text-muted text-xs block">超级管理员<b class="caret"></b></span>
+                                    <span><img alt="image" class="img-circle" style="width: 50px;height: 50px;" src="../static/img/1.jpg" /></span>
+                                    <span class="block m-t-xs"><strong id="adminName" class="font-bold"></strong></span>
+                                    <span class="text-muted text-xs block" id="adminType"></span>
                                 </span>
                             </a>
                         </div>
@@ -112,9 +113,6 @@
                             <li>
                                 <a class="J_menuItem" href="/xianuni-dm/html/partyDuesM.html">党费信息</a>
                             </li>
-                            <li>
-                                <a class="J_menuItem" href="/xianuni-dm/html/activitistM.html">党费统计</a>
-                            </li>
                         </ul>
                     </li>
                     <li>
@@ -126,6 +124,24 @@
                         <ul class="nav nav-second-level">
                             <li>
                                 <a class="J_menuItem" href="/xianuni-dm/html/messageM.html">通知管理</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="/xianuni-dm/html/resourceM.html">媒体资源</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-cutlery"></i>
+                            <span class="nav-label">数据统计</span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a class="J_menuItem" href="/xianuni-dm/html/personStatisM.html">党员数量统计</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="/xianuni-dm/html/personStatisM_time.html">历年数据统计</a>
                             </li>
                         </ul>
                     </li>
@@ -329,7 +345,24 @@
     <!-- 自定义js -->
     <script src="../static/js/hplus.js?v=4.0.0"></script>
     <script type="text/javascript" src="../static/js/contabs.js"></script>
-
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "/xianuni-dm/login/userInfo.do",
+                dataType: "json",
+                data: {},
+                success: function (data) {
+                    if(data.success){
+                        $('#adminType').html(data.adminType);
+                        $('#adminName').html(data.adminNumber);
+                    }else{
+                    }
+                },
+                error:function(){
+                }
+            })
+        });
+    </script>
 </body>
 
 </html>

@@ -5,6 +5,8 @@ import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.RelationTransferCondition;
+import com.alan.dm.service.IAdminService;
+import com.alan.dm.service.IOrgnizationService;
 import com.alan.dm.service.IRelationTransferService;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
@@ -29,6 +31,12 @@ public class RelationController extends BaseController{
 	@Resource(name = "relationTransferService")
 	private IRelationTransferService relationTransferService;
 
+	@Resource(name = "adminService")
+	private IAdminService adminService;
+
+	@Resource(name = "orgnizationService")
+	private IOrgnizationService orgnizationService;
+
 	/**
 	 *
 	 * @param httpServletRequest
@@ -43,14 +51,39 @@ public class RelationController extends BaseController{
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId",0);
 		String name=request.getString("number", null);
+		boolean containSubOrg=request.getBoolean("containSub", true);
+		//如果没有传入orgId，设置为管理员所管理的ORG
+		if(orgId==0){
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin adminInfo = adminService.getById(adminId);
+			if(adminInfo.getType()==Admin.ORG_ADMIN){
+				orgId=adminInfo.getOrgId();
+			}
+		}
+		RelationTransferCondition condition=new RelationTransferCondition();
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
 
+		if(containSubOrg){
+			Orgnization orgnization=null;
+			if(orgId==0){
+				orgnization =new Orgnization();
+				orgnization.setId(-1);
+			}else{
+				orgnization= orgnizationService.getOrgById(orgId);
+			}
+			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+			if(subOrgList!=null){
+				for (Orgnization subOrg:subOrgList){
+					orgIdList.add(subOrg.getId());
+				}
+			}
+		}
+		condition.setFromOrgId(orgIdList);
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page - 1) * limit);
 		pageInfo.setSize(limit);
-		RelationTransferCondition condition=new RelationTransferCondition();
-		if(orgId!=0){
-			condition.setFromOrgId(orgId);
-		}
+
 		if(!StringUtils.isEmpty(name)){
 			condition.setNumber(name);
 		}
@@ -70,6 +103,7 @@ public class RelationController extends BaseController{
 				subOrgObject.put("id", relationTransferInfo.getId());
 				List<String> cellList=new ArrayList<String>();
 				Person person=relationTransferInfo.getPerson();
+				cellList.add(String.valueOf(relationTransferInfo.getId()));
 				cellList.add(person.getName());
 				cellList.add(person.getNumber());
 				cellList.add(relationTransferInfo.getFromOrgName());
@@ -98,18 +132,39 @@ public class RelationController extends BaseController{
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId",0);
 		String name=request.getString("number", null);
+		boolean containSubOrg=request.getBoolean("containSub", true);
+		//如果没有传入orgId，设置为管理员所管理的ORG
+		if(orgId==0){
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin adminInfo = adminService.getById(adminId);
+			if(adminInfo.getType()==Admin.ORG_ADMIN){
+				orgId=adminInfo.getOrgId();
+			}
+		}
+		RelationTransferCondition condition=new RelationTransferCondition();
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
 
+		if(containSubOrg){
+			Orgnization orgnization=null;
+			if(orgId==0){
+				orgnization =new Orgnization();
+				orgnization.setId(-1);
+			}else{
+				orgnization= orgnizationService.getOrgById(orgId);
+			}
+			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+			if(subOrgList!=null){
+				for (Orgnization subOrg:subOrgList){
+					orgIdList.add(subOrg.getId());
+				}
+			}
+		}
+		condition.setToOrgId(orgIdList);
+		condition.setTypes(Arrays.asList(1, 0));
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page - 1) * limit);
 		pageInfo.setSize(limit);
-		RelationTransferCondition condition=new RelationTransferCondition();
-		if(orgId!=0){
-			condition.setToOrgId(orgId);
-		}
-		if(!StringUtils.isEmpty(name)){
-			condition.setNumber(name);
-		}
-		condition.setTypes(Arrays.asList(1, 0));
 
 		int subCount = relationTransferService.countByCondition(condition);
 
@@ -126,6 +181,7 @@ public class RelationController extends BaseController{
 				subOrgObject.put("id", relationTransferInfo.getId());
 				List<String> cellList=new ArrayList<String>();
 				Person person=relationTransferInfo.getPerson();
+				cellList.add(String.valueOf(relationTransferInfo.getId()));
 				cellList.add(person.getName());
 				cellList.add(person.getNumber());
 				cellList.add(relationTransferInfo.getFromOrgName());

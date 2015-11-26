@@ -33,23 +33,30 @@
           A.fromOrgName as fromOrgName,
           A.toOrgId as toOrgId,
           A.toOrgName as toOrgName,
+          A.transferTime as transferTime,
           P.name as personName,
           P.number as personNumber
+
         FROM  <include refid="A_TABLE" /> A
           LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
         <where>
-            <if test="condition.fromOrgId != null">A.fromOrgId=#{condition.fromOrgId}</if>
-            <if test="condition.toOrgId != null">AND A.toOrgId=#{condition.toOrgId}</if>
+            <if test="condition.fromOrgId != null">
+                A.fromOrgId IN
+                <foreach collection="condition.fromOrgId" item="fromOrgs" index="index"
+                         open="(" close=")" separator=",">
+                    #{fromOrgs}
+                </foreach>
+            </if>
+            <if test="condition.toOrgId != null">
+                AND A.toOrgId IN
+                <foreach collection="condition.toOrgId" item="toOrgs" index="index"
+                         open="(" close=")" separator=",">
+                    #{toOrgs}
+                </foreach>
+            </if>
             <if test="condition.number != null">
                 <bind name="pattern" value="condition.number+ '%'" />
                 AND P.number LIKE #{pattern}
-            </if>
-            <if test="condition.types != null">
-                AND A.transferType IN
-                <foreach collection="condition.types" item="type" index="index"
-                         open="(" close=")" separator=",">
-                    #{type}
-                </foreach>
             </if>
         </where>
         ORDER BY transferId DESC
@@ -63,19 +70,25 @@
         FROM  <include refid="A_TABLE" /> A
         LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
         <where>
-            <if test="condition.fromOrgId != null">A.fromOrgId=#{condition.fromOrgId}</if>
-            <if test="condition.toOrgId != null">AND A.toOrgId=#{condition.toOrgId}</if>
+            <if test="condition.fromOrgId != null">
+                A.fromOrgId IN
+                <foreach collection="condition.fromOrgId" item="fromOrgs" index="index"
+                         open="(" close=")" separator=",">
+                    #{fromOrgs}
+                </foreach>
+            </if>
+            <if test="condition.toOrgId != null">
+                AND A.toOrgId IN
+                <foreach collection="condition.toOrgId" item="toOrgs" index="index"
+                         open="(" close=")" separator=",">
+                    #{toOrgs}
+                </foreach>
+            </if>
             <if test="condition.number != null">
                 <bind name="pattern" value="condition.number+ '%'" />
                 AND P.number LIKE #{pattern}
             </if>
-            <if test="condition.types != null">
-                AND A.transferType IN
-                <foreach collection="condition.types" item="type" index="index"
-                         open="(" close=")" separator=",">
-                    #{type}
-                </foreach>
-            </if>
+
         </where>
     </select>
 

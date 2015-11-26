@@ -30,4 +30,21 @@ public interface IPartyDuesDao {
      * @throws DMException
      */
     int countByCondition(PartyDuesCondition condition) throws DMException;
+
+    /**
+     *
+     * @param partyDuesPay
+     * @throws DMException
+     */
+    void insert(PartyDuesPay partyDuesPay) throws DMException;
+
+    /**
+     *
+     * @param partyDuesPay
+     * @throws DMException
+     */
+    void delete(PartyDuesPay partyDuesPay) throws DMException;
 }
+
+
+

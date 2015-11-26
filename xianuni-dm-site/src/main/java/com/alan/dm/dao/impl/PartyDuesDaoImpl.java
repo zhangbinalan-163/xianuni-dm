@@ -30,4 +30,14 @@ public class PartyDuesDaoImpl implements IPartyDuesDao {
     public int countByCondition(PartyDuesCondition condition) throws DMException {
         return partyDuesMapper.countByCondition(condition);
     }
+
+    @Override
+    public void insert(PartyDuesPay partyDuesPay) throws DMException {
+        partyDuesMapper.insert(partyDuesPay);
+    }
+
+    @Override
+    public void delete(PartyDuesPay partyDuesPay) throws DMException {
+        partyDuesMapper.delete(partyDuesPay);
+    }
 }

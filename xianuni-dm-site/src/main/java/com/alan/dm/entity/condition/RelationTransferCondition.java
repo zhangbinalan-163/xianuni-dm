@@ -10,8 +10,8 @@ import java.util.List;
 public class RelationTransferCondition {
     private String number;
     private List<Integer> types;
-    private Integer fromOrgId;
-    private Integer toOrgId;
+    private List<Integer> fromOrgId;
+    private List<Integer> toOrgId;
 
     public String getNumber() {
         return number;
@@ -21,7 +21,6 @@ public class RelationTransferCondition {
         this.number = number;
     }
 
-
     public List<Integer> getTypes() {
         return types;
     }
@@ -30,19 +29,19 @@ public class RelationTransferCondition {
         this.types = types;
     }
 
-    public Integer getFromOrgId() {
+    public List<Integer> getFromOrgId() {
         return fromOrgId;
     }
 
-    public void setFromOrgId(Integer fromOrgId) {
+    public void setFromOrgId(List<Integer> fromOrgId) {
         this.fromOrgId = fromOrgId;
     }
 
-    public Integer getToOrgId() {
+    public List<Integer> getToOrgId() {
         return toOrgId;
     }
 
-    public void setToOrgId(Integer toOrgId) {
+    public void setToOrgId(List<Integer> toOrgId) {
         this.toOrgId = toOrgId;
     }
 }

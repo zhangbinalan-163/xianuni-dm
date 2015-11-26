@@ -76,7 +76,7 @@
     $(document).ready(function () {
 
         $("#pNumber").bsSuggest({
-            url: "/xianuni-dm/person/listQuery.do?status=5&orgId="+getOrgTag()+"&number=",
+            url: "/xianuni-dm/admin/candidateList.do?orgId="+getOrgTag()+"&number=",
             getDataMethod:"url",
             effectiveFields: ["personNumber", "personName"],
             effectiveFieldsAlias:{"personName": "姓名","personNumber":"学工号"},

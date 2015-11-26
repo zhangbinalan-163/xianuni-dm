@@ -27,126 +27,39 @@
                             </a>
                         </div>
                     </div>
-                    <div class="ibox-content timeline">
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
+                    <div class="ibox-content no-padding">
+                        <ul id="messageDiv" class="list-group">
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>媒体资源</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
                         </div>
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="row">
-                                <div class="col-xs-2 date">
-                                    <i class="fa fa-comments"></i> 11:00
-                                    <br/>
-                                    <small class="text-navy">21小时前</small>
-                                </div>
-                                <div class="col-xs-7 content">
-                                    <p class="m-b-xs"><strong>项目经理打电话来了</strong>
-                                    </p>
-                                    <p>
-                                        TMD，项目经理居然还没有起床！！！
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table table-hover no-margins">
+                            <tbody id="resourceBody">
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-
+    <input type="text" hidden="hidden" id="resourceIdTag"/>
     <!-- 全局js -->
     <script src="../static/js/jquery.min.js?v=2.1.4"></script>
     <script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
@@ -154,10 +67,63 @@
     <script src="../static/js/content.js?v=1.0.0"></script>
     <!-- jQuery UI -->
     <script src="../static/js/plugins/jquery-ui/jquery-ui.min.js"></script>
-
+    <!-- layer javascript -->
+    <script src="../static/js/plugins/layer/layer.min.js"></script>
+    <!-- layerDate plugin javascript -->
+    <script src="../static/js/plugins/layer/laydate/laydate.js"></script>
     <script>
         $(document).ready(function () {
+            $.ajax({
+                url: "/xianuni-dm/message/person/list.do",
+                dataType: 'json',
+                success: function(data){
+                    var list = data.list, buf = [];
+                    var itemTpl = function(item){
+                        return '<li class="list-group-item"><p><a class="text-info" href="index.html#">'
+                                + item.publisher
+                                + '</a>' + item.content +'</p>'
+                                + ' <small class="block text-muted"><i class="fa fa-clock-o"></i>'
+                                + item.time+'</small></li>';
+                    }
+                    $.each(list, function(index, item){
+                        buf.push(itemTpl(item));
+                    })
+                    $('#messageDiv').html(buf.join(''));
+                },
+                error: function(){
 
+                }
+            });
+            $.ajax({
+                url: "/xianuni-dm/message/person/list.do",
+                dataType: 'json',
+                success: function(data){
+                    var list = data.list, buf = [];
+                    var itemTpl = function(item){
+                        return '<tr><td><a class="J_view  text-info" data-id="' + item.id + '"<small>'+item.content+'</small></a></td><td><i class="fa fa-clock-o"></i>'+item.time+'</td></tr>';
+                    }
+                    $.each(list, function(index, item){
+                        buf.push(itemTpl(item));
+                    })
+                    $('#resourceBody').html(buf.join(''));
+                    $('.J_view').on('click', function () {
+                        var id = $(this).data('id');
+                        $('#resourceIdTag').val(id);
+                        layer.open({
+                            type: 2,
+                            content: 'resource/view.html',
+                            area: ['100%', '100%'],
+                            maxmin: false,
+                            title: '媒体资源查看',
+                            shade: 0.6, //遮罩透明度
+                            shift: 5//0-6的动画形式，-1不开启
+                        });
+                    });
+                },
+                error: function(){
+
+                }
+            });
         });
     </script>
 

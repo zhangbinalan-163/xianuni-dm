@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../static/css/plugins/jsTree/style.min.css" rel="stylesheet">
+    <!-- jqgrid-->
+    <link href="../static/css/plugins/jqgrid/ui.jqgrid.css?0820" rel="stylesheet">
+    <!-- zTree -->
+    <link href="../static/css/plugins/zTree/metroStyle/metroStyle.css" rel="stylesheet">
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>党组织结构</h5>
+                </div>
+                <div class="ibox-content">
+                    <ul id="orgTree" class="ztree"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>统计信息</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="echarts" id="echarts-bar-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../static/js/content.js?v=1.0.0"></script>
+
+<!-- jqGrid -->
+<script src="../static/js/plugins/jqgrid/i18n/grid.locale-cn.js?0820"></script>
+<script src="../static/js/plugins/jqgrid/jquery.jqGrid.min.js?0820"></script>
+
+<!-- zTree plugin javascript -->
+<script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
+
+<!-- ECharts -->
+<script src="../static/js/plugins/echarts/echarts-all.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var tree = ({
+            init: function () {
+                $.fn.zTree.init($("#orgTree"), this.config());
+                this.zTree = $.fn.zTree.getZTreeObj("orgTree");
+                return this;
+            },
+            config: function () {
+                var self = this;
+                return this.setting = {
+                    data: {
+                        simpleData: {
+                            enable: true,
+                            idKey: "id",
+                            pIdKey: "pId",
+                            rootPId: 0
+                        }
+                    },
+                    async: {
+                        enable: true,
+                        url: "/xianuni-dm/orgnization/orgtree.do",
+                        dataFilter: self.filter,
+                        type: "get",
+                        autoParam:["id", "name", "level"]
+                    },
+                    view: {
+                        showIcon: false
+                    },
+                    callback: {
+                        onClick: self.updateTable
+                    }
+                }
+            },
+            updateTable: function (event, treeId, treeNode) {
+                $('#orgIdTag').val(treeNode.id);
+                $('#orgNameTag').val(treeNode.name);
+                table.fetchData({
+                    orgId: treeNode.id
+                })
+            },
+            filter: function (treeId, parentNode, childNodes) {
+                return childNodes;
+            }
+
+        }).init();
+        var barChart = echarts.init(document.getElementById("echarts-bar-chart"));
+        var baroption = {
+            title : {
+                text: '某地区蒸发量和降水量'
+            },
+            tooltip : {
+                trigger: 'axis'
+            },
+            legend: {
+                data:['蒸发量','降水量']
+            },
+            grid:{
+                x:30,
+                x2:40,
+                y2:24
+            },
+            calculable : true,
+            xAxis : [
+                {
+                    type : 'category',
+                    data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'蒸发量',
+                    type:'bar',
+                    data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3],
+                    markPoint : {
+                        data : [
+                            {type : 'max', name: '最大值'},
+                            {type : 'min', name: '最小值'}
+                        ]
+                    },
+                    markLine : {
+                        data : [
+                            {type : 'average', name: '平均值'}
+                        ]
+                    }
+                },
+                {
+                    name:'降水量',
+                    type:'bar',
+                    data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
+                    markPoint : {
+                        data : [
+                            {name : '年最高', value : 182.2, xAxis: 7, yAxis: 183, symbolSize:18},
+                            {name : '年最低', value : 2.3, xAxis: 11, yAxis: 3}
+                        ]
+                    },
+                    markLine : {
+                        data : [
+                            {type : 'average', name : '平均值'}
+                        ]
+                    }
+                }
+            ]
+        };
+        barChart.setOption(baroption);
+
+        window.onresize = barChart.resize;
+    });
+</script>
+</body>
+</html>

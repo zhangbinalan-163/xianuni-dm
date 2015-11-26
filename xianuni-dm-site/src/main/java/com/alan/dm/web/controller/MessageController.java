@@ -44,10 +44,21 @@ public class MessageController extends BaseController{
 	@Resource(name = "messageService")
 	private IMessageService messageService;
 
+	@Resource(name = "personService")
+	private IPersonService personService;
+
 	@RequestMapping("/delete.do")
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {
-		return null;
+		Request request = getRequest(httpServletRequest);
+		int messageId=request.getInt("id");
+		Message message=messageService.getById(messageId);
+		if(message!=null){
+			messageService.deleteMessage(message);
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", true);
+		return JsonUtils.fromObject(jsonObject);
 	}
 
 	/**
@@ -60,7 +71,6 @@ public class MessageController extends BaseController{
 	@ResponseBody
 	public String add(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		String title = request.getString("title");
 		String content = request.getString("content");
 		int orgId=request.getInt("orgId");
 		String toSubParam=request.getString("toSub","1");
@@ -68,7 +78,6 @@ public class MessageController extends BaseController{
 
 		Message message=new Message();
 		message.setContent(content);
-		message.setTitle(title);
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		message.setOrgnization(orgnization);
 		message.setToSub(toSub);
@@ -100,7 +109,53 @@ public class MessageController extends BaseController{
 	}
 
 	/**
-	 * 管理员列表
+	 * 展现给个人的信息列表
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/person/list.do")
+	@ResponseBody
+	public String personListMessage(HttpServletRequest httpServletRequest) throws Exception {
+		//获取当前登录账号、或者管理员的ID
+		int adminId=getOnlineAdminId(httpServletRequest);
+		Admin adminInfo = adminService.getById(adminId);
+		Person person=personService.getByNumber(adminInfo.getSchoolNumber());
+		Orgnization orgnization = orgnizationService.getOrgById(person.getOrgId());
+		List<Orgnization> parentOrgList=orgnizationService.getParentOrg(orgnization);
+
+		MessageCondition condition=new MessageCondition();
+		if(parentOrgList!=null){
+			List<Integer> orgIdList=new ArrayList<Integer>();
+			for(Orgnization parentOrg:parentOrgList){
+				orgIdList.add(parentOrg.getId());
+			}
+			condition.setOrgList(orgIdList);
+		}
+		condition.setOrgId(orgnization.getId());
+		condition.setPersonQuery(true);
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(0);
+		pageInfo.setSize(10);
+
+		List<Message> messageList=messageService.getMessageByCondtition(condition,pageInfo);
+		JSONObject jsonObject=new JSONObject();
+		JSONArray dataArray=new JSONArray();
+		if(messageList!=null){
+			for(Message message:messageList){
+				JSONObject itemObj=new JSONObject();
+				itemObj.put("id",message.getId());
+				itemObj.put("time",TimeUtils.convertToTimeString(message.getCreateTime()));
+				itemObj.put("content",message.getContent());
+				itemObj.put("publisher","#管理员#");
+				dataArray.add(itemObj);
+			}
+		}
+		jsonObject.put("list",dataArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 * 列表
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -125,10 +180,10 @@ public class MessageController extends BaseController{
 			}
 		}
 		MessageCondition condition=new MessageCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -143,8 +198,6 @@ public class MessageController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
 		condition.setToSub(toSub);
 
@@ -167,8 +220,8 @@ public class MessageController extends BaseController{
 				subOrgObject.put("id", message.getId());
 				List<String> cellList=new ArrayList<String>();
 				cellList.add(String.valueOf(message.getId()));
-				cellList.add(message.getTitle());
 				cellList.add(message.getOrgnization().getName());
+				cellList.add(message.getContent());
 				cellList.add(message.isToSub()?"是":"否");
 				cellList.add(TimeUtils.convertToDateString(message.getCreateTime()));
 				subOrgObject.put("cell", cellList);

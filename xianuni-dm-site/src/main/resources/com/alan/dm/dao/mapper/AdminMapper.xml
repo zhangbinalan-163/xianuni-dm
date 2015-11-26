@@ -43,17 +43,12 @@
         SELECT *
         FROM  <include refid="TABLE" />
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
             <if test="condition.type != null">AND type=#{condition.type}</if>
         </where>
@@ -67,17 +62,12 @@
         select count(*)
         from <include refid="TABLE" />
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
             <if test="condition.type != null">AND type=#{condition.type}</if>
         </where>

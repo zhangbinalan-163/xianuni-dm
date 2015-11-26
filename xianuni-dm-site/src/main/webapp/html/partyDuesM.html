@@ -39,7 +39,9 @@
                         <div class="form-group">
                             <input type="text" placeholder="请输入学工号" id="number" class="form-control">
                         </div>
-                        <button id="searchBtn" class="btn btn-white" type="button">搜索</button>
+                        <button id="searchBtn" class="btn btn-primary" type="button">搜索</button>
+                        <button id="addBtn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="testSpan" class="bold">新增</span>
+                        </button>
                     </form>
                     <div class="jqGrid_wrapper">
                         <table id="list"></table>
@@ -50,7 +52,8 @@
         </div>
     </div>
 </div>
-
+<input type="text" hidden="hidden" id="orgIdTag"/>
+<input type="text" hidden="hidden" id="idTag"/>
 
 <!-- 全局js -->
 <script src="../static/js/jquery.min.js?v=2.1.4"></script>
@@ -65,6 +68,10 @@
 
 <!-- zTree plugin javascript -->
 <script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
+<!-- layer javascript -->
+<script src="../static/js/plugins/layer/layer.min.js"></script>
+<!-- layerDate plugin javascript -->
+<script src="../static/js/plugins/layer/laydate/laydate.js"></script>
 <script>
     $(document).ready(function () {
         $.jgrid.defaults.styleUI = 'Bootstrap';
@@ -90,16 +97,96 @@
                     self.fetchData({
                         number: $('#number').val().trim()
                     })
-                })
+                });
+                $('#addBtn').on('click', function () {
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node||node.id==0){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    layer.open({
+                        type: 2,
+                        content: 'partydue/add.html',
+                        area: ['100%', '100%'],
+                        maxmin: false,
+                        title: '创建<strong>' + node.name +'</strong>的党员缴费信息',
+                        shade: 0.6, //遮罩透明度
+                        shift: 5, //0-6的动画形式，-1不开启
+                        btn: ['创建', '取消'],
+                        yes: function(index){
+                            var inputs=layer.getChildFrame('body',index).find('input');
+                            var number,payTime,startTime,endTime;
+                            for(var i=0; i<inputs.length; i++){
+                                var inputName=inputs[i].id;
+                                var inputValue=inputs[i].value;
+                                if(inputName=='pNumber'){
+                                    if(!inputValue){
+                                        layer.alert('学工号不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    number=inputValue;
+                                }
+                                if(inputName=='payTime'){
+                                    if(!inputValue){
+                                        layer.alert('缴费日期不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    payTime=inputValue;
+                                }
+                                if(inputName=='startTime'){
+                                    if(!inputValue){
+                                        layer.alert('开始日期不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    startTime=inputValue;
+                                }
+                                if(inputName=='endTime'){
+                                    if(!inputValue){
+                                        layer.alert('截止日期不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    endTime=inputValue;
+                                }
+
+                            }
+                            $.ajax( {
+                                url:'/xianuni-dm/dues/add.do',
+                                data:{
+                                    orgId : node.id,
+                                    number:number,
+                                    payTime:payTime,
+                                    startTime:startTime,
+                                    endTime:endTime
+                                },
+                                type:'post',
+                                dataType:'json',
+                                success:function(data) {
+                                    if(data.success){
+                                        layer.alert('添加缴费信息成功', {icon: 1});
+                                        layer.close(index);
+                                        self.fetchData({});
+                                    }else{
+                                        layer.alert('添加缴费信息失败！'+data.msg, {icon: 5});
+                                    }
+                                },
+                                error : function() {
+                                    layer.alert('添加缴费信息失败', {icon: 5});
+                                }
+                            });
+                        }
+                    });
+                });
             },
             render: function () {
+                var self = this;
                 this.$el.jqGrid(
                         {
                             url: '/xianuni-dm/dues/list.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '学工号','党员类型','缴费时间','党费开始日期','党费截止日期'],
+                            colNames: ['ID','党组织', '姓名', '学工号','党员类型','缴费时间','党费开始日期','党费截止日期','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
@@ -108,7 +195,8 @@
                                 {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'payTime', index: 'payTime',width: 60, align: "left"},
                                 {name: 'startTime', index: 'startTime',width: 60, align: "left"},
-                                {name: 'endTime', index: 'endTime',width: 60, align: "left"}
+                                {name: 'endTime', index: 'endTime',width: 60, align: "left"},
+                                {name: 'actions', index: 'actions', width: 120, align: "center"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
@@ -116,15 +204,75 @@
                             sortname: 'id',
                             mtype: "get",
                             height: 400,
-                            viewrecords: true
+                            viewrecords: true,
+                            multiselect: true,
+                            // 自定义事件
+                            gridComplete: function () {
+                                var ids = self.$el.jqGrid('getDataIDs');
+                                for (var i = 0; i < ids.length; i++) {
+                                    var id = ids[i],
+                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
+                                    self.$el.jqGrid('setRowData', ids[i],
+                                            {
+                                                actions: [b].join(' ')
+                                            });
+                                }
+                                $('.J_delete').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var index=layer.confirm('确定要删除该信息吗？', {
+                                        btn: ['确认','取消'], //按钮
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5 //0-6的动画形式，-1不开启
+                                    }, function(){
+                                        $.ajax( {
+                                            url:'/xianuni-dm/dues/delete.do',
+                                            data:{
+                                                id :id
+                                            },
+                                            type:'post',
+                                            dataType:'json',
+                                            success:function(data) {
+                                                if(data.success){
+                                                    layer.alert('删除信息成功', {icon: 1});
+                                                    self.fetchData({});
+                                                }else{
+                                                    layer.alert('删除信息失败！'+data.msg, {icon: 5});
+                                                }
+                                            },
+                                            error : function() {
+                                                layer.alert('删除信息失败', {icon: 5});
+                                            }
+                                        });
+                                    }, function(){
+                                        layer.close(index);
+                                    });
+                                })
+                            }
                         })
-                        .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
+                        .jqGrid('navGrid', '#pager',
+                        { edit: false, add: false, del: true,deltitle:'删除',search:false},
+                        {},
+                        {},
+                        {   reloadAfterSubmit:true,
+                            url: '/xianuni-dm/person/activitist/delete.do',
+                            afterSubmit : function(response, postdata) {
+                                var json = eval('('+response.responseText+')');
+                                if(json.status){
+                                    return [true,''];
+                                }else{
+                                    return [false,json.msg];
+                                }
+                            }
+                        }
+                );
             }
         }).init();
 
         var tree = ({
             init: function () {
                 $.fn.zTree.init($("#orgTree"), this.config());
+                this.zTree = $.fn.zTree.getZTreeObj("orgTree");
+                return this;
             },
             config: function () {
                 var self = this;
@@ -153,15 +301,12 @@
                 }
             },
             updateTable: function (event, treeId, treeNode) {
+                $('#orgIdTag').val(treeNode.id);
                 table.fetchData({
                     orgId: treeNode.id
                 })
             },
             filter: function (treeId, parentNode, childNodes) {
-//                if (!childNodes) return null;
-//                for (var i = 0, l = childNodes.length; i < l; i++) {
-//                    childNodes[i].name = 'Test>' + childNodes[i].name;
-//                }
                 return childNodes;
             }
 

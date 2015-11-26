@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -579,17 +580,23 @@ public class PersonController extends BaseController{
 	public String listQuery(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId=request.getInt("orgId", 0);
-		Integer status=request.getInt("status");
+		String[] statusArray=request.getStringArray("status", ",");
+
 		String number=request.getString("number", null);
 		PersonCondition condition=new PersonCondition();
-		condition.setContainSub(false);
-		if(orgId!=0){
-			condition.setOrgId(orgId);
-		}
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
-		condition.setStatus(status);
+		List<Integer> statuslist=new ArrayList<Integer>();
+		for(String statusParam:statusArray){
+			statuslist.add(Integer.parseInt(statusParam));
+		}
+		condition.setOrgList(orgIdList);
+		condition.setStatus(statuslist);
+
 		List<Person> personList=personService.getByCondition(condition,null);
 
 		JSONArray rowsArray=new JSONArray();
@@ -599,6 +606,7 @@ public class PersonController extends BaseController{
 				keyObject.put("personId",person.getId());
 				keyObject.put("personName",person.getName());
 				keyObject.put("personNumber", person.getNumber());
+				keyObject.put("personStatus",PersonStatus.getInstance(person.getStatus()).getName());
 				rowsArray.add(keyObject);
 			}
 		}
@@ -633,10 +641,10 @@ public class PersonController extends BaseController{
 			}
 		}
 		PersonCondition condition=new PersonCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -651,10 +659,7 @@ public class PersonController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
-
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
@@ -665,7 +670,7 @@ public class PersonController extends BaseController{
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
-		condition.setStatus(PersonStatus.NO.getId());
+		condition.setStatus(Arrays.asList(PersonStatus.NO.getId()));
 		int subCount = personService.countByCondition(condition);
 
 		List<Person> personList=personService.getByCondition(condition,pageInfo);
@@ -721,10 +726,10 @@ public class PersonController extends BaseController{
 			}
 		}
 		ApplierInfoCondition condition=new ApplierInfoCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -739,14 +744,12 @@ public class PersonController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
-		condition.setStatus(PersonStatus.APPLIER.getId());
+		condition.setStatus(Arrays.asList(PersonStatus.APPLIER.getId()));
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
@@ -808,10 +811,10 @@ public class PersonController extends BaseController{
 			}
 		}
 		ActivitistInfoCondition condition=new ActivitistInfoCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -826,14 +829,12 @@ public class PersonController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
-		condition.setStatus(PersonStatus.ACTIVISTS.getId());
+		condition.setStatus(Arrays.asList(PersonStatus.ACTIVISTS.getId()));
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
@@ -894,10 +895,10 @@ public class PersonController extends BaseController{
 			}
 		}
 		IntentionInfoCondition condition=new IntentionInfoCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -912,14 +913,12 @@ public class PersonController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
-		condition.setStatus(PersonStatus.INTENTION.getId());
+		condition.setStatus(Arrays.asList(PersonStatus.INTENTION.getId()));
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
@@ -980,10 +979,10 @@ public class PersonController extends BaseController{
 			}
 		}
 		PrepareInfoCondition condition=new PrepareInfoCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -998,14 +997,12 @@ public class PersonController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
-		condition.setStatus(PersonStatus.PERPARE.getId());
+		condition.setStatus(Arrays.asList(PersonStatus.PERPARE.getId()));
 
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
@@ -1064,10 +1061,10 @@ public class PersonController extends BaseController{
 			}
 		}
 		NormalInfoCondition condition=new NormalInfoCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -1082,13 +1079,11 @@ public class PersonController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page - 1) * limit);
 		pageInfo.setSize(limit);
-		condition.setStatus(PersonStatus.NORMAL.getId());
+		condition.setStatus(Arrays.asList(PersonStatus.NORMAL.getId()));
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}

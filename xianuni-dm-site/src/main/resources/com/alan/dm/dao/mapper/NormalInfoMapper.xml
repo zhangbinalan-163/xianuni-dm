@@ -62,25 +62,26 @@
         O.name as orgName
 
         FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
+        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    P.orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    P.orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
-            <if test="condition.status != null">AND P.status=#{condition.status}</if>
+            <if test="condition.status != null">
+                AND P.status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
             <if test="condition.number != null">
-                <bind name="pattern" value="condition.number+ '%'" />
-                AND P.number LIKE #{pattern}
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
             </if>
         </where>
         ORDER BY normalId DESC
@@ -92,25 +93,26 @@
     <select id="countByCondition" resultType="Integer">
         SELECT count(*)
         FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
+        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    P.orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    P.orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
-            <if test="condition.status != null">AND P.status=#{condition.status}</if>
+            <if test="condition.status != null">
+                AND P.status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
             <if test="condition.number != null">
-                <bind name="pattern" value="condition.number+ '%'" />
-                AND P.number LIKE #{pattern}
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
             </if>
         </where>
     </select>

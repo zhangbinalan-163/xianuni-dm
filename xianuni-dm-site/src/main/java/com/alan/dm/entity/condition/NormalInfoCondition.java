@@ -5,15 +5,6 @@ package com.alan.dm.entity.condition;
  */
 public class NormalInfoCondition extends BaseCondition{
     private String number;
-    private Integer status;
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 
     public String getNumber() {
         return number;

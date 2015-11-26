@@ -2,7 +2,9 @@ package com.alan.dm.service;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Admin;
+import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
+import com.alan.dm.entity.Person;
 import com.alan.dm.entity.condition.AdminCondition;
 
 import java.util.List;
@@ -12,6 +14,13 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/15.
  */
 public interface IAdminService {
+    /**
+     *
+     * @param orgnizationList
+     * @return
+     * @throws DMException
+     */
+    List<Person> getCandidatePerson(List<Orgnization> orgnizationList,String number,Page page) throws DMException;
     /**
      *
      * @param condition
@@ -57,4 +66,13 @@ public interface IAdminService {
      * @throws DMException
      */
     void deleteAdmin(Admin admin) throws DMException;
+
+    /**
+     *
+     * @param admin
+     * @param orgnization
+     * @return
+     * @throws DMException
+     */
+    boolean hasRight(Admin admin,Orgnization orgnization) throws DMException;
 }

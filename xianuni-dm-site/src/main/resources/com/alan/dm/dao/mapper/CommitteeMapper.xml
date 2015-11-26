@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.CommitteeMapper">
+
+    <sql id="COMMITTEE_TABLE">tb_org_committee</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+        <result property="type" column="personType"/>
+    </resultMap>
+
+    <resultMap id="COMMITTEE_INFO" type="com.alan.dm.entity.CommitteeInfo">
+        <id property="id" column="committeeId" />
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="job" column="job"/>
+        <result property="personId" column="personId"/>
+        <result property="orgId" column="orgId"/>
+        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="committeeInfo.id">
+        INSERT INTO
+        <include refid="COMMITTEE_TABLE"/>
+        (personId,orgId,createTime,job)
+        VALUES(#{committeeInfo.person.id},#{committeeInfo.orgnization.id},#{committeeInfo.createTime},#{committeeInfo.job})
+    </insert>
+
+    <select id="getById" resultType="com.alan.dm.entity.CommitteeInfo">
+        select *
+        FROM <include refid="COMMITTEE_TABLE" />
+        WHERE id=#{id}
+    </select>
+
+    <select id="getByPerson" resultType="com.alan.dm.entity.CommitteeInfo">
+        select *
+        FROM <include refid="COMMITTEE_TABLE" />
+        WHERE id=#{person.id}
+    </select>
+
+    <select id="getByCondition" resultMap="COMMITTEE_INFO">
+        SELECT
+          COMMITTEE.id as committeeId,
+          COMMITTEE.personId as personId,
+          COMMITTEE.orgId as orgId,
+          COMMITTEE.createTime as createTime,
+          COMMITTEE.updateTime as updateTime,
+          COMMITTEE.job as job,
+          PERSON.name as personName,
+          PERSON.number as personNumber,
+          PERSON.type as personType,
+          ORG.id as orgId,
+          ORG.name as orgName
+        FROM  <include refid="COMMITTEE_TABLE" /> COMMITTEE
+        JOIN <include refid="PERSON_TABLE"/> PERSON ON COMMITTEE.personId=PERSON.id
+        JOIN <include refid="ORG_TABLE"/> ORG ON COMMITTEE.orgId=ORG.id
+        <where>
+            <if test="condition.orgList != null">
+                COMMITTEE.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND PERSON.number LIKE #{patternNumber}
+            </if>
+        </where>
+        ORDER BY committeeId DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="COMMITTEE_TABLE" /> COMMITTEE
+        JOIN <include refid="PERSON_TABLE"/> PERSON ON COMMITTEE.personId=PERSON.id
+        JOIN <include refid="ORG_TABLE"/> ORG ON COMMITTEE.orgId=ORG.id
+        <where>
+            <if test="condition.orgList != null">
+                COMMITTEE.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND PERSON.number LIKE #{patternNumber}
+            </if>
+        </where>
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM  <include refid="COMMITTEE_TABLE" />
+        WHERE id=#{committeeInfo.id}
+    </delete>
+</mapper>

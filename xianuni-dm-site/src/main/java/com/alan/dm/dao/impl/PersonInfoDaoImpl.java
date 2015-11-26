@@ -3,10 +3,12 @@ package com.alan.dm.dao.impl;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.dao.IPersonInfoDao;
 import com.alan.dm.dao.mapper.PersonInfoMapper;
+import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
 import com.alan.dm.entity.PersonStatus;
 import com.alan.dm.entity.condition.PersonCondition;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +23,11 @@ import java.util.List;
 public class PersonInfoDaoImpl implements IPersonInfoDao {
     @Autowired
     private PersonInfoMapper personInfoMapper;
+
+    @Override
+    public List<Person> getCommitteeCandidateList(List<Orgnization> orgnizationList, String number, Page page) {
+        return personInfoMapper.getCommitteeCandidateList(orgnizationList,number,page);
+    }
 
     @Override
     public Person getById(int id) throws DMException {
@@ -55,5 +62,10 @@ public class PersonInfoDaoImpl implements IPersonInfoDao {
     @Override
     public void delete(Person person) throws DMException {
         personInfoMapper.delete(person);
+    }
+
+    @Override
+    public List<Person> getAdminCandidateList(List<Orgnization> orgnizationList,String number,Page page) {
+        return personInfoMapper.getAdminCandidateList(orgnizationList,number,page);
     }
 }

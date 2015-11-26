@@ -22,7 +22,6 @@ import java.util.List;
  */
 @Service(value = "messageService")
 public class MessageServiceImpl implements IMessageService{
-
     @Resource(name = "messageDaoImpl")
     private IMessageDao messageDao;
 
@@ -30,6 +29,11 @@ public class MessageServiceImpl implements IMessageService{
     public void createMessage(Message message) throws DMException {
         message.setCreateTime(new Date());
         messageDao.insert(message);
+    }
+
+    @Override
+    public Message getById(int messageId) throws DMException {
+        return messageDao.getById(messageId);
     }
 
     @Override

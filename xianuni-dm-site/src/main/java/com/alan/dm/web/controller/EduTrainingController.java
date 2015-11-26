@@ -156,7 +156,7 @@ public class EduTrainingController extends BaseController {
         pageInfo.setSize(limit);
         EduTrainingCondition condition=new EduTrainingCondition();
         if(orgId!=0){
-            condition.setOrgId(orgId);
+            //condition.setOrgId(orgId);
         }
         condition.setType(type);
         condition.setTrainingType(trainingType);

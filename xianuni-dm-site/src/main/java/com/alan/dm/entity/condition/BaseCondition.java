@@ -7,25 +7,8 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/24.
  */
 public class BaseCondition {
-    private Integer orgId;
-    private Boolean containSub;//是否级联包含所有的子部门
     private List<Integer> orgList;//部门的列表
-
-    public Integer getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Integer orgId) {
-        this.orgId = orgId;
-    }
-
-    public Boolean getContainSub() {
-        return containSub;
-    }
-
-    public void setContainSub(Boolean containSub) {
-        this.containSub = containSub;
-    }
+    private List<Integer> status;//部门的列表
 
     public List<Integer> getOrgList() {
         return orgList;
@@ -33,5 +16,13 @@ public class BaseCondition {
 
     public void setOrgList(List<Integer> orgList) {
         this.orgList = orgList;
+    }
+
+    public List<Integer> getStatus() {
+        return status;
+    }
+
+    public void setStatus(List<Integer> status) {
+        this.status = status;
     }
 }

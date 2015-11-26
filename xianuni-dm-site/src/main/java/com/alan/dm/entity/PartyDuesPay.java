@@ -10,6 +10,7 @@ import java.util.Date;
 public class PartyDuesPay {
     private int id;
     private Person person; // 党员ID
+    private int personId;
     private Date payStartTime; // 缴费起始日期
     private Date payEndTime; // 缴费截止日期
     private Date payTime; // 缴费日期
@@ -52,5 +53,13 @@ public class PartyDuesPay {
 
     public void setPayTime(Date payTime) {
         this.payTime = payTime;
+    }
+
+    public int getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
     }
 }

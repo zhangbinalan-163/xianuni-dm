@@ -1,5 +1,6 @@
 package com.alan.dm.dao.mapper;
 
+import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.PartyDuesPay;
 import com.alan.dm.entity.condition.PartyDuesCondition;
@@ -28,4 +29,17 @@ public interface PartyDuesMapper {
      * @return
      */
     int countByCondition(@Param(value = "condition") PartyDuesCondition condition);
+
+    /**
+     *
+     * @param partyDuesPay
+     */
+    void insert(@Param(value = "partyDuesPay")PartyDuesPay partyDuesPay);
+
+    /**
+     *
+     * @param partyDuesPay
+     * @throws DMException
+     */
+    void delete(@Param(value = "partyDuesPay")PartyDuesPay partyDuesPay);
 }

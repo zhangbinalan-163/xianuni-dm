@@ -135,10 +135,10 @@ public class OrgRewardController extends BaseController{
 			}
 		}
 		OrgRewardCondition condition=new OrgRewardCondition();
-		condition.setContainSub(containSubOrg);
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
 		if(containSubOrg){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			orgIdList.add(orgId);
 			Orgnization orgnization=null;
 			if(orgId==0){
 				orgnization =new Orgnization();
@@ -153,9 +153,8 @@ public class OrgRewardController extends BaseController{
 				}
 			}
 			condition.setOrgList(orgIdList);
-		}else{
-			condition.setOrgId(orgId);
 		}
+
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);

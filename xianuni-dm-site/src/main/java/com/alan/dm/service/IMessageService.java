@@ -13,7 +13,12 @@ import java.util.List;
  * @author: fan
  */
 public interface IMessageService {
-
+    /**
+     *
+     * @param messageId
+     * @return
+     */
+    Message getById(int messageId) throws DMException;
     /**
      * 新增消息
      * @param message

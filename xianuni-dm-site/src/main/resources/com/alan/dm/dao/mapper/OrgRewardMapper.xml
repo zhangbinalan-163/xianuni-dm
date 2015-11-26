@@ -24,22 +24,17 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    O.orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    O.orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                O.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
             <if test="condition.name != null">
                 <bind name="pattern" value="condition.name+ '%'" />
+                AND O.name LIKE #{pattern}
             </if>
-            <if test="condition.name != null">AND O.name LIKE #{pattern}</if>
         </where>
         ORDER BY createTime DESC
         <if test="page!=null">
@@ -49,25 +44,20 @@
 
     <select id="countByCondition" resultType="Integer">
         SELECT count(*)
-        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
+        FROM  <include refid="OUT_TABLE" /> O JOIN <include refid="ORG_TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.containSub != null">
-                <if test="condition.containSub">
-                    O.orgId in
-                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                             separator="," close=")">
-                        #{orgList}
-                    </foreach>
-                </if>
-                <if test="!condition.containSub">
-                    O.orgId=#{condition.orgId}
-                </if>
+            <if test="condition.orgList != null">
+                O.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
             <if test="condition.name != null">
                 <bind name="pattern" value="condition.name+ '%'" />
+                AND O.name LIKE #{pattern}
             </if>
-            <if test="condition.name != null">AND O.name LIKE #{pattern}</if>
         </where>
     </select>
 

@@ -34,8 +34,32 @@ public class LoginController extends BaseController{
     private IAdminService adminService;
 
     /**
+     * 获取当前用户信息
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/userInfo.do")
+    @ResponseBody
+    public String userInfo(HttpServletRequest httpServletRequest,HttpServletResponse httpServletResponse) throws Exception {
+        Integer adminId = getOnlineAdminId(httpServletRequest);
+        Admin adminInfo = adminService.getById(adminId);
+        if(adminInfo!=null){
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("success",true);
+            jsonObject.put("adminType", adminInfo.getType() == Admin.ORG_ADMIN ? "部门管理员" : "系统管理员");
+            jsonObject.put("adminNumber",adminInfo.getSchoolNumber());
+            return JsonUtils.fromObject(jsonObject);
+        }else{
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("success",false);
+            return JsonUtils.fromObject(jsonObject);
+        }
+    }
+
+    /**
      * 管理员登录接口
-     * TODO 改成异步调用
      * @param httpServletRequest
      * @param httpServletResponse
      * @return

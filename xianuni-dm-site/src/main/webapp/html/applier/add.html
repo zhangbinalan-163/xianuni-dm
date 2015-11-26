@@ -9,6 +9,7 @@
     <link href="../../static/css/animate.css" rel="stylesheet">
     <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
     <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../static/css/plugins/select2/select2.min.css" rel="stylesheet" />
     <base target="_blank">
 </head>
 
@@ -23,16 +24,9 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
-            <div class="input-group">
-                <input type="text" class="form-control" id="pNumber">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    </ul>
-                </div>
-            </div>
+            <select id="pNumber" style="width:300px;">
+
+            </select>
             <span class="help-block m-b-none">请从本党支部入党申请人库中查询</span>
         </div>
     </div>
@@ -53,16 +47,9 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">谈话人：</label>
         <div class="col-sm-4">
-            <div class="input-group">
-                <input type="text" class="form-control" id="talkerId">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    </ul>
-                </div>
-            </div>
+            <select id="pTalker" style="width:300px;">
+
+            </select>
             <span class="help-block m-b-none">请从本党支部党员库中查询</span>
         </div>
     </div>
@@ -90,12 +77,12 @@
 <script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
 <!-- maxlength -->
 <script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
-<script src="../../static/js/plugins/suggest/bootstrap-suggest.min.js"></script>
 <!-- layer javascript -->
 <script src="../../static/js/plugins/layer/layer.min.js"></script>
 <!-- layerDate plugin javascript -->
 <script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
 
+<script src="../../static/js/plugins/select2/select2.min.js"></script>
 <script>
     $(document).ready(function () {
         var config = {
@@ -128,29 +115,44 @@
             message: '已输入 %charsTyped%/最多输入%charsTotal%'
         });
 
-        $("#pNumber").bsSuggest({
-            url: "/xianuni-dm/person/listQuery.do?status=0&orgId="+getOrgTag()+"&number=",
-            getDataMethod:"url",
-            effectiveFields: ["personNumber", "personName"],
-            effectiveFieldsAlias:{"personName": "姓名","personNumber":"学工号"},
-            showBtn: true,
-            idField: "personId",
-            keyField: "personNumber"
-        }).on('onSetSelectValue', function (e, keyword) {
-            //
+        $("#pNumber").select2({
+           placeholder:"请选择",
+           allowClear: true,  //是否允许用户清除文本信息
+           ajax:{
+               url:'',
+               dataType:'json',
+               data: function (term, pageNo) {//在查询时向服务器端传输的数据
+                   term = $.trim(term);
+                   return {
+                       autNumber: term,//联动查询的字符
+                       pageSize: 15,//一次性加载的数据条数
+                       pageNo:pageNo,//页码
+                       time:new Date()//测试
+                   }
+               },
+               results:function(data,pageNo){
+                    if(data.length>0){   //如果没有查询到数据，将会返回空串
+                        var dataObj =data;  //将接收到的JSON格式的字符串转换成JSON数据
+                        var more = (pageNo*15)<dataObj.total; //用来判断是否还有更多数据可以加载
+                        return {
+                            results:dataObj.result,more:more
+                        };
+                    }else{
+                        return {results:data};
+                    }
+                }
+            },
+            formatResult: formatAsText
         });
-        $("#talkerId").bsSuggest({
-            url: "/xianuni-dm/person/listQuery.do?status=5&orgId="+getOrgTag()+"&number=",
-            getDataMethod:"url",
-            effectiveFields: ["personNumber", "personName"],
-            effectiveFieldsAlias:{"personName": "姓名","personNumber":"学工号"},
-            showBtn: true,
-            idField: "personId",
-            keyField: "personNumber"
-        }).on('onSetSelectValue', function (e, keyword) {
-            //
-        });
+
+        $("#pTalker").select2();
     });
+    //格式化查询结果,将查询回来的id跟name放在两个div里并同行显示，后一个div靠右浮动
+    function formatAsText(item){
+        var itemFmt ="<div style='display:inline;'>"+item.id+"</div><div style='float:right;color:#4F4F4F;display:inline'>"+item.name+"</div>"
+        return itemFmt;
+    }
+
     function getOrgTag(){
         return parent.$('#orgIdTag').val();
     }

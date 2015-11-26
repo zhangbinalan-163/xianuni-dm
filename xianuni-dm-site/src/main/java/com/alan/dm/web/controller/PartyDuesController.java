@@ -4,11 +4,11 @@ import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
-import com.alan.dm.entity.condition.OrgRewardCondition;
 import com.alan.dm.entity.condition.PartyDuesCondition;
-import com.alan.dm.service.IOrgRewardService;
+import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgnizationService;
 import com.alan.dm.service.IPartyDuesService;
+import com.alan.dm.service.IPersonService;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -31,6 +33,73 @@ public class PartyDuesController extends BaseController{
 	@Resource(name = "partyDuesService")
 	private IPartyDuesService partyDuesService;
 
+	@Resource(name = "adminService")
+	private IAdminService adminService;
+
+	@Resource(name = "orgnizationService")
+	private IOrgnizationService orgnizationService;
+
+	@Resource(name = "personService")
+	private IPersonService personService;
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/delete.do")
+	@ResponseBody
+	public String delete(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		int id = request.getInt("id");
+
+		PartyDuesPay partyDuesPay=new PartyDuesPay();
+		partyDuesPay.setId(id);
+
+		partyDuesService.deletePay(partyDuesPay);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", true);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/add.do")
+	@ResponseBody
+	public String add(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Date startTime = request.getDate("startTime");
+		Date endTime = request.getDate("endTime");
+		Date payTime = request.getDate("payTime");
+		int orgId=request.getInt("orgId");
+		String number=request.getString("number");
+		Person person=personService.getByNumber(number);
+
+		PartyDuesPay partyDues=new PartyDuesPay();
+		partyDues.setPerson(person);
+		partyDues.setPayEndTime(endTime);
+		partyDues.setPayStartTime(startTime);
+		partyDues.setPayTime(payTime==null?new Date():payTime);
+
+		partyDuesService.involvePay(partyDues);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", true);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/list.do")
 	@ResponseBody
 	public String dueList(HttpServletRequest httpServletRequest) throws Exception {
@@ -39,17 +108,44 @@ public class PartyDuesController extends BaseController{
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId",0);
 		String number=request.getString("number", null);
+		boolean containSubOrg=request.getBoolean("containSub", true);
+
+		//如果没有传入orgId，设置为管理员所管理的ORG
+		if(orgId==0){
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin adminInfo = adminService.getById(adminId);
+			if(adminInfo.getType()==Admin.ORG_ADMIN){
+				orgId=adminInfo.getOrgId();
+			}
+		}
+		PartyDuesCondition condition=new PartyDuesCondition();
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
+		if(containSubOrg){
+			Orgnization orgnization=null;
+			if(orgId==0){
+				orgnization =new Orgnization();
+				orgnization.setId(-1);
+			}else{
+				orgnization= orgnizationService.getOrgById(orgId);
+			}
+			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+			if(subOrgList!=null){
+				for (Orgnization subOrg:subOrgList){
+					orgIdList.add(subOrg.getId());
+				}
+			}
+			condition.setOrgList(orgIdList);
+		}
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page-1)*limit);
 		pageInfo.setSize(limit);
-		PartyDuesCondition condition=new PartyDuesCondition();
-		if(orgId!=0){
-			condition.setOrgId(orgId);
-		}
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
+		condition.setStatus(Arrays.asList(PersonStatus.PERPARE.getId(), PersonStatus.NORMAL.getId()));
 		int subCount = partyDuesService.countByCondition(condition);
 
 		List<PartyDuesPay> duesPayList = partyDuesService.getByCondition(condition, pageInfo);

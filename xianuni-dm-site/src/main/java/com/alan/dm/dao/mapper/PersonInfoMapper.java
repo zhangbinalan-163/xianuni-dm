@@ -1,5 +1,6 @@
 package com.alan.dm.dao.mapper;
 
+import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
 import com.alan.dm.entity.condition.PersonCondition;
@@ -12,6 +13,23 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface PersonInfoMapper {
+    /**
+     *
+     * @param orgnizationList
+     * @param number
+     * @param page
+     * @return
+     */
+    List<Person> getCommitteeCandidateList(@Param(value="orgList")List<Orgnization> orgnizationList,@Param(value="number")String number, @Param(value="page") Page page);
+
+    /**
+     *
+     * 获取部门里面可以成为管理员的账号信息
+     * @param orgnizationList
+     * @param page
+     * @return
+     */
+    List<Person> getAdminCandidateList(@Param(value="orgList")List<Orgnization> orgnizationList,@Param(value="number")String number, @Param(value="page") Page page);
     /**
      *
      * @param condition

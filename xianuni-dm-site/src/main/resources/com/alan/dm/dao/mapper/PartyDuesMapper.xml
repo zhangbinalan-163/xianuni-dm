@@ -29,6 +29,17 @@
         <result property="payTime" column="payTime"/>
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="partyDuesPay.id">
+        INSERT INTO
+        <include refid="A_TABLE"/>
+        (personId,payStartTime,payEndTime,payTime)
+        VALUES(#{partyDuesPay.person.id},#{partyDuesPay.payStartTime},#{partyDuesPay.payEndTime},#{partyDuesPay.payTime})
+    </insert>
+
+    <delete id="delete">
+        delete from <include refid="A_TABLE" />
+        where id=#{partyDuesPay.id}
+    </delete>
 
     <select id="getByCondition" resultMap="A_INFO">
         SELECT
@@ -45,15 +56,26 @@
         O.name as orgName
 
         FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
+        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
         <where>
-            <if test="condition.orgId != null">P.orgId=#{condition.orgId}</if>
-            <if test="condition.startDate != null">AND P.payTime <![CDATA[>]]> #{condition.startDate}</if>
-            <if test="condition.endDate != null">AND P.payTime <![CDATA[<]]> #{condition.endDate}</if>
+            <if test="condition.orgList != null">
+                P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.status != null">
+                AND P.status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
             <if test="condition.number != null">
-                <bind name="pattern" value="condition.number+ '%'" />
-                AND P.number LIKE #{pattern}
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
             </if>
         </where>
         ORDER BY dueId DESC
@@ -65,15 +87,26 @@
     <select id="countByCondition" resultType="Integer">
         SELECT count(*)
         FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
+        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
+        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
         <where>
-            <if test="condition.orgId != null">P.orgId=#{condition.orgId}</if>
-            <if test="condition.startDate != null">AND P.payTime <![CDATA[>]]> #{condition.startDate}</if>
-            <if test="condition.endDate != null">AND P.payTime <![CDATA[<]]> #{condition.endDate}</if>
+            <if test="condition.orgList != null">
+                P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.status != null">
+                AND P.status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
             <if test="condition.number != null">
-                <bind name="pattern" value="condition.number+ '%'" />
-                AND P.number LIKE #{pattern}
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
             </if>
         </where>
     </select>

@@ -4,6 +4,7 @@ import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
+import com.alan.dm.entity.condition.ActivitistInfoCondition;
 import com.alan.dm.entity.condition.AdminCondition;
 import com.alan.dm.entity.condition.ApplierInfoCondition;
 import com.alan.dm.entity.condition.PersonCondition;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -44,22 +46,27 @@ public class AdminController extends BaseController{
 		return "orgnization/index";
 	}
 
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/delete.do")
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {
-		Request request = getRequest(httpServletRequest);
-		Integer adminId = request.getInt("adminId");
 		//检查当前用户权限 TODO
-		Admin adminInfo = adminService.getById(adminId);
-		JSONObject orgObject=new JSONObject();
-		if(adminInfo!=null){
-			adminService.deleteAdmin(adminInfo);
-			orgObject.put("success", true);
-			orgObject.put("msg", "success");
-			return JsonUtils.fromObject(orgObject);
+		Request request = getRequest(httpServletRequest);
+		String[] adminIds= request.getStringArray("id",",");
+		for(String adminId:adminIds){
+			Admin adminInfo =adminService.getById(Integer.parseInt(adminId));
+			if(adminInfo!=null){
+				adminService.deleteAdmin(adminInfo);
+			}
 		}
-		orgObject.put("success", false);
-		orgObject.put("msg", "不存在");
+		JSONObject orgObject=new JSONObject();
+		orgObject.put("status","success");
+		orgObject.put("message", "success");
 		return JsonUtils.fromObject(orgObject);
 	}
 
@@ -113,6 +120,12 @@ public class AdminController extends BaseController{
 		return null;
 	}
 
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/info.do")
 	@ResponseBody
 	public String adminInfo(HttpServletRequest httpServletRequest) throws Exception {
@@ -158,30 +171,35 @@ public class AdminController extends BaseController{
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId", 0);
 		boolean containSubOrg=request.getBoolean("containSub", true);
-		//如果没有传入orgId，设置为管理员所管理的ORG
+
 		Integer adminId = getOnlineAdminId(httpServletRequest);
 		Admin adminInfo = adminService.getById(adminId);
-		if(orgId==0){
-			if(adminInfo.getType()==Admin.ORG_ADMIN){
+		AdminCondition condition=new AdminCondition();
+		if(adminInfo.getType()==Admin.SYSTEM_ADMIN){
+			if(orgId==0){
+				//不指定部门，全部查询
+			}else{
+				List<Integer> orgIdList=new ArrayList<Integer>();
+				orgIdList.add(orgId);
+				Orgnization orgnization= orgnizationService.getOrgById(orgId);
+				List<Orgnization> subOrgList =orgnizationService.getOrgByParent(orgnization, true);
+				if(subOrgList!=null){
+					for (Orgnization subOrg:subOrgList){
+						orgIdList.add(subOrg.getId());
+					}
+				}
+				condition.setOrgList(orgIdList);
+			}
+		}else if(adminInfo.getType()==Admin.ORG_ADMIN){
+			if(orgId==0){
 				orgId=adminInfo.getOrgId();
 			}
-		}
-		AdminCondition condition=new AdminCondition();
-		condition.setContainSub(containSubOrg);
-		if(containSubOrg){
 			List<Integer> orgIdList=new ArrayList<Integer>();
-			//部门管理员不能看到同级的部门管理员
-			if(adminInfo.getType()==Admin.SYSTEM_ADMIN){
+			if(orgId!=adminInfo.getOrgId()){
 				orgIdList.add(orgId);
 			}
-			Orgnization orgnization=null;
-			if(orgId==0){
-				orgnization =new Orgnization();
-				orgnization.setId(-1);
-			}else{
-				orgnization= orgnizationService.getOrgById(orgId);
-			}
-			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+			Orgnization orgnization= orgnizationService.getOrgById(orgId);
+			List<Orgnization> subOrgList =orgnizationService.getOrgByParent(orgnization, true);
 			if(subOrgList!=null){
 				for (Orgnization subOrg:subOrgList){
 					orgIdList.add(subOrg.getId());
@@ -189,13 +207,17 @@ public class AdminController extends BaseController{
 			}
 			condition.setOrgList(orgIdList);
 		}else{
-			condition.setOrgId(orgId);
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("page",1);
+			jsonObject.put("total",0);
+			jsonObject.put("records",0);
+			return JsonUtils.fromObject(jsonObject);
 		}
 		condition.setType(Admin.ORG_ADMIN);
+
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page - 1) * limit);
 		pageInfo.setSize(limit);
-
 		int count=adminService.countByCondition(condition);
 		List<Admin> adminList = adminService.getByCondition(condition, pageInfo);
 
@@ -204,7 +226,6 @@ public class AdminController extends BaseController{
 		jsonObject.put("total",count==0?0:count/limit+1);
 		jsonObject.put("records",count);
 		JSONArray rowsArray=new JSONArray();
-
 		if(adminList!=null){
 			for(Admin admin:adminList){
 				JSONObject subOrgObject=new JSONObject();
@@ -224,6 +245,44 @@ public class AdminController extends BaseController{
 			}
 		}
 		jsonObject.put("rows",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 * 查询可以成为管理员的党员信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/candidateList.do")
+	@ResponseBody
+	public String candidateList(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId=request.getInt("orgId");
+		String number=request.getString("number", null);
+
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
+		Page page=new Page();
+		page.setSize(20);
+		page.setCurrent(0);
+
+		List<Person> personList=adminService.getCandidatePerson(Arrays.asList(orgnization),number,page);
+
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject keyObject=new JSONObject();
+				keyObject.put("personId",person.getId());
+				keyObject.put("personName",person.getName());
+				keyObject.put("personNumber", person.getNumber());
+				keyObject.put("personStatus",PersonStatus.getInstance(person.getStatus()).getName());
+				rowsArray.add(keyObject);
+			}
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("code", 200);
+		jsonObject.put("message", "success");
+		jsonObject.put("value",rowsArray);
 		return JsonUtils.fromObject(jsonObject);
 	}
 }

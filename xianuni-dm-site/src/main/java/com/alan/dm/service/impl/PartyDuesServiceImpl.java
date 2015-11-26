@@ -16,7 +16,6 @@ import java.util.List;
  */
 @Service(value = "partyDuesService")
 public class PartyDuesServiceImpl implements IPartyDuesService {
-
     @Resource(name = "partyDuesDao")
     private IPartyDuesDao partyDuesDao;
 
@@ -28,5 +27,15 @@ public class PartyDuesServiceImpl implements IPartyDuesService {
     @Override
     public int countByCondition(PartyDuesCondition condition) throws DMException {
         return partyDuesDao.countByCondition(condition);
+    }
+
+    @Override
+    public void involvePay(PartyDuesPay partyDuesPay) throws DMException {
+        partyDuesDao.insert(partyDuesPay);
+    }
+
+    @Override
+    public void deletePay(PartyDuesPay partyDuesPay) throws DMException {
+        partyDuesDao.delete(partyDuesPay);
     }
 }

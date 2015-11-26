@@ -223,16 +223,16 @@
                                         $.ajax( {
                                             url:'/xianuni-dm/admin/delete.do',
                                             data:{
-                                                adminId :id
+                                                id :id
                                             },
                                             type:'post',
                                             dataType:'json',
                                             success:function(data) {
-                                                if(data.success){
+                                                if(data.status){
                                                     layer.alert('删除信息成功', {icon: 1});
                                                     self.fetchData({});
                                                 }else{
-                                                    layer.alert('删除信息失败！'+data.msg, {icon: 5});
+                                                    layer.alert('删除信息失败！'+data.message, {icon: 5});
                                                 }
                                             },
                                             error : function() {

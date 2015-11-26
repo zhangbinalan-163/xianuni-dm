@@ -3,6 +3,7 @@ package com.alan.dm.dao;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.PersonCondition;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,6 +12,21 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface IPersonInfoDao {
+    /**
+     *
+     * @param orgnizationList
+     * @param number
+     * @param page
+     * @return
+     */
+    List<Person> getCommitteeCandidateList(List<Orgnization> orgnizationList,String number,Page page);
+    /**
+     *
+     * @param orgnizationList
+     * @param page
+     * @return
+     */
+    List<Person> getAdminCandidateList(List<Orgnization> orgnizationList,String number,Page page);
     /**
      *
      * @param condition

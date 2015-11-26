@@ -89,6 +89,7 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
         int parent=orgnization.getParent();
         while(parent!=-1){
             Orgnization parentOrg = orgnizationDao.getById(parent);
+            parent=parentOrg.getParent();
             orgnizationList.add(parentOrg);
         }
         return orgnizationList;

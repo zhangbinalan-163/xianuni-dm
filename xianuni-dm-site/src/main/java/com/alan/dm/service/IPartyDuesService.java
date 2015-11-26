@@ -29,4 +29,18 @@ public interface IPartyDuesService {
      * @throws DMException
      */
     int countByCondition(PartyDuesCondition condition) throws DMException;
+
+    /**
+     *
+     * @param partyDuesPay
+     * @throws DMException
+     */
+    void involvePay(PartyDuesPay partyDuesPay) throws DMException;
+
+    /**
+     *
+     * @param partyDuesPay
+     * @throws DMException
+     */
+    void deletePay(PartyDuesPay partyDuesPay) throws DMException;
 }
