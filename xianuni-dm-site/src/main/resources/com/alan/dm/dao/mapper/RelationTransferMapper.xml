@@ -24,6 +24,24 @@
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
 
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="person.id">
+        INSERT INTO
+        <include refid="A_TABLE"/>
+        (transferType,personId,toOrgId,fromOrgId,fromOrgName,toOrgName,transferTime)
+        VALUES(#{relationTransferInfo.},#{relationTransferInfo.person.id},#{relationTransferInfo.status},#{relationTransferInfo.type},#{relationTransferInfo.fromOrgName},#{relationTransferInfo.toOrgName},#{relationTransferInfo.transferTime})
+    </insert>
+
+    <select id="getById" resultType="com.alan.dm.entity.RelationTransferInfo">
+        SELECT *
+        FROM  <include refid="A_TABLE" />
+        WHERE id=#{id}
+    </select>
+
+    <delete id="delete">
+        DELETE  FROM <include refid="A_TABLE"/>
+        WHERE id=#{relationTransferInfo.id}
+    </delete>
+
     <select id="getByCondition" resultMap="A_INFO">
         SELECT
           A.id as transferId,

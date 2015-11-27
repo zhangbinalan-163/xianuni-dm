@@ -1,16 +1,13 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IIntentionInfoDao;
-import com.alan.dm.dao.IPersonInfoDao;
+import com.alan.dm.dao.mapper.IntentionInfoMapper;
 import com.alan.dm.entity.*;
-import com.alan.dm.entity.condition.IntentionInfoCondition;
 import com.alan.dm.service.IIntentionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.Date;
-import java.util.List;
 
 /**
  *
@@ -19,46 +16,23 @@ import java.util.List;
 @Service(value = "intentionService")
 public class IntentionServiceImpl implements IIntentionService {
 
-    @Resource(name = "intentionInfoDao")
-    private IIntentionInfoDao intentionDao;
-
-    @Resource(name = "personInfoDao")
-    private IPersonInfoDao personInfoDao;
-
-    @Override
-    public List<IntentionInfo> getByCondition(IntentionInfoCondition condition, Page page) throws DMException {
-        return intentionDao.getByCondition(condition,page);
-    }
-
-    @Override
-    public int countByCondition(IntentionInfoCondition condition) throws DMException {
-        return intentionDao.countByCondition(condition);
-    }
+    @Autowired
+    private IntentionInfoMapper intentionInfoMapper;
 
     @Override
     public void createIntention(IntentionInfo intentionInfo) throws DMException {
         intentionInfo.setCreateTime(new Date());
-        intentionDao.insert(intentionInfo);
-        //修改用户状态
-        intentionInfo.getPerson().setUpdateTime(new Date());
-        personInfoDao.updateStatus(intentionInfo.getPerson(), PersonStatus.INTENTION);
+        intentionInfoMapper.insert(intentionInfo);
     }
 
     @Override
     public void deleteIntention(IntentionInfo intentionInfo) throws DMException {
-        intentionDao.delete(intentionInfo);
-        //修改用户状态
-        intentionInfo.getPerson().setUpdateTime(new Date());
-        personInfoDao.updateStatus(intentionInfo.getPerson(), PersonStatus.ACTIVISTS);
+        intentionInfoMapper.delete(intentionInfo);
     }
 
     @Override
     public IntentionInfo getById(int intentionId) throws DMException {
-        return intentionDao.getById(intentionId);
+        return intentionInfoMapper.getById(intentionId);
     }
 
-    @Override
-    public IntentionInfo getByPerson(Person person) throws DMException {
-        return intentionDao.getByPerson(person);
-    }
 }

@@ -5,117 +5,18 @@
 <mapper namespace="com.alan.dm.dao.mapper.ApplierInfoMapper">
 
     <sql id="A_TABLE">tb_party_applier</sql>
-    <sql id="PERSON_TABLE">tb_person</sql>
-    <sql id="ORG_TABLE">tb_orgnization</sql>
-
-    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
-        <id property="id" column="orgId"/>
-        <result property="name" column="orgName"/>
-    </resultMap>
-
-    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
-        <id property="id" column="personId"/>
-        <result property="name" column="personName"/>
-        <result property="number" column="personNumber"/>
-        <result property="type" column="personType"/>
-        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
-    </resultMap>
-
-    <resultMap id="A_INFO" type="com.alan.dm.entity.ApplierInfo">
-        <id property="id" column="applierId" />
-        <result property="applyTime" column="applyTime"/>
-        <result property="talkTime" column="talkTime"/>
-        <result property="createTime" column="createTime"/>
-        <result property="updateTime" column="updateTime"/>
-        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
-    </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="applier.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (personId,createTime,applyTime,talkTime,talkContent,talkerId)
-        VALUES(#{applier.person.id},#{applier.createTime},#{applier.applyTime},#{applier.talkTime},#{applier.talkContent},#{applier.talker.id})
+        (createTime,applyTime,talkTime,talkContent,talkerId)
+        VALUES(#{applier.createTime},#{applier.applyTime},#{applier.talkTime},#{applier.talkContent},#{applier.talker.id})
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.ApplierInfo">
         select *
         FROM <include refid="A_TABLE" />
         WHERE id=#{applierId}
-    </select>
-
-    <select id="getByPersonId" resultType="com.alan.dm.entity.ApplierInfo">
-        select *
-        FROM <include refid="A_TABLE" />
-        WHERE personId=#{personId}
-    </select>
-
-    <select id="getByCondition" resultMap="A_INFO">
-        SELECT
-        A.id as applierId,
-        A.personId as personId,
-        A.applyTime as applyTime,
-        A.talkTime as talkTime,
-        P.name as personName,
-        P.number as personNumber,
-        P.type as personType,
-        O.id as orgId,
-        O.name as orgName,
-        A.createTime as createTime,
-        A.updateTime as updateTime
-        FROM  <include refid="A_TABLE" /> A
-        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
-        <where>
-            <if test="condition.orgList != null">
-                P.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
-            </if>
-            <if test="condition.status != null">
-                AND P.status in
-                <foreach collection="condition.status" index="index" item="status" open="("
-                         separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND P.number LIKE #{patternNumber}
-            </if>
-        </where>
-        ORDER BY A.updateTime desc,A.createTime desc
-        <if test="page!=null">
-            LIMIT #{page.current}, #{page.size}
-        </if>
-    </select>
-
-    <select id="countByCondition" resultType="Integer">
-        SELECT count(*)
-        FROM  <include refid="A_TABLE" /> A
-        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
-        <where>
-            <if test="condition.orgList != null">
-                P.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
-            </if>
-            <if test="condition.status != null">
-                AND P.status in
-                <foreach collection="condition.status" index="index" item="status" open="("
-                         separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND P.number LIKE #{patternNumber}
-            </if>
-        </where>
     </select>
 
     <delete id="delete">

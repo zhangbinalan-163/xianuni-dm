@@ -30,4 +30,25 @@ public interface RelationTransferMapper {
      */
     int countByCondition(@Param(value="condition")RelationTransferCondition condition);
 
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
+    void insert(@Param(value="relationTransferInfo")RelationTransferInfo relationTransferInfo);
+
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
+    void delete(@Param(value="relationTransferInfo")RelationTransferInfo relationTransferInfo);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    RelationTransferInfo getById(@Param(value="id")int id);
+
 }

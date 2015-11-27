@@ -4,64 +4,47 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.alan.dm.dao.mapper.PersonInfoMapper">
 
-    <sql id="OUT_TABLE">tb_person</sql>
-    <sql id="TABLE">tb_orgnization</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
     <sql id="ADMIN_TABLE">tb_admin</sql>
     <sql id="COMMITTEE_TABLE">tb_org_committee</sql>
 
-    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
-        <id property="id" column="orgId"/>
-        <result property="name" column="orgName"/>
-    </resultMap>
-
-    <resultMap id="OUT_INFO" type="com.alan.dm.entity.Person">
-        <id property="id" column="id"/>
-        <result property="name" column="personName"/>
-        <result property="createTime" column="createTime"/>
-        <result property="number" column="number"/>
-        <result property="status" column="personStatus"/>
-        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
-    </resultMap>
-
+    <!--插入数据，暂时不处理其他信息，只保存基本信息-->
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="person.id">
         INSERT INTO
-        <include refid="OUT_TABLE"/>
-        (orgId,name,status,type,number,idNumber,sex,nation,degree,password,birth,createTime,personDesc)
-        VALUES(#{person.orgnization.id},#{person.name},#{person.status},#{person.type},#{person.number},#{person.idNumber},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},#{person.personDesc})
+        <include refid="PERSON_TABLE"/>
+        (orgId,name,status,type,number,idNumber,sex,nation,degree,password,birth,createTime,personDesc,applierInfoId,activitistInfoId,intentionInfoId,prepareInfoId,normalInfoId)
+        VALUES(#{person.orgnization.id},#{person.name},#{person.status},#{person.type},
+        #{person.number},#{person.idNumber},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},
+        #{person.personDesc},#{person.applierInfoId},#{person.activitistInfoId},#{person.intentionInfoId},#{person.prepareInfoId},#{person.normalInfoId})
     </insert>
 
-    <update id="setStatus">
-        UPDATE <include refid="OUT_TABLE"/>
-        SET status=#{status},updateTime=#{updateTime}
-        WHERE id=#{personId}
+    <!-- 更新数据，暂时只有状态修改-->
+    <update id="update">
+        UPDATE <include refid="PERSON_TABLE"/>
+        SET status=#{person.status},updateTime=#{person.updateTime},applierInfoId=#{person.applierInfoId},activitistInfoId=#{person.activitistInfoId},intentionInfoId=#{person.intentionInfoId},prepareInfoId=#{person.prepareInfoId},normalInfoId=#{person.normalInfoId}
+        WHERE id=#{person.id}
     </update>
 
+    <!-- 删除操作-->
     <delete id="delete">
-        DELETE  FROM <include refid="OUT_TABLE"/>
+        DELETE  FROM <include refid="PERSON_TABLE"/>
         WHERE id=#{person.id}
     </delete>
 
-    <select id="getByCondition" resultMap="OUT_INFO">
-        SELECT
-          O.id AS id,
-          P.name AS orgName,
-          P.id AS orgId,
-          O.name AS personName,
-          O.createTime AS createTime,
-          O.number AS number,
-          O.status AS personStatus
-        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
-        ON O.orgId=P.id
+    <!-- 根据条件，分页获取人员信息-->
+    <select id="getByCondition" resultType="com.alan.dm.entity.Person">
+        SELECT *
+        FROM  <include refid="PERSON_TABLE" />
         <where>
             <if test="condition.orgList != null">
-                O.orgId in
+                orgId in
                 <foreach collection="condition.orgList" index="index" item="orgList" open="("
                          separator="," close=")">
                     #{orgList}
                 </foreach>
             </if>
             <if test="condition.status != null">
-                AND O.status in
+                AND status in
                 <foreach collection="condition.status" index="index" item="status" open="("
                          separator="," close=")">
                     #{status}
@@ -69,14 +52,14 @@
             </if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
-                AND O.number LIKE #{patternNumber}
+                AND number LIKE #{patternNumber}
             </if>
             <if test="condition.name != null">
                 <bind name="patternName" value="condition.name+ '%'" />
-                AND O.name LIKE #{patternName}
+                AND name LIKE #{patternName}
             </if>
         </where>
-        ORDER BY O.updateTime desc,O.createTime desc
+        ORDER BY updateTime desc,createTime desc
         <if test="page!=null">
             LIMIT #{page.current}, #{page.size}
         </if>
@@ -84,18 +67,17 @@
 
     <select id="countByCondition" resultType="Integer">
         select count(*)
-        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
-        ON O.orgId=P.id
+        FROM  <include refid="PERSON_TABLE" />
         <where>
             <if test="condition.orgList != null">
-                O.orgId in
+                orgId in
                 <foreach collection="condition.orgList" index="index" item="orgList" open="("
                          separator="," close=")">
                     #{orgList}
                 </foreach>
             </if>
             <if test="condition.status != null">
-                AND O.status in
+                AND status in
                 <foreach collection="condition.status" index="index" item="status" open="("
                          separator="," close=")">
                     #{status}
@@ -103,68 +85,66 @@
             </if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
-                AND O.number LIKE #{patternNumber}
+                AND number LIKE #{patternNumber}
             </if>
             <if test="condition.name != null">
                 <bind name="patternName" value="condition.name+ '%'" />
-                AND O.name LIKE #{patternName}
+                AND name LIKE #{patternName}
             </if>
         </where>
     </select>
 
     <select id="getByNumber" resultType="com.alan.dm.entity.Person">
         SELECT *
-        FROM  <include refid="OUT_TABLE" />
+        FROM  <include refid="PERSON_TABLE" />
         WHERE number=#{number}
     </select>
+
     <select id="getById" resultType="com.alan.dm.entity.Person">
         SELECT *
-        FROM  <include refid="OUT_TABLE" />
+        FROM  <include refid="PERSON_TABLE" />
         WHERE id=#{id}
     </select>
 
     <select id="getAdminCandidateList" resultType="com.alan.dm.entity.Person">
         SELECT *
-        FROM  <include refid="OUT_TABLE" />
+        FROM  <include refid="PERSON_TABLE" />
         <where>
-            status=5
-            <if test="orgList != null">
-                AND orgId in
-                <foreach collection="orgList" index="index" item="org" open="("
+            <if test="condition.orgList != null">
+                orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
                          separator="," close=")">
-                    #{org.id}
+                    #{orgList}
                 </foreach>
             </if>
-            <if test="number != null">
-                <bind name="patternName" value="number+ '%'" />
-                AND number LIKE #{patternName}
-            </if>
+            and status=5
             and number not in(
-              select distinct(schoolNumber)
+              select schoolNumber
               from <include refid="ADMIN_TABLE" />
             )
         </where>
-        ORDER BY createTime DESC
+        ORDER BY updateTime desc,createTime desc
         <if test="page!=null">
             LIMIT #{page.current}, #{page.size}
         </if>
     </select>
+
     <select id="getCommitteeCandidateList" resultType="com.alan.dm.entity.Person">
         SELECT *
-        FROM  <include refid="OUT_TABLE" />
+        FROM  <include refid="PERSON_TABLE" />
         <where>
-            status=5
-            <if test="orgList != null">
-                AND orgId in
-                <foreach collection="orgList" index="index" item="org" open="("
-                         separator="," close=")">
-                    #{org.id}
+            <if test="condition.orgList != null">
+                orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                separator="," close=")">
+                    #{orgList}
                 </foreach>
             </if>
-            <if test="number != null">
-                <bind name="patternName" value="number+ '%'" />
+            <if test="condition.number != null">
+                <bind name="patternName" value="condition.number+ '%'" />
                 AND number LIKE #{patternName}
             </if>
+            and status=5
             and id not in(
             select distinct(personId)
             from <include refid="COMMITTEE_TABLE" />

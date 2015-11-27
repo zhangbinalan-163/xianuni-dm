@@ -4,8 +4,9 @@ import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
-import com.alan.dm.entity.condition.*;
 import com.alan.dm.entity.PrepareInfo;
+import com.alan.dm.entity.query.PersonCondition;
+import com.alan.dm.entity.query.PersonResult;
 import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
@@ -146,17 +147,17 @@ public class PersonController extends BaseController{
 	@ResponseBody
 	public String applierInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int applierId = request.getInt("applierId");
-		ApplierInfo applierInfo = applierService.getById(applierId);
+		int personId = request.getInt("personId");
+
+		Person person=personService.getById(personId);
 		JSONObject jsonObject=new JSONObject();
-		if(applierInfo==null){
+		if(person==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
 		}
-
-		Person person = personService.getById(applierInfo.getPersonId());
-		if(person==null){
+		ApplierInfo applierInfo =applierService.getById(person.getApplierInfoId());
+		if(applierInfo==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
@@ -191,21 +192,23 @@ public class PersonController extends BaseController{
 	@ResponseBody
 	public String intentionInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int intentionId = request.getInt("intentionId");
-		IntentionInfo intentionInfo = intentionService.getById(intentionId);
+		int personId = request.getInt("intentionId");
+
 		JSONObject jsonObject=new JSONObject();
+		Person person = personService.getById(personId);
+		if(person==null){
+			jsonObject.put("success", false);
+			jsonObject.put("msg","不存在该记录");
+			return JsonUtils.fromObject(jsonObject);
+		}
+
+		IntentionInfo intentionInfo = intentionService.getById(person.getIntentionInfoId());
 		if(intentionInfo==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
 		}
 
-		Person person = personService.getById(intentionInfo.getPersonId());
-		if(person==null){
-			jsonObject.put("success", false);
-			jsonObject.put("msg","不存在该记录");
-			return JsonUtils.fromObject(jsonObject);
-		}
 		jsonObject.put("success", true);
 		Orgnization orgnization=orgnizationService.getOrgById(person.getOrgId());
 		jsonObject.put("orgName", orgnization.getName());
@@ -239,17 +242,17 @@ public class PersonController extends BaseController{
 	@ResponseBody
 	public String prepareInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int prepareId = request.getInt("prepareId");
-		PrepareInfo prepareInfo = prepareService.getById(prepareId);
+		int personId = request.getInt("prepareId");
+
 		JSONObject jsonObject=new JSONObject();
-		if(prepareInfo==null){
+		Person person=personService.getById(personId);
+		if(person==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
 		}
-
-		Person person = personService.getById(prepareInfo.getPersonId());
-		if(person==null){
+		PrepareInfo prepareInfo = prepareService.getById(person.getPrepareInfoId());
+		if(prepareInfo==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
@@ -278,17 +281,17 @@ public class PersonController extends BaseController{
 	@ResponseBody
 	public String normalInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int normalId = request.getInt("normalId");
-		NormalInfo normalInfo = normalService.getById(normalId);
+		int personId = request.getInt("normalId");
+
 		JSONObject jsonObject=new JSONObject();
-		if(normalInfo==null){
+		Person person=personService.getById(personId);
+		if(person==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
 		}
-
-		Person person = personService.getById(normalInfo.getPersonId());
-		if(person==null){
+		NormalInfo normalInfo = normalService.getById(person.getNormalInfoId());
+		if(normalInfo==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
@@ -326,9 +329,13 @@ public class PersonController extends BaseController{
 		int profession=request.getInt("profession", 0);
 		Date birth=request.getDate("birth");
 
-		Orgnization orgnization = new Orgnization();
-		orgnization.setId(orgId);
-
+		Orgnization orgnization = orgnizationService.getOrgById(orgId);
+		if(orgnization==null){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", false);
+			jsonObject.put("msg","党组织不存在");
+			return JsonUtils.fromObject(jsonObject);
+		}
 		Person person=new Person();
 		person.setOrgnization(orgnization);
 		person.setName(name);
@@ -378,7 +385,6 @@ public class PersonController extends BaseController{
 		String talkerNumber=request.getString("talkerNumber",null);
 		Date talkTime=request.getDate("talkTime", null);
 		Date applyTime=request.getDate("applyTime", null);
-
 		//检查是否学号正确，状态+部门
 		//检查谈话人是否是本部门
 		//添加申请人信息，修改基础人员状态
@@ -396,6 +402,7 @@ public class PersonController extends BaseController{
 			applierInfo.setTalker(talkerPerson);
 		}
 		applierInfo.setTalkTime(talkTime);
+
 		Person person = personService.getByNumber(number);
 		if(person==null||person.getStatus()!=PersonStatus.NO.getId()){
 			JSONObject jsonObject=new JSONObject();
@@ -403,9 +410,11 @@ public class PersonController extends BaseController{
 			jsonObject.put("msg","该学号不能转为申请人"+number);
 			return JsonUtils.fromObject(jsonObject);
 		}
-		applierInfo.setPerson(person);
-
 		applierService.createApplier(applierInfo);
+		//修改基础人员状态
+		person.setStatus(PersonStatus.APPLIER.getId());
+		person.setApplierInfoId(applierInfo.getId());
+		personService.updatePerson(person);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success", true);
@@ -425,15 +434,22 @@ public class PersonController extends BaseController{
 		String number=request.getString("number");
 		String meetContent=request.getString("meetContent", null);
 		String evaContent=request.getString("evaContent", null);
-		Integer directorId=request.getInt("directorId", -1);
+		String directorNumber=request.getString("directorNumber",null);
 		Date meetTime=request.getDate("meetTime", null);
 		Date evaTime=request.getDate("evaTime",null);
 
-		//检查是否学号正确，状态+部门
-		//检查培养人是否是本部门
-		//添加积极分子信息，修改基础人员状态
 		ActivitistInfo activitistInfo=new ActivitistInfo();
-		activitistInfo.setDirector(directorId);
+		if(!StringUtils.isEmpty(directorNumber)){
+			Person talkerPerson = personService.getByNumber(directorNumber);
+			if(talkerPerson==null||talkerPerson.getStatus()!=PersonStatus.NORMAL.getId()){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success", false);
+				jsonObject.put("msg", "无效" + directorNumber);
+				return JsonUtils.fromObject(jsonObject);
+			}
+			activitistInfo.setDirector(talkerPerson.getId());
+		}
+
 		activitistInfo.setEvaluationContent(evaContent);
 		activitistInfo.setMeetContent(meetContent);
 		activitistInfo.setMeetTime(meetTime);
@@ -446,8 +462,18 @@ public class PersonController extends BaseController{
 			jsonObject.put("msg","该学号不能转为积极分子"+number);
 			return JsonUtils.fromObject(jsonObject);
 		}
-		activitistInfo.setPerson(person);
+		if(person.getOrgId()!=orgId){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success",false);
+			jsonObject.put("msg","该学号不能转为积极分子"+number);
+			return JsonUtils.fromObject(jsonObject);
+		}
+
 		activitistService.createActivitist(activitistInfo);
+
+		person.setStatus(PersonStatus.ACTIVISTS.getId());
+		person.setActivitistInfoId(activitistInfo.getId());
+		personService.updatePerson(person);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success",true);
@@ -467,16 +493,26 @@ public class PersonController extends BaseController{
 		String number=request.getString("number");
 		int classHour=request.getInt("trainHour", 0);
 		int publiced=request.getInt("publiced", 0);
-		Integer directorId=request.getInt("directorId", -1);
+		String directorNumber=request.getString("directorId", null);
 		Date meetTime=request.getDate("meetTime", null);
 		String meetContent=request.getString("meetContent", null);
 		String politicalCheck=request.getString("politicalCheck",null);
 
 		IntentionInfo intentionInfo=new IntentionInfo();
+		if(!StringUtils.isEmpty(directorNumber)){
+			Person talkerPerson = personService.getByNumber(directorNumber);
+			if(talkerPerson==null||talkerPerson.getStatus()!=PersonStatus.NORMAL.getId()){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success", false);
+				jsonObject.put("msg", "无效" + directorNumber);
+				return JsonUtils.fromObject(jsonObject);
+			}
+			intentionInfo.setIntroducer(talkerPerson.getId());
+		}
+
 		intentionInfo.setRecorded(true);
 		intentionInfo.setMeetContent(meetContent);
 		intentionInfo.setMeetTime(meetTime);
-		intentionInfo.setIntroducer(directorId);
 		intentionInfo.setPoliticalChcekContent(politicalCheck);
 		intentionInfo.setSchoolApproval(null);
 		intentionInfo.setPubliced(publiced == 0);
@@ -488,8 +524,11 @@ public class PersonController extends BaseController{
 			jsonObject.put("msg","该学号不能转为发展对象"+number);
 			return JsonUtils.fromObject(jsonObject);
 		}
-		intentionInfo.setPerson(person);
 		intentionService.createIntention(intentionInfo);
+
+		person.setStatus(PersonStatus.INTENTION.getId());
+		person.setIntentionInfoId(intentionInfo.getId());
+		personService.updatePerson(person);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success",true);
@@ -520,6 +559,7 @@ public class PersonController extends BaseController{
 		prepareInfo.setMeetContent(meetContent);
 		prepareInfo.setMeetTime(meetTime);
 		prepareInfo.setSchoolApproval(schoolApproval);
+
 		Person person = personService.getByNumber(number);
 		if(person==null||person.getStatus()!=PersonStatus.INTENTION.getId()){
 			JSONObject jsonObject=new JSONObject();
@@ -527,8 +567,11 @@ public class PersonController extends BaseController{
 			jsonObject.put("msg","该学号不能转为预备党员"+number);
 			return JsonUtils.fromObject(jsonObject);
 		}
-		prepareInfo.setPerson(person);
 		prepareService.createPrepare(prepareInfo);
+
+		person.setStatus(PersonStatus.PERPARE.getId());
+		person.setPrepareInfoId(prepareInfo.getId());
+		personService.updatePerson(person);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success",true);
@@ -562,8 +605,12 @@ public class PersonController extends BaseController{
 			jsonObject.put("msg","该学号不能转为正式党员"+number);
 			return JsonUtils.fromObject(jsonObject);
 		}
-		normalInfo.setPerson(person);
+
 		normalService.createNormal(normalInfo);
+
+		person.setStatus(PersonStatus.NORMAL.getId());
+		person.setNormalInfoId(normalInfo.getId());
+		personService.updatePerson(person);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success",true);
@@ -597,7 +644,13 @@ public class PersonController extends BaseController{
 		condition.setOrgList(orgIdList);
 		condition.setStatus(statuslist);
 
-		List<Person> personList=personService.getByCondition(condition,null);
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(0);
+		pageInfo.setSize(10);
+
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(false);
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONArray rowsArray=new JSONArray();
 		if(personList!=null){
@@ -673,7 +726,8 @@ public class PersonController extends BaseController{
 		condition.setStatus(Arrays.asList(PersonStatus.NO.getId()));
 		int subCount = personService.countByCondition(condition);
 
-		List<Person> personList=personService.getByCondition(condition,pageInfo);
+		PersonResult result=new PersonResult();
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("page",page);
@@ -725,7 +779,7 @@ public class PersonController extends BaseController{
 				orgId=adminInfo.getOrgId();
 			}
 		}
-		ApplierInfoCondition condition=new ApplierInfoCondition();
+		PersonCondition condition=new PersonCondition();
 		List<Integer> orgIdList=new ArrayList<Integer>();
 		orgIdList.add(orgId);
 
@@ -754,30 +808,33 @@ public class PersonController extends BaseController{
 			condition.setNumber(number);
 		}
 
-		int subCount = applierService.countByCondition(condition);
+		int subCount = personService.countByCondition(condition);
 
-		List<ApplierInfo> applierInfoList=applierService.getByCondition(condition,pageInfo);
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(true);
+		result.setIncludeApplierInfo(true);
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("page",page);
 		jsonObject.put("total",subCount==0?0:subCount/limit+1);
 		jsonObject.put("records",subCount);
 		JSONArray rowsArray=new JSONArray();
-		if(applierInfoList!=null){
-			for(ApplierInfo applier:applierInfoList){
+		if(personList!=null){
+			for(Person person:personList){
 				JSONObject subOrgObject=new JSONObject();
-				subOrgObject.put("id", applier.getId());
+				subOrgObject.put("id", person.getId());
 				List<String> cellList=new ArrayList<String>();
-				cellList.add(String.valueOf(applier.getId()));
-				Person person=applier.getPerson();
+				cellList.add(String.valueOf(person.getId()));
+				ApplierInfo applierInfo=person.getApplierInfo();
 				Orgnization orgInfo = person.getOrgnization();
 				cellList.add(orgInfo.getName());
 				cellList.add(person.getName());
 				cellList.add(PersonType.getInstance(person.getType()).getName());
 				cellList.add(person.getNumber());
-				String applyTime=TimeUtils.convertToDateString(applier.getApplyTime());
+				String applyTime=TimeUtils.convertToDateString(applierInfo.getApplyTime());
 				cellList.add(StringUtils.isEmpty(applyTime)?"未提交申请书":applyTime);
-				String talkTime=TimeUtils.convertToDateString(applier.getTalkTime());
+				String talkTime=TimeUtils.convertToDateString(applierInfo.getTalkTime());
 				cellList.add(StringUtils.isEmpty(talkTime)?"未谈话":talkTime);
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
@@ -810,7 +867,7 @@ public class PersonController extends BaseController{
 				orgId=adminInfo.getOrgId();
 			}
 		}
-		ActivitistInfoCondition condition=new ActivitistInfoCondition();
+		PersonCondition condition=new PersonCondition();
 		List<Integer> orgIdList=new ArrayList<Integer>();
 		orgIdList.add(orgId);
 
@@ -839,30 +896,33 @@ public class PersonController extends BaseController{
 			condition.setNumber(number);
 		}
 
-		int subCount = activitistService.countByCondition(condition);
+		int subCount = personService.countByCondition(condition);
 
-		List<ActivitistInfo> activitistInfoList=activitistService.getByCondition(condition,pageInfo);
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(true);
+		result.setIncludeActivitistInfo(true);
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("page",page);
 		jsonObject.put("total",subCount==0?0:subCount/limit+1);
 		jsonObject.put("records",subCount);
 		JSONArray rowsArray=new JSONArray();
-		if(activitistInfoList!=null){
-			for(ActivitistInfo activitistInfo:activitistInfoList){
+		if(personList!=null){
+			for(Person person:personList){
 				JSONObject subOrgObject=new JSONObject();
-				subOrgObject.put("id", activitistInfo.getId());
+				subOrgObject.put("id", person.getId());
 				List<String> cellList=new ArrayList<String>();
-				cellList.add(String.valueOf(activitistInfo.getId()));
-				cellList.add(activitistInfo.getPerson().getOrgnization().getName());
-				cellList.add(activitistInfo.getPerson().getName());
-				cellList.add(PersonType.getInstance(activitistInfo.getPerson().getType()).getName());
-				cellList.add(activitistInfo.getPerson().getNumber());
-				String evaluaTime=TimeUtils.convertToDateString(activitistInfo.getEvaluationTime());
+				cellList.add(String.valueOf(person.getId()));
+				cellList.add(person.getOrgnization().getName());
+				cellList.add(person.getName());
+				cellList.add(PersonType.getInstance(person.getType()).getName());
+				cellList.add(person.getNumber());
+				String evaluaTime=TimeUtils.convertToDateString(person.getActivitistInfo().getEvaluationTime());
 				cellList.add(StringUtils.isEmpty(evaluaTime)?"未测评":evaluaTime);
-				String meetTime=TimeUtils.convertToDateString(activitistInfo.getMeetTime());
+				String meetTime=TimeUtils.convertToDateString(person.getActivitistInfo().getMeetTime());
 				cellList.add(StringUtils.isEmpty(meetTime)?"未召开":meetTime);
-				cellList.add(activitistInfo.getDirector()==0?"未确定":"已确定");
+				cellList.add(person.getActivitistInfo().getDirector()==0?"未确定":"已确定");
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}
@@ -894,7 +954,7 @@ public class PersonController extends BaseController{
 				orgId=adminInfo.getOrgId();
 			}
 		}
-		IntentionInfoCondition condition=new IntentionInfoCondition();
+		PersonCondition condition=new PersonCondition();
 		List<Integer> orgIdList=new ArrayList<Integer>();
 		orgIdList.add(orgId);
 
@@ -923,24 +983,26 @@ public class PersonController extends BaseController{
 			condition.setNumber(number);
 		}
 
-		int subCount = intentionService.countByCondition(condition);
+		int subCount = personService.countByCondition(condition);
 
-		List<IntentionInfo> intentionInfoList=intentionService.getByCondition(condition,pageInfo);
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(true);
+		result.setIncludeIntentionInfo(true);
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("page",page);
 		jsonObject.put("total",subCount==0?0:subCount/limit+1);
 		jsonObject.put("records",subCount);
 		JSONArray rowsArray=new JSONArray();
-		if(intentionInfoList!=null){
-			System.out.println("intention size=" + intentionInfoList.size());
-			for(IntentionInfo intentionInfo:intentionInfoList){
+		if(personList!=null){
+			for(Person person:personList){
 				JSONObject subOrgObject=new JSONObject();
-				subOrgObject.put("id", intentionInfo.getId());
+				subOrgObject.put("id", person.getId());
 				List<String> cellList=new ArrayList<String>();
-				cellList.add(String.valueOf(intentionInfo.getId()));
-				Person person=intentionInfo.getPerson();
+				cellList.add(String.valueOf(person.getId()));
 				Orgnization orgInfo = person.getOrgnization();
+				IntentionInfo intentionInfo=person.getIntentionInfo();
 				cellList.add(orgInfo.getName());
 				cellList.add(person.getName());
 				cellList.add(PersonType.getInstance(person.getType()).getName());
@@ -978,7 +1040,7 @@ public class PersonController extends BaseController{
 				orgId=adminInfo.getOrgId();
 			}
 		}
-		PrepareInfoCondition condition=new PrepareInfoCondition();
+		PersonCondition condition=new PersonCondition();
 		List<Integer> orgIdList=new ArrayList<Integer>();
 		orgIdList.add(orgId);
 
@@ -1008,22 +1070,25 @@ public class PersonController extends BaseController{
 			condition.setNumber(number);
 		}
 
-		int subCount = prepareService.countByCondition(condition);
+		int subCount = personService.countByCondition(condition);
 
-		List<PrepareInfo> prepareInfoList=prepareService.getByCondition(condition,pageInfo);
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(true);
+		result.setIncludePrepareInfo(true);
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("page",page);
 		jsonObject.put("total",subCount==0?0:subCount/limit+1);
 		jsonObject.put("records",subCount);
 		JSONArray rowsArray=new JSONArray();
-		if(prepareInfoList!=null){
-			for(PrepareInfo prepareInfo:prepareInfoList){
+		if(personList!=null){
+			for(Person person:personList){
 				JSONObject subOrgObject=new JSONObject();
-				subOrgObject.put("id", prepareInfo.getId());
+				subOrgObject.put("id", person.getId());
+				PrepareInfo prepareInfo = person.getPrepareInfo();
 				List<String> cellList=new ArrayList<String>();
 				cellList.add(String.valueOf(prepareInfo.getId()));
-				Person person=prepareInfo.getPerson();
 				Orgnization orgInfo = person.getOrgnization();
 				cellList.add(orgInfo.getName());
 				cellList.add(person.getName());
@@ -1060,7 +1125,7 @@ public class PersonController extends BaseController{
 				orgId=adminInfo.getOrgId();
 			}
 		}
-		NormalInfoCondition condition=new NormalInfoCondition();
+		PersonCondition condition=new PersonCondition();
 		List<Integer> orgIdList=new ArrayList<Integer>();
 		orgIdList.add(orgId);
 
@@ -1088,25 +1153,29 @@ public class PersonController extends BaseController{
 			condition.setNumber(number);
 		}
 
-		int subCount = normalService.countByCondition(condition);
+		int subCount = personService.countByCondition(condition);
 
-		List<NormalInfo> normalInfoList=normalService.getByCondition(condition,pageInfo);
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(true);
+		result.setIncludeNormalInfo(true);
+
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("page",page);
 		jsonObject.put("total",subCount==0?0:subCount/limit+1);
 		jsonObject.put("records",subCount);
 		JSONArray rowsArray=new JSONArray();
-		if(normalInfoList!=null){
-			for(NormalInfo normalInfo:normalInfoList){
+		if(personList!=null){
+			for(Person person:personList){
 				JSONObject subOrgObject=new JSONObject();
-				subOrgObject.put("id", normalInfo.getId());
+				subOrgObject.put("id", person.getId());
 				List<String> cellList=new ArrayList<String>();
-				cellList.add(String.valueOf(normalInfo.getId()));
-				Person person=normalInfo.getPerson();
+				cellList.add(String.valueOf(person.getId()));
 				Orgnization orgInfo = person.getOrgnization();
 				cellList.add(orgInfo.getName());
 				cellList.add(person.getName());
+				cellList.add(person.getSource()==Person.SOURCE_OUT?"是":"否");
 				cellList.add(PersonType.getInstance(person.getType()).getName());
 				cellList.add(person.getNumber());
 				subOrgObject.put("cell", cellList);
@@ -1129,9 +1198,15 @@ public class PersonController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String[] ids=request.getStringArray("id", ",");
 		for(String id:ids){
-			ApplierInfo applierInfo = applierService.getById(Integer.parseInt(id));
-			if(applierInfo!=null){
-				applierService.deleteApplier(applierInfo);
+			Person person=personService.getById(Integer.parseInt(id));
+			if(person!=null){
+				ApplierInfo applierInfo=applierService.getById(person.getApplierInfoId());
+				if(applierInfo!=null){
+					applierService.deleteApplier(applierInfo);
+				}
+				person.setStatus(PersonStatus.NO.getId());
+				person.setApplierInfoId(0);
+				personService.updatePerson(person);
 			}
 		}
 		JSONObject jsonObject=new JSONObject();
@@ -1150,9 +1225,15 @@ public class PersonController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String[] ids=request.getStringArray("id", ",");
 		for(String id:ids){
-			ActivitistInfo activitistInfo = activitistService.getById(Integer.parseInt(id));
-			if(activitistInfo!=null){
-				activitistService.deleteActivitist(activitistInfo);
+			Person person=personService.getById(Integer.parseInt(id));
+			if(person!=null){
+				ActivitistInfo activitistInfo=activitistService.getById(person.getApplierInfoId());
+				if(activitistInfo!=null){
+					activitistService.deleteActivitist(activitistInfo);
+				}
+				person.setStatus(PersonStatus.APPLIER.getId());
+				person.setActivitistInfoId(0);
+				personService.updatePerson(person);
 			}
 		}
 		JSONObject jsonObject=new JSONObject();
@@ -1171,9 +1252,15 @@ public class PersonController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String[] ids=request.getStringArray("id", ",");
 		for(String id:ids){
-			IntentionInfo intentionInfo = intentionService.getById(Integer.parseInt(id));
-			if(intentionInfo!=null){
-				intentionService.deleteIntention(intentionInfo);
+			Person person=personService.getById(Integer.parseInt(id));
+			if(person!=null){
+				IntentionInfo intentionInfo=intentionService.getById(person.getApplierInfoId());
+				if(intentionInfo!=null){
+					intentionService.deleteIntention(intentionInfo);
+				}
+				person.setStatus(PersonStatus.ACTIVISTS.getId());
+				person.setIntentionInfoId(0);
+				personService.updatePerson(person);
 			}
 		}
 		JSONObject jsonObject=new JSONObject();
@@ -1192,9 +1279,15 @@ public class PersonController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String[] ids=request.getStringArray("id", ",");
 		for(String id:ids){
-			PrepareInfo prepareInfo = prepareService.getById(Integer.parseInt(id));
-			if(prepareInfo!=null){
-				prepareService.deletePrepare(prepareInfo);
+			Person person=personService.getById(Integer.parseInt(id));
+			if(person!=null){
+				PrepareInfo prepareInfo=prepareService.getById(person.getApplierInfoId());
+				if(prepareInfo!=null){
+					prepareService.deletePrepare(prepareInfo);
+				}
+				person.setStatus(PersonStatus.INTENTION.getId());
+				person.setPrepareInfoId(0);
+				personService.updatePerson(person);
 			}
 		}
 		JSONObject jsonObject=new JSONObject();
@@ -1213,9 +1306,15 @@ public class PersonController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String[] ids=request.getStringArray("id", ",");
 		for(String id:ids){
-			NormalInfo normalInfo = normalService.getById(Integer.parseInt(id));
-			if(normalInfo!=null){
-				normalService.deleteNormal(normalInfo);
+			Person person=personService.getById(Integer.parseInt(id));
+			if(person!=null){
+				NormalInfo normalInfo=normalService.getById(person.getApplierInfoId());
+				if(normalInfo!=null){
+					normalService.deleteNormal(normalInfo);
+				}
+				person.setStatus(PersonStatus.PERPARE.getId());
+				person.setNormalInfoId(0);
+				personService.updatePerson(person);
 			}
 		}
 		JSONObject jsonObject=new JSONObject();
@@ -1236,26 +1335,26 @@ public class PersonController extends BaseController{
 		for(String id:ids){
 			Person person=personService.getById(Integer.parseInt(id));
 			if(person!=null){
-				NormalInfo normalInfo = normalService.getByPerson(person);
-				if(normalInfo!=null){
-					normalService.deleteNormal(normalInfo);
-				}
-				PrepareInfo prepareInfo = prepareService.getByPerson(person);
-				if(prepareInfo!=null){
-					prepareService.deletePrepare(prepareInfo);
-				}
-				IntentionInfo intentionInfo=intentionService.getByPerson(person);
-				if(intentionInfo!=null){
-					intentionService.deleteIntention(intentionInfo);
-				}
-				ActivitistInfo activitistInfo=activitistService.getByPerson(person);
-				if(activitistInfo!=null){
-					activitistService.deleteActivitist(activitistInfo);
-				}
-				ApplierInfo applierInfo=applierService.getByPerson(person);
-				if(applierInfo!=null){
-					applierService.deleteApplier(applierInfo);
-				}
+//				NormalInfo normalInfo = normalService.getByPerson(person);
+//				if(normalInfo!=null){
+//					normalService.deleteNormal(normalInfo);
+//				}
+//				PrepareInfo prepareInfo = prepareService.getByPerson(person);
+//				if(prepareInfo!=null){
+//					prepareService.deletePrepare(prepareInfo);
+//				}
+//				IntentionInfo intentionInfo=intentionService.getByPerson(person);
+//				if(intentionInfo!=null){
+//					intentionService.deleteIntention(intentionInfo);
+//				}
+//				ActivitistInfo activitistInfo=activitistService.getByPerson(person);
+//				if(activitistInfo!=null){
+//					activitistService.deleteActivitist(activitistInfo);
+//				}
+				//ApplierInfo applierInfo=applierService.getByPerson(person);
+				//if(applierInfo!=null){
+				//	applierService.deleteApplier(applierInfo);
+				//}
 				//TODO 其他信息
 				personService.deletePerson(person);
 			}

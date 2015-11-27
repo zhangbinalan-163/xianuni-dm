@@ -117,7 +117,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var number,directorId,meetTime,meetContent,evaTime,evaContent;
+                            var number,directorNumber,meetTime,meetContent,evaTime,evaContent;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -135,7 +135,7 @@
                                     evaTime=inputValue;
                                 }
                                 if(inputName=='directorId'){
-                                    directorId=inputValue;
+                                    directorNumber=inputValue;
                                 }
 
                             }
@@ -155,7 +155,7 @@
                                 data:{
                                     orgId : node.id,
                                     number:number,
-                                    directorId:directorId,
+                                    directorNumber:directorNumber,
                                     meetTime:meetTime,
                                     meetContent:meetContent,
                                     evaTime:evaTime,

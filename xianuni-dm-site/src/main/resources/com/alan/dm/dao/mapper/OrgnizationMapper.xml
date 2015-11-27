@@ -40,7 +40,7 @@
         WHERE parent=#{parentId}
     </select>
 
-    <select id="getById" resultMap="INFO">
+    <select id="getById" resultType="com.alan.dm.entity.Orgnization">
         SELECT *
         FROM  <include refid="TABLE" />
         WHERE id=#{id}

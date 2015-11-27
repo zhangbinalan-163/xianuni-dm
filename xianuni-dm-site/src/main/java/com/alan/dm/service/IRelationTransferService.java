@@ -27,4 +27,25 @@ public interface IRelationTransferService {
      * @throws DMException
      */
     int countByCondition(RelationTransferCondition condition) throws DMException;
+
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
+    void createTransfer(RelationTransferInfo relationTransferInfo) throws DMException;
+
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
+    void deleteTransfer(RelationTransferInfo relationTransferInfo) throws DMException;
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    RelationTransferInfo getById(int id) throws DMException;
 }

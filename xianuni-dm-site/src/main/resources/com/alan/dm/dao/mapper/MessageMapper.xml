@@ -80,14 +80,29 @@
         FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="TABLE"/> P
         ON O.orgId=P.id
         <where>
-            <if test="condition.orgList != null">
-                O.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
+            <if test="condition.personQuery!=null">
+                <if test="condition.orgList != null">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                    AND O.toSub=true
+                </if>
+                <if test="condition.orgId!=null">
+                    OR O.orgId=#{condition.orgId}
+                </if>
             </if>
-            <if test="condition.toSub != null">AND O.toSub=#{condition.toSub}</if>
+            <if test="condition.personQuery == null">
+                <if test="condition.orgList != null">
+                    O.orgId in
+                    <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                             separator="," close=")">
+                        #{orgList}
+                    </foreach>
+                </if>
+                <if test="condition.toSub != null">AND O.toSub=#{condition.toSub}</if>
+            </if>
         </where>
     </select>
 

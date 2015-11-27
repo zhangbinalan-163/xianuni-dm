@@ -125,7 +125,7 @@ public class MessageController extends BaseController{
 		List<Orgnization> parentOrgList=orgnizationService.getParentOrg(orgnization);
 
 		MessageCondition condition=new MessageCondition();
-		if(parentOrgList!=null){
+		if(parentOrgList!=null&&parentOrgList.size()>0){
 			List<Integer> orgIdList=new ArrayList<Integer>();
 			for(Orgnization parentOrg:parentOrgList){
 				orgIdList.add(parentOrg.getId());

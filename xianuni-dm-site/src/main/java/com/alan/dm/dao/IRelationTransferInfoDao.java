@@ -27,4 +27,24 @@ public interface IRelationTransferInfoDao {
      * @throws DMException
      */
     int countByCondition(RelationTransferCondition condition) throws DMException;
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
+    void insert(RelationTransferInfo relationTransferInfo) throws DMException;
+
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
+    void delete(RelationTransferInfo relationTransferInfo) throws DMException;
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    RelationTransferInfo getById(int id)throws DMException;
 }

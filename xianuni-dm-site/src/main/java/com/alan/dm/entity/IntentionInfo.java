@@ -8,9 +8,6 @@ import java.util.Date;
  */
 public class IntentionInfo {
     private int id;
-    private Person person;
-    private int personId;
-
     private int trainHour;
     private Date meetTime;
     private String meetContent;
@@ -21,40 +18,12 @@ public class IntentionInfo {
     private Date createTime;
     private boolean publiced;
 
-    public int getPersonId() {
-        return personId;
-    }
-
-    public void setPersonId(int personId) {
-        this.personId = personId;
-    }
-
-    public boolean isPubliced() {
-        return publiced;
-    }
-
-    public void setPubliced(boolean publiced) {
-        this.publiced = publiced;
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Person getPerson() {
-        if(person==null&&personId!=0){
-            person=new Person();
-            person.setId(personId);
-        }
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
     }
 
     public int getTrainHour() {
@@ -119,5 +88,13 @@ public class IntentionInfo {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public boolean isPubliced() {
+        return publiced;
+    }
+
+    public void setPubliced(boolean publiced) {
+        this.publiced = publiced;
     }
 }

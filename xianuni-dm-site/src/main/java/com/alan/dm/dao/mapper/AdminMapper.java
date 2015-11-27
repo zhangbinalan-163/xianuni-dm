@@ -1,11 +1,8 @@
 package com.alan.dm.dao.mapper;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.entity.ActivitistInfo;
 import com.alan.dm.entity.Admin;
-import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
-import com.alan.dm.entity.condition.ActivitistInfoCondition;
 import com.alan.dm.entity.condition.AdminCondition;
 import org.apache.ibatis.annotations.Param;
 

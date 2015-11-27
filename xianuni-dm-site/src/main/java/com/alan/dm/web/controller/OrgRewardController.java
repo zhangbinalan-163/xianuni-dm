@@ -4,7 +4,6 @@ import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
-import com.alan.dm.entity.condition.NormalInfoCondition;
 import com.alan.dm.entity.condition.OrgRewardCondition;
 import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgRewardService;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 

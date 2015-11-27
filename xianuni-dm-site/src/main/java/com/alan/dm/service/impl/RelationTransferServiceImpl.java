@@ -29,4 +29,19 @@ public class RelationTransferServiceImpl implements IRelationTransferService {
     public int countByCondition(RelationTransferCondition condition) throws DMException {
         return relationTransferInfoDao.countByCondition(condition);
     }
+
+    @Override
+    public void createTransfer(RelationTransferInfo relationTransferInfo) throws DMException {
+        relationTransferInfoDao.insert(relationTransferInfo);
+    }
+
+    @Override
+    public void deleteTransfer(RelationTransferInfo relationTransferInfo) throws DMException {
+        relationTransferInfoDao.delete(relationTransferInfo);
+    }
+
+    @Override
+    public RelationTransferInfo getById(int id) throws DMException{
+        return relationTransferInfoDao.getById(id);
+    }
 }

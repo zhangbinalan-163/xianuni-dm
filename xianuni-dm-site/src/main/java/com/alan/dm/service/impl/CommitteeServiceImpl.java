@@ -2,16 +2,18 @@ package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.dao.CommitteeInfoDao;
-import com.alan.dm.dao.IPersonInfoDao;
+import com.alan.dm.dao.mapper.PersonInfoMapper;
 import com.alan.dm.entity.CommitteeInfo;
 import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
 import com.alan.dm.entity.condition.CommitteeCondition;
+import com.alan.dm.entity.query.PersonCondition;
 import com.alan.dm.service.ICommitteeService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,8 +23,8 @@ import java.util.List;
 @Service(value = "committeeService")
 public class CommitteeServiceImpl implements ICommitteeService {
 
-    @Resource(name = "personInfoDao")
-    private IPersonInfoDao personInfoDao;
+    @Resource(name = "personInfoMapper")
+    private PersonInfoMapper personInfoMapper;
 
     @Resource(name="committeeInfoDao")
     private CommitteeInfoDao committeeInfoDao;
@@ -34,7 +36,16 @@ public class CommitteeServiceImpl implements ICommitteeService {
 
     @Override
     public List<Person> getCandidatePerson(List<Orgnization> orgnizationList, String number, Page page) throws DMException {
-        return personInfoDao.getCommitteeCandidateList(orgnizationList,number,page);
+        PersonCondition personCondition=new PersonCondition();
+        if(orgnizationList!=null){
+            List<Integer> orgIdsList=new ArrayList<Integer>();
+            for(Orgnization orgnization:orgnizationList){
+                orgIdsList.add(orgnization.getId());
+            }
+            personCondition.setOrgList(orgIdsList);
+        }
+        personCondition.setNumber(number);
+        return personInfoMapper.getCommitteeCandidateList(personCondition,page);
     }
 
     @Override

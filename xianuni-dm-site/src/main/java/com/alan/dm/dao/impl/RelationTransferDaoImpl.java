@@ -17,7 +17,6 @@ import java.util.List;
  */
 @Repository(value = "relationTransferDao")
 public class RelationTransferDaoImpl implements IRelationTransferInfoDao {
-
     @Autowired
     private RelationTransferMapper relationTransferMapper;
 
@@ -29,5 +28,20 @@ public class RelationTransferDaoImpl implements IRelationTransferInfoDao {
     @Override
     public int countByCondition(RelationTransferCondition condition) throws DMException {
         return relationTransferMapper.countByCondition(condition);
+    }
+
+    @Override
+    public void insert(RelationTransferInfo relationTransferInfo) throws DMException {
+        relationTransferMapper.insert(relationTransferInfo);
+    }
+
+    @Override
+    public void delete(RelationTransferInfo relationTransferInfo) throws DMException {
+        relationTransferMapper.delete(relationTransferInfo);
+    }
+
+    @Override
+    public RelationTransferInfo getById(int id) throws DMException {
+        return relationTransferMapper.getById(id);
     }
 }

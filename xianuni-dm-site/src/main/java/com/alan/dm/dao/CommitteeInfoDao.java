@@ -2,7 +2,6 @@ package com.alan.dm.dao;
 
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.*;
-import com.alan.dm.entity.condition.ActivitistInfoCondition;
 import com.alan.dm.entity.condition.CommitteeCondition;
 
 import java.util.List;

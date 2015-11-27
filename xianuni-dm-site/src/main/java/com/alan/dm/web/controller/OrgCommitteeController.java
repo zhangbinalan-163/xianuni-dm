@@ -3,10 +3,8 @@ package com.alan.dm.web.controller;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
-import com.alan.dm.dao.IPersonInfoDao;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.CommitteeCondition;
-import com.alan.dm.entity.condition.OrgRewardCondition;
 import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
@@ -21,7 +19,6 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 @Controller

@@ -7,6 +7,7 @@ import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.RelationTransferCondition;
 import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgnizationService;
+import com.alan.dm.service.IPersonService;
 import com.alan.dm.service.IRelationTransferService;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
@@ -21,6 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -37,6 +39,61 @@ public class RelationController extends BaseController{
 	@Resource(name = "orgnizationService")
 	private IOrgnizationService orgnizationService;
 
+	@Resource(name = "personService")
+	private IPersonService personService;
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/transfer/in/add.do")
+	@ResponseBody
+	public String inAdd(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId=request.getInt("orgId");
+		String orgName=request.getString("orgName");
+		String name=request.getString("name");
+		String number=request.getString("number");
+		Integer type=request.getInt("type", 0);
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
+		if(type==1){
+			//校外转入
+			Person person = personService.getByNumber(number);
+			if(person!=null){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success",false);
+				jsonObject.put("msg","该学号已经存在");
+				return JsonUtils.fromObject(jsonObject);
+			}
+			//先创建党员信息
+			person=new Person();
+			person.setNumber(number);
+			person.setSource(type == 1 ? 1 : 0);
+			person.setOrgnization(orgnization);
+			person.setPersonDesc("校外转入");
+			person.setName(name);
+			person.setStatus(PersonStatus.NORMAL.getId());
+			personService.createPerson(person);
+			//创建转入记录
+			RelationTransferInfo transferInfo=new RelationTransferInfo();
+			transferInfo.setTransferType(RelationTransferType.IN_OTHER.getId());
+			transferInfo.setPerson(person);
+			transferInfo.setFromOrgName(orgName);
+			transferInfo.setTransferTime(new Date());
+			transferInfo.setToOrgId(orgnization.getId());
+			transferInfo.setToOrgName(orgnization.getName());
+			relationTransferService.createTransfer(transferInfo);
+		}else{
+			//
+
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success",true);
+		jsonObject.put("msg","success");
+		return JsonUtils.fromObject(jsonObject);
+	}
 	/**
 	 *
 	 * @param httpServletRequest

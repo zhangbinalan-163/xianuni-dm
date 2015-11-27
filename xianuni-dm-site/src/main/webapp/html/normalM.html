@@ -176,11 +176,12 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号','操作'],
+                            colNames: ['ID','党组织', '姓名','是否外部转入', '人员类型', '学工号','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
+                                {name: 'source', index: 'source',width: 60, align: "left"},
                                 {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
                                 {name: 'actions', index: 'actions', width: 120, align: "center"}

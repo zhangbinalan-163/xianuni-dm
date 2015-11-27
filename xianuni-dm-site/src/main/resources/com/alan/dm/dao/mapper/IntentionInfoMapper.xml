@@ -5,36 +5,12 @@
 <mapper namespace="com.alan.dm.dao.mapper.IntentionInfoMapper">
 
     <sql id="A_TABLE">tb_party_intention</sql>
-    <sql id="PERSON_TABLE">tb_person</sql>
-    <sql id="ORG_TABLE">tb_orgnization</sql>
-
-
-    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
-        <id property="id" column="orgId"/>
-        <result property="name" column="orgName"/>
-    </resultMap>
-
-    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
-        <id property="id" column="personId"/>
-        <result property="name" column="personName"/>
-        <result property="number" column="personNumber"/>
-        <result property="type" column="personType"/>
-        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
-    </resultMap>
-
-    <resultMap id="A_INFO" type="com.alan.dm.entity.IntentionInfo">
-        <id property="id" column="intentionId" />
-        <result property="trainHour" column="trainHour"/>
-        <result property="publiced" column="publiced"/>
-        <result property="recorded" column="recorded"/>
-        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
-    </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="intentionInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (personId,trainHour,publiced,meetTime,meetContent,introducer,politicalChcekContent,recorded,schoolApproval,createTime)
-        VALUES(#{intentionInfo.person.id},#{intentionInfo.trainHour},#{intentionInfo.publiced},#{intentionInfo.meetTime},#{intentionInfo.meetContent},#{intentionInfo.introducer},#{intentionInfo.politicalChcekContent},#{intentionInfo.recorded},#{intentionInfo.schoolApproval},#{intentionInfo.createTime})
+        (trainHour,publiced,meetTime,meetContent,introducer,politicalChcekContent,recorded,schoolApproval,createTime)
+        VALUES(#{intentionInfo.trainHour},#{intentionInfo.publiced},#{intentionInfo.meetTime},#{intentionInfo.meetContent},#{intentionInfo.introducer},#{intentionInfo.politicalChcekContent},#{intentionInfo.recorded},#{intentionInfo.schoolApproval},#{intentionInfo.createTime})
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.IntentionInfo">
@@ -43,84 +19,10 @@
         WHERE id=#{intentionId}
     </select>
 
-    <select id="getByPersonId" resultType="com.alan.dm.entity.IntentionInfo">
-        select *
-        FROM <include refid="A_TABLE" />
-        WHERE personId=#{personId}
-    </select>
-
     <delete id="delete">
         DELETE
         FROM  <include refid="A_TABLE" />
         WHERE id=#{intentionInfo.id}
     </delete>
-
-    <select id="getByCondition" resultMap="A_INFO">
-        SELECT
-        A.id as intentionId,
-        A.personId as personId,
-        A.trainHour as trainHour,
-        A.publiced as publiced,
-        A.recorded as recorded,
-        P.name as personName,
-        P.number as personNumber,
-        P.type as personType,
-        O.id as orgId,
-        O.name as orgName
-        FROM  <include refid="A_TABLE" /> A
-        JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
-        <where>
-            <if test="condition.orgList != null">
-                P.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
-            </if>
-            <if test="condition.status != null">
-                AND P.status in
-                <foreach collection="condition.status" index="index" item="status" open="("
-                         separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND P.number LIKE #{patternNumber}
-            </if>
-        </where>
-        ORDER BY intentionId DESC
-        <if test="page!=null">
-            LIMIT #{page.current}, #{page.size}
-        </if>
-    </select>
-
-    <select id="countByCondition" resultType="Integer">
-        SELECT count(*)
-        FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
-        <where>
-            <if test="condition.orgList != null">
-                P.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
-            </if>
-            <if test="condition.status != null">
-                AND P.status in
-                <foreach collection="condition.status" index="index" item="status" open="("
-                         separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND P.number LIKE #{patternNumber}
-            </if>
-        </where>
-    </select>
 
 </mapper>

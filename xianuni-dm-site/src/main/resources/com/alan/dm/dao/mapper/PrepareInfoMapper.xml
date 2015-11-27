@@ -5,33 +5,12 @@
 <mapper namespace="com.alan.dm.dao.mapper.PrepareInfoMapper">
 
     <sql id="A_TABLE">tb_party_prepare</sql>
-    <sql id="PERSON_TABLE">tb_person</sql>
-    <sql id="ORG_TABLE">tb_orgnization</sql>
-
-    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
-        <id property="id" column="orgId"/>
-        <result property="name" column="orgName"/>
-    </resultMap>
-
-    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
-        <id property="id" column="personId"/>
-        <result property="name" column="personName"/>
-        <result property="number" column="personNumber"/>
-        <result property="type" column="personType"/>
-        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
-    </resultMap>
-
-    <resultMap id="A_INFO" type="com.alan.dm.entity.PrepareInfo">
-        <id property="id" column="prepareId" />
-        <result property="application" column="application"/>
-        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
-    </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="prepareInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (personId,approval,branchApproval,schoolApproval,application,meetTime,meetContent,createTime)
-        VALUES(#{prepareInfo.person.id},#{prepareInfo.approval},#{prepareInfo.branchApproval},#{prepareInfo.schoolApproval},#{prepareInfo.application},#{prepareInfo.meetTime},#{prepareInfo.meetContent},#{prepareInfo.createTime})
+        (approval,branchApproval,schoolApproval,application,meetTime,meetContent,createTime)
+        VALUES(#{prepareInfo.approval},#{prepareInfo.branchApproval},#{prepareInfo.schoolApproval},#{prepareInfo.application},#{prepareInfo.meetTime},#{prepareInfo.meetContent},#{prepareInfo.createTime})
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.PrepareInfo">
@@ -40,82 +19,10 @@
         WHERE id=#{prepareId}
     </select>
 
-    <select id="getByPersonId" resultType="com.alan.dm.entity.PrepareInfo">
-        select *
-        FROM <include refid="A_TABLE" />
-        WHERE personId=#{personId}
-    </select>
-
     <delete id="delete">
         DELETE
         FROM  <include refid="A_TABLE" />
         WHERE id=#{prepareInfo.id}
     </delete>
-
-    <select id="getByCondition" resultMap="A_INFO">
-        SELECT
-        A.id as prepareId,
-        A.personId as personId,
-        A.application as application,
-        P.name as personName,
-        P.number as personNumber,
-        P.type as personType,
-        O.id as orgId,
-        O.name as orgName
-        FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
-        <where>
-            <if test="condition.orgList != null">
-                P.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
-            </if>
-            <if test="condition.status != null">
-                AND P.status in
-                <foreach collection="condition.status" index="index" item="status" open="("
-                         separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND P.number LIKE #{patternNumber}
-            </if>
-        </where>
-        ORDER BY prepareId DESC
-        <if test="page!=null">
-            LIMIT #{page.current}, #{page.size}
-        </if>
-    </select>
-
-    <select id="countByCondition" resultType="Integer">
-        SELECT count(*)
-        FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON P.orgId=O.id
-        <where>
-            <if test="condition.orgList != null">
-                P.orgId in
-                <foreach collection="condition.orgList" index="index" item="orgList" open="("
-                         separator="," close=")">
-                    #{orgList}
-                </foreach>
-            </if>
-            <if test="condition.status != null">
-                AND P.status in
-                <foreach collection="condition.status" index="index" item="status" open="("
-                         separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND P.number LIKE #{patternNumber}
-            </if>
-        </where>
-    </select>
 
 </mapper>

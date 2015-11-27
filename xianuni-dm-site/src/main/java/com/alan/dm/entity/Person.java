@@ -7,11 +7,12 @@ import java.util.Date;
  * Created by zhangbinalan on 15/11/16.
  */
 public class Person {
+    public static int SOURCE_DEFAULT=0;//校内添加
+    public static int SOURCE_OUT=1;//校外转入的党员
+
     private int id;
     private String name;
-    private int status;//TODO
-    private Orgnization orgnization;//党组织
-    private int orgId;//
+    private int status;
     private int type;//0-学生 1-教工
     private String number;//学工号
     private String idNumber;//身份证号
@@ -25,6 +26,28 @@ public class Person {
     private Date createTime;
     private Date updateTime;
     private String personDesc;
+    private int source;
+
+    private Orgnization orgnization;//党组织
+    private int orgId;//
+    private ApplierInfo applierInfo;//申请人信息
+    private int applierInfoId;
+    private ActivitistInfo activitistInfo;//积极分子信息
+    private int activitistInfoId;
+    private IntentionInfo intentionInfo;//发展对象信息
+    private int intentionInfoId;
+    private PrepareInfo prepareInfo;//预备党员相关信息
+    private int prepareInfoId;
+    private NormalInfo normalInfo;//正式党员所需要的信息
+    private int normalInfoId;
+
+    public int getSource() {
+        return source;
+    }
+
+    public void setSource(int source) {
+        this.source = source;
+    }
 
     public String getPersonDesc() {
         return personDesc;
@@ -168,5 +191,85 @@ public class Person {
 
     public void setOrgId(int orgId) {
         this.orgId = orgId;
+    }
+
+    public ApplierInfo getApplierInfo() {
+        return applierInfo;
+    }
+
+    public void setApplierInfo(ApplierInfo applierInfo) {
+        this.applierInfo = applierInfo;
+    }
+
+    public int getApplierInfoId() {
+        return applierInfoId;
+    }
+
+    public void setApplierInfoId(int applierInfoId) {
+        this.applierInfoId = applierInfoId;
+    }
+
+    public ActivitistInfo getActivitistInfo() {
+        return activitistInfo;
+    }
+
+    public void setActivitistInfo(ActivitistInfo activitistInfo) {
+        this.activitistInfo = activitistInfo;
+    }
+
+    public int getActivitistInfoId() {
+        return activitistInfoId;
+    }
+
+    public void setActivitistInfoId(int activitistInfoId) {
+        this.activitistInfoId = activitistInfoId;
+    }
+
+    public IntentionInfo getIntentionInfo() {
+        return intentionInfo;
+    }
+
+    public void setIntentionInfo(IntentionInfo intentionInfo) {
+        this.intentionInfo = intentionInfo;
+    }
+
+    public int getIntentionInfoId() {
+        return intentionInfoId;
+    }
+
+    public void setIntentionInfoId(int intentionInfoId) {
+        this.intentionInfoId = intentionInfoId;
+    }
+
+    public PrepareInfo getPrepareInfo() {
+        return prepareInfo;
+    }
+
+    public void setPrepareInfo(PrepareInfo prepareInfo) {
+        this.prepareInfo = prepareInfo;
+    }
+
+    public int getPrepareInfoId() {
+        return prepareInfoId;
+    }
+
+    public void setPrepareInfoId(int prepareInfoId) {
+        this.prepareInfoId = prepareInfoId;
+    }
+
+    public NormalInfo getNormalInfo() {
+        return normalInfo;
+    }
+
+    public void setNormalInfo(NormalInfo normalInfo) {
+        this.normalInfo = normalInfo;
+    }
+
+    public int getNormalInfoId() {
+        return normalInfoId;
+    }
+
+    public void setNormalInfoId(int normalInfoId) {
+        this.normalInfoId = normalInfoId;
     }
 }
