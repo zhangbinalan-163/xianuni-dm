@@ -1363,4 +1363,76 @@ public class PersonController extends BaseController{
 		jsonObject.put("status",true);
 		return JsonUtils.fromObject(jsonObject);
 	}
+
+	/**
+	 * 党员统计图表信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/statis.do")
+	@ResponseBody
+	public String statisPersonInfo(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId=request.getInt("orgId", 0);
+		//如果没有传入orgId，设置为管理员所管理的ORG
+		if(orgId==0){
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin adminInfo = adminService.getById(adminId);
+			if(adminInfo.getType()==Admin.ORG_ADMIN){
+				orgId=adminInfo.getOrgId();
+			}else if(adminInfo.getType()==Admin.SYSTEM_ADMIN){
+				orgId=1;//默认的设置为校党委
+			}
+		}
+
+		List<String> orgNames=new ArrayList<>();
+		List<Integer> normalCountArray=new ArrayList<>();
+		List<Integer> prepareCountArray=new ArrayList<>();
+
+		//先统计本党委正式党员的人数
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
+		int directCount=personService.countByOrgWithStatus(orgnization, PersonStatus.NORMAL.getId(), false);
+		orgNames.add(orgnization.getName());//直属组织的名字
+		normalCountArray.add(directCount);
+		//预备党员数量统计
+		int prepareDirectCount=personService.countByOrgWithStatus(orgnization, PersonStatus.NORMAL.getId(), false);
+		prepareCountArray.add(prepareDirectCount);
+
+		//获得直属的子组织
+		List<Orgnization> subOrgList=orgnizationService.getOrgByParent(orgnization, false);
+		if(subOrgList!=null){
+			for(Orgnization subOrg:subOrgList){
+				//统计直属自组织的所有子组织的人数
+				int subCount=personService.countByOrgWithStatus(subOrg, PersonStatus.NORMAL.getId(), true);
+				orgNames.add(subOrg.getName());
+				normalCountArray.add(subCount);
+				int prepareSubCount=personService.countByOrgWithStatus(subOrg,PersonStatus.PERPARE.getId(),true);
+				prepareCountArray.add(prepareSubCount);
+			}
+		}
+		JSONObject resObje=new JSONObject();
+		resObje.put("success",true);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("x", orgNames);
+
+		JSONArray dataArray=new JSONArray();
+		JSONObject aDataObject=new JSONObject();
+		aDataObject.put("name", "正式党员");
+		aDataObject.put("data", normalCountArray);
+		dataArray.add(aDataObject);
+
+		JSONObject bDataObject=new JSONObject();
+		bDataObject.put("name","预备党员");
+		bDataObject.put("data",prepareCountArray);
+		dataArray.add(bDataObject);
+
+		jsonObject.put("series", dataArray);
+
+		resObje.put("data",jsonObject);
+
+		return JsonUtils.fromObject(resObje);
+	}
+
 }

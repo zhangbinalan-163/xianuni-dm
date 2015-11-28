@@ -11,7 +11,6 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface PersonInfoMapper {
-
     /**
      *
      * @param condition

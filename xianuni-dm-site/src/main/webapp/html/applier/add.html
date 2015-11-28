@@ -9,6 +9,7 @@
     <link href="../../static/css/animate.css" rel="stylesheet">
     <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
     <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../static/js/plugins/select2/select2.css" rel="stylesheet">
     <base target="_blank">
 </head>
 
@@ -23,17 +24,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
-            <div class="input-group">
-                <input type="text" class="form-control" id="pNumber">
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-white dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    </ul>
-                </div>
-            </div>
-            <span class="help-block m-b-none">请从本党支部基础人员库中查询</span>
+            <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
         </div>
     </div>
     <div class="form-group">
@@ -95,6 +86,9 @@
 <!-- layerDate plugin javascript -->
 <script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
 <script src="../../static/js/plugins/suggest/bootstrap-suggest.min.js"></script>
+
+<script src="../../static/js/plugins/select2/select2.js"></script>
+<script src="../../static/js/plugins/select2/select2_locale_zh-CN.js"></script>
 <script>
     $(document).ready(function () {
         var config = {
@@ -127,17 +121,6 @@
             message: '已输入 %charsTyped%/最多输入%charsTotal%'
         });
 
-        $("#pNumber").bsSuggest({
-            url: "/xianuni-dm/person/listQuery.do?status=0&orgId="+getOrgTag()+"&number=",
-            getDataMethod:"url",
-            effectiveFields: ["personNumber", "personName"],
-            effectiveFieldsAlias:{"personName": "姓名","personNumber":"学工号"},
-            showBtn: true,
-            idField: "personId",
-            keyField: "personNumber"
-        }).on('onSetSelectValue', function (e, keyword) {
-            //
-        });
 
         $("#pTalker").bsSuggest({
             url: "/xianuni-dm/person/listQuery.do?status=5&orgId="+getOrgTag()+"&number=",
@@ -150,12 +133,52 @@
         }).on('onSetSelectValue', function (e, keyword) {
             //
         });
+
+        var $ajax = $(".js-example-data-ajax");
+
+        var formatResult = function(item){
+
+
+        };
+        var formatResult = function(result, container, query, escapeMarkup) {
+            return "<div>" + result.personId+ " >>>数量" + result.personName+"</div>";
+        };
+        var formatSelection = function (data, container, escapeMarkup) {
+            return data ? escapeMarkup(this.text(data)) : undefined;
+        };
+
+        $ajax.select2({
+            ajax: {
+                url: "/xianuni-dm/person/listQuery.do?status=5&orgId="+getOrgTag(),
+                type:'get',
+                cache:false,
+                dataType:'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        number: params, // search term
+                        code: 'utf-8',
+                        extras: 1
+                    };
+                },
+                processResults: function (data, params) {
+                    //params.page = params.page || 1;
+
+                    return {
+                        results: data.value
+                        // pagination: {
+                        //   more: (params.page * 30) < data.total_count
+                        // }
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; },
+            minimumInputLength: 1,
+            formatResult: formatResult, // 下拉列表生成模板
+            formatSelection: formatSelection // 选中结果生成模板
+        });
     });
-    //格式化查询结果,将查询回来的id跟name放在两个div里并同行显示，后一个div靠右浮动
-    function formatAsText(item){
-        var itemFmt ="<div style='display:inline;'>"+item.id+"</div><div style='float:right;color:#4F4F4F;display:inline'>"+item.name+"</div>"
-        return itemFmt;
-    }
 
     function getOrgTag(){
         return parent.$('#orgIdTag').val();

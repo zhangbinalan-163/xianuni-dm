@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -35,8 +37,10 @@ public class PersonServiceImpl implements IPersonService{
 
     @Autowired
     private IIntentionService intentionService;
+
     @Autowired
     private IPrepareService prepareService;
+
     @Autowired
     private INormalService normalService;
     @Override
@@ -86,6 +90,36 @@ public class PersonServiceImpl implements IPersonService{
         }
         return personList;
     }
+
+
+    @Override
+    public int countByOrgWithStatus(Orgnization orgnization, int status, boolean withAllSub) throws DMException {
+        int totalCount=0;
+        if(orgnization==null){
+            return totalCount;
+        }
+        //组织直接的数量计算
+        PersonCondition personCondition=new PersonCondition();
+        personCondition.setOrgList(Arrays.asList(orgnization.getId()));
+        personCondition.setStatus(Arrays.asList(status));
+        totalCount=personInfoMapper.countByCondition(personCondition);
+        //下属组织的计算
+        if(withAllSub){
+            List<Orgnization> subOrgList=orgnizationService.getOrgByParent(orgnization,true);
+            if(subOrgList!=null&&subOrgList.size()>0){
+                List<Integer> orgIdList=new ArrayList<>();
+                for(Orgnization subOrg:subOrgList){
+                    orgIdList.add(subOrg.getId());
+                }
+                personCondition=new PersonCondition();
+                personCondition.setOrgList(orgIdList);
+                personCondition.setStatus(Arrays.asList(status));
+                totalCount=totalCount+personInfoMapper.countByCondition(personCondition);
+            }
+        }
+        return totalCount;
+    }
+
     @Override
     public void updatePerson(Person person) throws DMException {
         person.setUpdateTime(new Date());

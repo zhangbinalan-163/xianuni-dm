@@ -93,7 +93,7 @@
                         showIcon: false
                     },
                     callback: {
-                        onClick: self.updateTable
+                        onClick: self.updateChart
                     }
                 }
             },
@@ -198,10 +198,10 @@
                 //     ]
                 // };
                 $.ajax({
-                    url: '', // 接口地址
+                    url: '/xianuni-dm/person/statis.do', // 接口地址
                     type: 'get',
                     data: {
-                        orgId: orgId,
+                        orgId: orgId
                     },
                     dataType: 'json',
                     complete: function(){
@@ -209,7 +209,7 @@
                     },
                     success: function(res){
                         if(res.success){
-                            self.initChart(data);
+                            self.initChart(res.data);
                         }else{
                             layer.alert(res.msg || '数据获取失败', {icon: 5});
                         }

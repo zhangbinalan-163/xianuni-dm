@@ -1,6 +1,7 @@
 package com.alan.dm.service;
 
 import com.alan.dm.common.exception.DMException;
+import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.Person;
 import com.alan.dm.entity.query.PersonCondition;
@@ -12,6 +13,14 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface IPersonService {
+    /**
+     * 统计某个党组织特定状态的党员的数量,包含下属组织
+     * @param orgnization
+     * @param status
+     * @return
+     * @throws DMException
+     */
+    int countByOrgWithStatus(Orgnization orgnization,int status,boolean withAllSub) throws DMException;
 
     /**
      * 根据条件分页查询人员信息，会带回响应的信息
