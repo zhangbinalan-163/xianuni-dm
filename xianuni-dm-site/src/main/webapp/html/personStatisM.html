@@ -151,8 +151,8 @@
                             type : 'category',
                             data : data.x,
                             axisLabel : {
-                                rotate: -30,
-                                margin : 2,
+                                rotate: -40, // 标签的倾斜程度
+                                margin : 2, // 标签距离x轴的距离
                             },
                         }
                     ],
@@ -185,21 +185,21 @@
                 self.chart.showLoading();
 
                 // 返回数据的格式
-                // {
-                //     // x轴标识
-                //     x: ['组织1','组织2','组织3','组织4'],
-                //     // 数据集合
-                //     series: [
-                //         {
-                //             name:'正式党员',
-                //             data:[8, 4, 9, 11],
-                //         },
-                //         {
-                //             name:'预备党员',
-                //             data:[6, 10, 9, 8],
-                //         }
-                //     ]
-                // };
+                self.initChart({
+                    // x轴标识
+                    x: ['组织1','组织2','组织3','组织4'],
+                    // 数据集合
+                    series: [
+                        {
+                            name:'正式党员',
+                            data:[8, 4, 9, 11],
+                        },
+                        {
+                            name:'预备党员',
+                            data:[6, 10, 9, 8],
+                        }
+                    ]
+                });
                 $.ajax({
                     url: '/xianuni-dm/person/statis.do', // 接口地址
                     type: 'get',
