@@ -177,9 +177,8 @@
             // 更新图表
             update: function(orgId){
                 var self = this;
-                var chart = this.chart;
                 $('#helpInfo').hide();
-                chart.showLoading();
+                self.chart.showLoading();
 
                 // 返回数据的格式
                 // {
@@ -205,7 +204,7 @@
                     },
                     dataType: 'json',
                     complete: function(){
-                        chart.hideLoading();
+                        self.chart.hideLoading();
                     },
                     success: function(res){
                         if(res.success){
