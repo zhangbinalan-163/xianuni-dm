@@ -99,11 +99,11 @@
 <script>
     $(document).ready(function () {
         //获取信息
-        var activitistId=getIdTag();
+        var personid=getIdTag();
         $.ajax( {
             url:'/xianuni-dm/person/activitist/info.do',
             data:{
-                activitistId : activitistId
+                personId : personid
             },
             type:'get',
             cache:false,

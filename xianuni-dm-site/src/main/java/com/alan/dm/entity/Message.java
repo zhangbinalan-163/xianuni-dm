@@ -15,6 +15,7 @@ public class Message {
     private int orgId;
     private Orgnization orgnization;
     private boolean toSub;//是否对下属所有的子部门可见
+    private String urlList;
 
     public int getId() {
         return id;
@@ -71,5 +72,13 @@ public class Message {
 
     public void setOrgId(int orgId) {
         this.orgId = orgId;
+    }
+
+    public String getUrlList() {
+        return urlList;
+    }
+
+    public void setUrlList(String urlList) {
+        this.urlList = urlList;
     }
 }

@@ -27,13 +27,14 @@
         <result property="payStartTime" column="payStartTime"/>
         <result property="payEndTime" column="payEndTime"/>
         <result property="payTime" column="payTime"/>
+        <result property="fee" column="fee"/>
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="partyDuesPay.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (personId,payStartTime,payEndTime,payTime)
-        VALUES(#{partyDuesPay.person.id},#{partyDuesPay.payStartTime},#{partyDuesPay.payEndTime},#{partyDuesPay.payTime})
+        (personId,payStartTime,payEndTime,payTime,fee)
+        VALUES(#{partyDuesPay.person.id},#{partyDuesPay.payStartTime},#{partyDuesPay.payEndTime},#{partyDuesPay.payTime},#{partyDuesPay.fee})
     </insert>
 
     <delete id="delete">
@@ -48,6 +49,7 @@
         A.payStartTime as payStartTime,
         A.payEndTime as payEndTime,
         A.payTime as payTime,
+        A.fee as fee,
         P.name as personName,
         P.number as personNumber,
         P.type as personType,

@@ -43,6 +43,12 @@ public class PersonServiceImpl implements IPersonService{
 
     @Autowired
     private INormalService normalService;
+
+    @Override
+    public void updatePassword(Person person) throws DMException {
+        personInfoMapper.updatePass(person);
+    }
+
     @Override
     public List<Person> getByCondition(PersonCondition condition, Page page, PersonResult result) throws DMException {
         List<Person> personList = personInfoMapper.getByCondition(condition,page);
@@ -123,6 +129,7 @@ public class PersonServiceImpl implements IPersonService{
     @Override
     public void updatePerson(Person person) throws DMException {
         person.setUpdateTime(new Date());
+        person.setPassUpdateTime(new Date());
         personInfoMapper.update(person);
     }
 

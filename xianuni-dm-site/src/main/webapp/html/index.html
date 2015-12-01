@@ -101,6 +101,9 @@
                             <li>
                                 <a class="J_menuItem" href="/xianuni-dm/html/transferOutM.html">转出管理</a>
                             </li>
+                            <li>
+                                <a class="J_menuItem" href="/xianuni-dm/html/historyM.html">历史党员</a>
+                            </li>
                         </ul>
                     </li>
                     <li>
@@ -127,6 +130,9 @@
                             </li>
                             <li>
                                 <a class="J_menuItem" href="/xianuni-dm/html/resourceM.html">媒体资源</a>
+                            </li>
+                            <li>
+                                <a class="J_menuItem" href="/xianuni-dm/html/mailM.html">站内信管理</a>
                             </li>
                         </ul>
                     </li>
@@ -340,8 +346,9 @@
     <script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
     <script src="../static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
     <script src="../static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <!-- layer javascript -->
     <script src="../static/js/plugins/layer/layer.min.js"></script>
-
+    <!-- layerDate plugin javascript -->
     <!-- 自定义js -->
     <script src="../static/js/hplus.js?v=4.0.0"></script>
     <script type="text/javascript" src="../static/js/contabs.js"></script>
@@ -356,6 +363,17 @@
                         $('#adminType').html(data.adminType);
                         $('#adminName').html(data.adminNumber);
                     }else{
+                        if(data.msg=='NOTLOGIN'){
+                            //询问框
+                            layer.confirm('需要重新登录', {
+                                btn: ['前往登录','取消'], //按钮
+                                shade: 0.6
+                            }, function(){
+                                location.href ="/xianuni-dm/html/login.html";
+                            }, function(){
+
+                            });
+                        }
                     }
                 },
                 error:function(){

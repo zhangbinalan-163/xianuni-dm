@@ -24,11 +24,11 @@
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
 
-    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="person.id">
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="relationTransferInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
         (transferType,personId,toOrgId,fromOrgId,fromOrgName,toOrgName,transferTime)
-        VALUES(#{relationTransferInfo.},#{relationTransferInfo.person.id},#{relationTransferInfo.status},#{relationTransferInfo.type},#{relationTransferInfo.fromOrgName},#{relationTransferInfo.toOrgName},#{relationTransferInfo.transferTime})
+        VALUES(#{relationTransferInfo.transferType},#{relationTransferInfo.person.id},#{relationTransferInfo.toOrgId},#{relationTransferInfo.fromOrgId},#{relationTransferInfo.fromOrgName},#{relationTransferInfo.toOrgName},#{relationTransferInfo.transferTime})
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.RelationTransferInfo">
@@ -72,10 +72,18 @@
                     #{toOrgs}
                 </foreach>
             </if>
+            <if test="condition.types != null">
+                AND A.transferType IN
+                <foreach collection="condition.types" item="types" index="index"
+                         open="(" close=")" separator=",">
+                    #{types}
+                </foreach>
+            </if>
             <if test="condition.number != null">
                 <bind name="pattern" value="condition.number+ '%'" />
                 AND P.number LIKE #{pattern}
             </if>
+
         </where>
         ORDER BY transferId DESC
         <if test="page!=null">
@@ -100,6 +108,13 @@
                 <foreach collection="condition.toOrgId" item="toOrgs" index="index"
                          open="(" close=")" separator=",">
                     #{toOrgs}
+                </foreach>
+            </if>
+            <if test="condition.types != null">
+                AND A.transferType IN
+                <foreach collection="condition.types" item="types" index="index"
+                         open="(" close=")" separator=",">
+                    #{types}
                 </foreach>
             </if>
             <if test="condition.number != null">

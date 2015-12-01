@@ -14,6 +14,15 @@ public class PartyDuesPay {
     private Date payStartTime; // 缴费起始日期
     private Date payEndTime; // 缴费截止日期
     private Date payTime; // 缴费日期
+    private float fee;
+
+    public float getFee() {
+        return fee;
+    }
+
+    public void setFee(float fee) {
+        this.fee = fee;
+    }
 
     public int getId() {
         return id;

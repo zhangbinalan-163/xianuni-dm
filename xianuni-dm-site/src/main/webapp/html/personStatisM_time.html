@@ -35,7 +35,8 @@
                     <h5>统计信息</h5>
                 </div>
                 <div class="ibox-content">
-                    <div class="echarts" id="echarts-bar-chart"></div>
+                    <div id="helpInfo">请选择一个组织查看具体信息</div>
+                    <div class="echarts" id="chart"></div>
                 </div>
             </div>
         </div>
@@ -58,6 +59,9 @@
 
 <!-- ECharts -->
 <script src="../static/js/plugins/echarts/echarts-all.js"></script>
+
+<!-- layer javascript -->
+<script src="../static/js/plugins/layer/layer.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -89,88 +93,120 @@
                         showIcon: false
                     },
                     callback: {
-                        onClick: self.updateTable
+                        onClick: self.updateChart
                     }
                 }
             },
-            updateTable: function (event, treeId, treeNode) {
-                $('#orgIdTag').val(treeNode.id);
-                $('#orgNameTag').val(treeNode.name);
-                table.fetchData({
-                    orgId: treeNode.id
-                })
+            updateChart: function (event, treeId, treeNode) {
+                barChart.update(treeNode.id);
             },
             filter: function (treeId, parentNode, childNodes) {
                 return childNodes;
             }
 
         }).init();
-        var barChart = echarts.init(document.getElementById("echarts-bar-chart"));
-        var baroption = {
-            title : {
-                text: '某地区蒸发量和降水量'
-            },
-            tooltip : {
-                trigger: 'axis'
-            },
-            legend: {
-                data:['蒸发量','降水量']
-            },
-            grid:{
-                x:30,
-                x2:40,
-                y2:24
-            },
-            calculable : true,
-            xAxis : [
-                {
-                    type : 'category',
-                    data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-                }
-            ],
-            yAxis : [
-                {
-                    type : 'value'
-                }
-            ],
-            series : [
-                {
-                    name:'蒸发量',
-                    type:'bar',
-                    data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3],
-                    markPoint : {
-                        data : [
-                            {type : 'max', name: '最大值'},
-                            {type : 'min', name: '最小值'}
-                        ]
-                    },
-                    markLine : {
-                        data : [
-                            {type : 'average', name: '平均值'}
-                        ]
-                    }
-                },
-                {
-                    name:'降水量',
-                    type:'bar',
-                    data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
-                    markPoint : {
-                        data : [
-                            {name : '年最高', value : 182.2, xAxis: 7, yAxis: 183, symbolSize:18},
-                            {name : '年最低', value : 2.3, xAxis: 11, yAxis: 3}
-                        ]
-                    },
-                    markLine : {
-                        data : [
-                            {type : 'average', name : '平均值'}
-                        ]
-                    }
-                }
-            ]
-        };
-        barChart.setOption(baroption);
 
-        window.onresize = barChart.resize;
+        var barChart = ({
+            init: function(){
+                this.orgId = '';
+                this.$el = document.getElementById("chart");
+                this.chart = echarts.init(this.$el);
+                return this;
+            },
+            initChart: function(data){
+                var chart = this.chart;
+                if (chart && chart.dispose) {
+                    chart.dispose();
+                }
+                this.chart = echarts.init(this.$el);
+                this.chart.setOption(this.getOptions(data));
+            },
+            getOptions: function(data){
+                data = this.formatData(data);
+                return {
+                    title : {
+                        text: '党员发展趋势'
+                    },
+                    tooltip : {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: $.map(data.series, function(item){
+                            if(!item.type){
+                                item.type = 'bar';
+                            }
+                            return item.name
+                        })
+                    },
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            magicType : {show: true, type: ['line', 'bar']},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : data.x,
+                            axisLabel : {
+                                rotate: -40, // 标签的倾斜程度
+                                margin : 2 // 标签距离x轴的距离
+                            }
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series: data.series
+                };
+            },
+            // 格式化输出数据
+            formatData: function(data){
+                data = data || {};
+                if(!data.x){
+                    data.x = [];
+                }
+                if(!data.series){
+                    data.series = [];
+                }
+                return data
+            },
+            bindEvents: function(){
+                window.onresize = this.chart.resize;
+            },
+            // 更新图表
+            update: function(orgId){
+                var self = this;
+                $('#helpInfo').hide();
+                self.chart.showLoading();
+                $.ajax({
+                    url: '/xianuni-dm/person/statis.do?type=bytime', // 接口地址
+                    type: 'get',
+                    data: {
+                        orgId: orgId
+                    },
+                    dataType: 'json',
+                    complete: function(){
+                        self.chart.hideLoading();
+                    },
+                    success: function(res){
+                        if(res.success){
+                            self.initChart(res.data);
+                        }else{
+                            layer.alert(res.msg || '数据获取失败', {icon: 5});
+                        }
+                    },
+                    error: function(){
+                        layer.alert('数据获取失败', {icon: 5});
+                    }
+                });
+            }
+        }).init();
+        window.chart = barChart;
     });
 </script>
 </body>

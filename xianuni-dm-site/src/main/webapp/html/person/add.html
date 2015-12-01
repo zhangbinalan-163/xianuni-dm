@@ -41,6 +41,13 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-sm-2 control-label">籍贯：</label>
+        <div id="homeTown" class="col-sm-6">
+            <select class="prov chosen-select"></select>
+            <select class="city chosen-select" disabled="disabled"></select>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-2">
             <input id="pNumber" type="text" class="form-control" name="pNumber">
@@ -98,9 +105,14 @@
 <script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
 <!-- maxlength -->
 <script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
-
+<script src="../../static/js/jquery.cityselect.js"></script>
 <script>
     $(document).ready(function () {
+
+        $("#homeTown").citySelect({
+
+        });
+
         var config = {
             '.chosen-select': {},
             '.chosen-select-deselect': {
@@ -130,6 +142,8 @@
             placement: 'right',
             message: '已输入 %charsTyped%/最多输入%charsTotal%'
         });
+
+
     });
 </script>
 </body>

@@ -11,7 +11,7 @@
     <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
     <link href="../../static/css/plugins/dropzone/basic.css" rel="stylesheet">
     <link href="../../static/css/plugins/dropzone/dropzone.css" rel="stylesheet">
-
+    <link rel="stylesheet" type="text/css" href="../../static/css/plugins/webuploader/webuploader.css">
     <base target="_blank">
 </head>
 
@@ -51,11 +51,17 @@
 </form>
 <label class="col-sm-1 control-label">附件：</label>
 <div class="col-sm-6">
-    <form id="my-awesome-dropzone" class="dropzone" action="form_file_upload.html#">
-        <div class="dropzone-previews"></div>
-        <button type="submit" class="btn btn-primary pull-right">提交</button>
-    </form>
+    <p>请选择上传的文件</p>
+    <div id="uploader" class="wu-example">
+        <!--用来存放文件信息-->
+        <div id="thelist" class="uploader-list"></div>
+        <div class="btns">
+            <div id="picker">选择文件</div>
+            <button id="ctlBtn" class="btn btn-primary">开始上传</button>
+        </div>
+    </div>
 </div>
+<input type="text" hidden="hidden" id="fileUrlList"/>
 <!-- 全局js -->
 <script src="../../static/js/jquery.min.js?v=2.1.4"></script>
 <script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
@@ -72,8 +78,12 @@
 <script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
 <!-- maxlength -->
 <script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
-<!-- DROPZONE -->
-<script src="../../static/js/plugins/dropzone/dropzone.js"></script>
+<!-- Web Uploader -->
+<script type="text/javascript">
+    // 添加全局站点信息
+    var BASE_URL = '../../static/js/plugins/webuploader';
+</script>
+<script src="../../static/js/plugins/webuploader/webuploader.min.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -119,23 +129,93 @@
         $('#pOrg').html(getOrgNameTag());
 
 
-        Dropzone.options.myAwesomeDropzone = {
-            autoProcessQueue: false,
-            uploadMultiple: true,
-            parallelUploads: 100,
-            maxFiles: 100,
-            init: function () {
-                var myDropzone = this;
-                this.element.querySelector("button[type=submit]").addEventListener("click", function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    myDropzone.processQueue();
-                });
-                this.on("sendingmultiple", function () {});
-                this.on("successmultiple", function (files, response) {});
-                this.on("errormultiple", function (files, response) {});
+        var $list = $('#thelist'),
+                $btn = $('#ctlBtn'),
+                state = 'pending',
+                uploader;
+
+        uploader = WebUploader.create({
+            // 不压缩image
+            resize: false,
+            // swf文件路径
+            swf: '../../static/js/plugins/webuploader/Uploader.swf',
+
+            // 文件接收服务端。
+            server: '/xianuni-dm/message/resource/file/upload.do',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#picker',
+
+            fileNumLimit:3,//最多允许上传3个文件
+//            accept:
+//            {
+//                extensions: 'gif,jpg,jpeg,bmp,png'
+//            }
+        });
+
+        // 当有文件添加进来的时候
+        uploader.on( 'fileQueued', function( file ) {
+            $list.append( '<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '</h4>' +
+            '<p class="state">等待上传...</p>' +
+            '</div>' );
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on( 'uploadProgress', function( file, percentage ) {
+            var $li = $( '#'+file.id ),
+                    $percent = $li.find('.progress .progress-bar');
+
+            // 避免重复创建
+            if ( !$percent.length ) {
+                $percent = $('<div class="progress progress-striped active">' +
+                '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>').appendTo( $li ).find('.progress-bar');
             }
-        }
+
+            $li.find('p.state').text('上传中');
+
+            $percent.css( 'width', percentage * 100 + '%' );
+        });
+
+        uploader.on( 'uploadSuccess', function( file ,data) {
+            $( '#'+file.id ).find('p.state').text('已上传');
+            $('#fileUrlList').val($('#fileUrlList').val()+','+data.url);
+        });
+
+        uploader.on( 'uploadError', function( file ) {
+            $( '#'+file.id ).find('p.state').text('上传出错');
+        });
+
+        uploader.on( 'uploadComplete', function( file ) {
+            $( '#'+file.id ).find('.progress').fadeOut();
+        });
+
+        uploader.on( 'all', function( type ) {
+            if ( type === 'startUpload' ) {
+                state = 'uploading';
+            } else if ( type === 'stopUpload' ) {
+                state = 'paused';
+            } else if ( type === 'uploadFinished' ) {
+                state = 'done';
+            }
+
+            if ( state === 'uploading' ) {
+                $btn.text('暂停上传');
+            } else {
+                $btn.text('开始上传');
+            }
+        });
+
+        $btn.on( 'click', function() {
+            if ( state === 'uploading' ) {
+                uploader.stop();
+            } else {
+                uploader.upload();
+            }
+        });
     });
     function getOrgNameTag(){
         return parent.$('#orgNameTag').val();

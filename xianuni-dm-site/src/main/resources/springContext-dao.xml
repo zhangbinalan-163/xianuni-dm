@@ -158,4 +158,8 @@
 		<property name="mapperInterface" value="com.alan.dm.dao.mapper.CommitteeMapper" />
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
+	<bean id="mailMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.MailMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
 </beans>

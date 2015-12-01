@@ -1,14 +1,15 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IOrgRewardDao;
+import com.alan.dm.dao.mapper.OrgRewardMapper;
 import com.alan.dm.entity.OrgReward;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.condition.OrgRewardCondition;
 import com.alan.dm.service.IOrgRewardService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -16,35 +17,35 @@ import java.util.List;
  */
 @Service(value = "orgRewardService")
 public class OrgRewardServiceImpl implements IOrgRewardService{
-    @Resource(name = "orgRewardDao")
-    private IOrgRewardDao orgRewardDao;
+
+    @Autowired
+    private OrgRewardMapper orgRewardMapper;
 
     @Override
     public List<OrgReward> getByCondition(OrgRewardCondition condition, Page page) throws DMException {
-        return orgRewardDao.getByCondition(condition,page);
+        return orgRewardMapper.getByCondition(condition,page);
     }
 
     @Override
     public OrgReward getById(int id) throws DMException {
-        return orgRewardDao.getById(id);
+        return orgRewardMapper.getById(id);
     }
 
     @Override
     public int countByCondition(OrgRewardCondition condition) throws DMException {
-        return orgRewardDao.countByCondition(condition);
+        return orgRewardMapper.countByCondition(condition);
     }
 
     @Override
     public void deleteBatch(List<Integer> idList) throws DMException {
         for(Integer id:idList){
-            OrgReward  reward=new OrgReward();
-            reward.setId(id);
-            orgRewardDao.delete(reward);
+            orgRewardMapper.delete(id);
         }
     }
 
     @Override
     public void addReward(OrgReward orgReward) throws DMException {
-        orgRewardDao.insert(orgReward);
+        orgReward.setCreateTime(new Date());
+        orgRewardMapper.insert(orgReward);
     }
 }

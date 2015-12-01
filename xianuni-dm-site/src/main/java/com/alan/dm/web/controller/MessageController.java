@@ -19,10 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,15 +75,19 @@ public class MessageController extends BaseController{
 	public String add(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		String content = request.getString("content");
+		String title = request.getString("title");
 		int orgId=request.getInt("orgId");
-		String toSubParam=request.getString("toSub","1");
+		String toSubParam=request.getString("toSub", "1");
 		boolean toSub=toSubParam.equals("1");
+		String urlList=request.getString("fileUrlList",",");
 
 		Message message=new Message();
 		message.setContent(content);
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		message.setOrgnization(orgnization);
 		message.setToSub(toSub);
+		message.setUrlList(urlList);
+
 		JSONObject jsonObject=new JSONObject();
 
 		messageService.createMessage(message);
@@ -229,6 +236,37 @@ public class MessageController extends BaseController{
 			}
 		}
 		jsonObject.put("rows",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 * 消息资源的上传
+	 * @param file
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/resource/file/upload.do")
+	@ResponseBody
+	public String resourceFileUpload(@RequestParam(value = "file") MultipartFile file,
+									 HttpServletRequest request) throws Exception {
+		String fileName = file.getOriginalFilename();
+		String extType=fileName.substring(fileName.lastIndexOf("."));
+		String newFileName=StringUtils.md5(fileName+System.currentTimeMillis())+extType;
+
+		String path=request.getServletContext().getRealPath("/resource/");
+		String today=TimeUtils.convertToDateString(new Date());
+		path=path+today;
+
+		File targetFile = new File(path, newFileName);
+		targetFile.mkdirs();
+
+		//保存
+		file.transferTo(targetFile);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success",true);
+		jsonObject.put("url",request.getContextPath()+"/resource/"+today+"/"+newFileName);
 		return JsonUtils.fromObject(jsonObject);
 	}
 }

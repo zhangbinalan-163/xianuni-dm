@@ -205,11 +205,12 @@
                                 var ids = self.$el.jqGrid('getDataIDs');
                                 for (var i = 0; i < ids.length; i++) {
                                     var id = ids[i],
+                                            c = '<a class="J_change" data-id="' + id + '"><i class="fa fa-edit"></i>快速转换</a>',
                                             a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>',
                                             b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
                                     self.$el.jqGrid('setRowData', ids[i],
                                             {
-                                                actions: [a, b].join(' ')
+                                                actions: [a, b,c].join(' ')
                                             });
                                 }
                                 $('.J_edit').on('click', function () {
@@ -257,6 +258,36 @@
                                             },
                                             error : function() {
                                                 layer.alert('删除信息失败', {icon: 5});
+                                            }
+                                        });
+                                    }, function(){
+                                        layer.close(index);
+                                    });
+                                })
+                                $('.J_change').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var index=layer.confirm('快速转换该人员为正式党员吗？', {
+                                        btn: ['确认','取消'], //按钮
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5 //0-6的动画形式，-1不开启
+                                    }, function(){
+                                        $.ajax( {
+                                            url:'/xianuni-dm/person/fastChange.do',
+                                            data:{
+                                                id :id
+                                            },
+                                            type:'post',
+                                            dataType:'json',
+                                            success:function(data) {
+                                                if(data.status){
+                                                    layer.alert('转换成功', {icon: 1});
+                                                    self.fetchData({});
+                                                }else{
+                                                    layer.alert('转换失败！'+data.msg, {icon: 5});
+                                                }
+                                            },
+                                            error : function() {
+                                                layer.alert('转换失败', {icon: 5});
                                             }
                                         });
                                     }, function(){

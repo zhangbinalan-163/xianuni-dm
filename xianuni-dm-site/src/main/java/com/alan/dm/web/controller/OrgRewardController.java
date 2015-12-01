@@ -19,10 +19,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 组织奖惩信息接口
+ */
 @Controller
 @RequestMapping("/reward")
 public class OrgRewardController extends BaseController{
@@ -36,8 +40,35 @@ public class OrgRewardController extends BaseController{
 
 	@Resource(name = "orgnizationService")
 	private IOrgnizationService orgnizationService;
+
 	/**
 	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/info.do")
+	@ResponseBody
+	public String info(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		int rewardId=request.getInt("id");
+		OrgReward  reward=orgRewardService.getById(rewardId);
+		if(reward!=null){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", true);
+			Orgnization orgnization = orgnizationService.getOrgById(reward.getOrgId());
+			jsonObject.put("orgName",orgnization.getName());
+			jsonObject.put("name",reward.getName());
+			jsonObject.put("rewardTime", TimeUtils.convertToDateString(reward.getRewardTime()));
+			jsonObject.put("rewardDesc",reward.getRewardDesc());
+			return JsonUtils.fromObject(jsonObject);
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", false);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 * 添加奖惩信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -62,24 +93,15 @@ public class OrgRewardController extends BaseController{
 		Orgnization orgnization=new Orgnization();
 		orgnization.setId(orgId);
 		orgReward.setOrgnization(orgnization);
+		orgRewardService.addReward(orgReward);
 
-		try{
-			orgRewardService.addReward(orgReward);
-
-			JSONObject jsonObject=new JSONObject();
-			jsonObject.put("success",true);
-			return JsonUtils.fromObject(jsonObject);
-		}catch (Exception e){
-			LOGGER.error("add reward fail,rewardName={}",name,e);
-			JSONObject jsonObject=new JSONObject();
-			jsonObject.put("success", false);
-			jsonObject.put("msg","添加失败");
-			return JsonUtils.fromObject(jsonObject);
-		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success",true);
+		return JsonUtils.fromObject(jsonObject);
 	}
 
 	/**
-	 *
+	 * 删除奖惩信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -93,15 +115,9 @@ public class OrgRewardController extends BaseController{
 		for(String id:ids){
 			idList.add(Integer.parseInt(id));
 		}
-		try{
-			orgRewardService.deleteBatch(idList);
-		}catch (Exception e){
-			LOGGER.error("delete reward list fail,ids={}",request.getString("id"));
-			JSONObject jsonObject=new JSONObject();
-			jsonObject.put("status", false);
-			jsonObject.put("msg","删除失败");
-			return JsonUtils.fromObject(jsonObject);
-		}
+
+		orgRewardService.deleteBatch(idList);
+
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("status",true);
 		return JsonUtils.fromObject(jsonObject);
@@ -109,7 +125,7 @@ public class OrgRewardController extends BaseController{
 	}
 
 	/**
-	 *
+	 * 根据组织分页获取奖惩信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception

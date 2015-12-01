@@ -110,16 +110,17 @@
                         return
                     }
                     //询问框
-                    layer.confirm('是否是校外转入', {
+                    var index=layer.confirm('是否是校外转入', {
                         btn: ['是','不，是校内转入'], //按钮
                         shade: false //不显示遮罩
                     }, function(){
+                        layer.close(index);
                         layer.open({
                             type: 2,
                             content: 'transfer/in/addFromOut.html',
                             area: ['100%', '100%'],
                             maxmin: false,
-                            title: '创建<strong>' + node.name + '</strong>的校内转入信息',
+                            title: '创建<strong>' + node.name + '</strong>的校外转入信息',
                             shade: 0.6, //遮罩透明度
                             shift: 5, //0-6的动画形式，-1不开启
                             btn: ['创建', '取消'],
@@ -191,18 +192,66 @@
                             }
                         });
                     }, function(){
-                        //todo
+                        layer.close(index);
+                        layer.open({
+                            type: 2,
+                            content: 'transfer/in/addFromInner.html',
+                            area: ['100%', '100%'],
+                            maxmin: false,
+                            title: '创建<strong>' + node.name + '</strong>的校内转入信息',
+                            shade: 0.6, //遮罩透明度
+                            shift: 5, //0-6的动画形式，-1不开启
+                            btn: ['创建', '取消'],
+                            yes: function (index) {
+                                var inputs = layer.getChildFrame('body', index).find('input');
+                                var number;
+                                for (var i = 0; i < inputs.length; i++) {
+                                    var inputName = inputs[i].id;
+                                    var inputValue = inputs[i].value;
+                                    if (inputName == 'pNumber') {
+                                        if (!inputValue) {
+                                            layer.alert('学工号不能为空', {icon: 5});
+                                            return;
+                                        }
+                                        number = inputValue;
+                                    }
+                                }
+                                $.ajax({
+                                    url: '/xianuni-dm/relation/transfer/in/add.do',
+                                    data: {
+                                        orgId: node.id,
+                                        number: number,
+                                        type: 0
+                                    },
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if (data.success) {
+                                            layer.alert('添加信息成功', {icon: 1});
+                                            layer.close(index);
+                                            self.fetchData({});
+                                        } else {
+                                            layer.alert('添加信息失败！' + data.msg, {icon: 5});
+                                        }
+                                    },
+                                    error: function () {
+                                        layer.alert('添加信息失败', {icon: 5});
+                                    }
+                                });
+                            }
+                        });
                     });
                 });
             },
             render: function () {
+                var self = this;
                 this.$el.jqGrid(
                         {
                             url: '/xianuni-dm/relation/transfer/inList.do',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID', '姓名', '学工号','转出组织','转入组织', '操作时间','操作类型'],
+                            colNames: ['ID', '姓名', '学工号','原组织','转入组织', '操作时间','操作类型','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
@@ -210,7 +259,8 @@
                                 {name: 'fromOrg', index: 'fromOrg',width: 60, align: "left"},
                                 {name: 'toOrg', index: 'toOrg',width: 60, align: "left"},
                                 {name: 'time', index: 'time',width: 60, align: "left"},
-                                {name: 'type', index: 'type',width: 60, align: "left"}
+                                {name: 'type', index: 'type',width: 60, align: "left"},
+                                {name: 'actions', index: 'actions', width: 120, align: "center"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
@@ -218,7 +268,49 @@
                             sortname: 'id',
                             mtype: "get",
                             height: 400,
-                            viewrecords: true
+                            viewrecords: true,
+                            // 自定义事件
+                            gridComplete: function () {
+                                var ids = self.$el.jqGrid('getDataIDs');
+                                for (var i = 0; i < ids.length; i++) {
+                                    var id = ids[i],
+                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
+                                    self.$el.jqGrid('setRowData', ids[i],
+                                            {
+                                                actions: [b].join(' ')
+                                            });
+                                }
+                                $('.J_delete').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var index=layer.confirm('确定要删除该转入记录吗', {
+                                        btn: ['确认','取消'], //按钮
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5 //0-6的动画形式，-1不开启
+                                    }, function(){
+                                        $.ajax( {
+                                            url:'/xianuni-dm/relation/transfer/delete.do',
+                                            data:{
+                                                id :id
+                                            },
+                                            type:'post',
+                                            dataType:'json',
+                                            success:function(data) {
+                                                if(data.success){
+                                                    layer.alert('删除信息成功', {icon: 1});
+                                                    self.fetchData({});
+                                                }else{
+                                                    layer.alert('删除信息失败！'+data.msg, {icon: 5});
+                                                }
+                                            },
+                                            error : function() {
+                                                layer.alert('删除信息失败', {icon: 5});
+                                            }
+                                        });
+                                    }, function(){
+                                        layer.close(index);
+                                    });
+                                })
+                            }
                         })
                         .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
             }

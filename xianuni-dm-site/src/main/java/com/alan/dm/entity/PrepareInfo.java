@@ -15,6 +15,15 @@ public class PrepareInfo {
     private Date meetTime;
     private String meetContent;
     private Date createTime;
+    private String evaluation;//考察和综合评价
+
+    public String getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(String evaluation) {
+        this.evaluation = evaluation;
+    }
 
     public int getId() {
         return id;

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../static/js/plugins/select2/select2.css" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body>
+<form class="form-horizontal">
+    <div class="form-group">
+        <div class="input-group">
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">标题：</label>
+        <div class="col-sm-6">
+            <input id="title" type="text" maxlength="60" class="form-control" name="title">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>部门：</small></label>
+        <div class="col-sm-2">
+            <p id="pOrg" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">收件人学工号：</label>
+        <div class="col-sm-4">
+            <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
+            <span class="help-block m-b-none">请从本党支部人员库查询</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">内容：</label>
+        <div class="col-sm-5">
+            <textarea id="content" name="content" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+        </div>
+    </div>
+</form>
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- maxlength -->
+<script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
+
+<script src="../../static/js/plugins/select2/select2.js"></script>
+<script src="../../static/js/plugins/select2/select2_locale_zh-CN.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var config = {
+            '.chosen-select': {},
+            '.chosen-select-deselect': {
+                allow_single_deselect: true
+            },
+            '.chosen-select-no-single': {
+                disable_search_threshold: 10
+            },
+            '.chosen-select-no-results': {
+                no_results_text: 'Oops, nothing found!'
+            },
+            '.chosen-select-width': {
+                width: "95%"
+            }
+        }
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+
+        $('#content').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
+        $('#title').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
+        $('#pOrg').html(getOrgNameTag());
+
+        var $pNumber = $("#pNumber");
+        var formatResult = function(result, container, query, escapeMarkup) {
+            return "<div>学工号:" + result.personNumber+ " 姓名:" + result.personName+"</div>";
+        };
+        var formatSelection = function (data, container, escapeMarkup) {
+            $pNumber.val(data.personNumber);
+            return data.personNumber;
+        };
+        $pNumber.select2({
+            ajax: {
+                url: "/xianuni-dm/person/listQuery.do?status=0,1,2,3,4,5&orgId="+getOrgTag(),
+                type:'get',
+                cache:false,
+                dataType:'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        number: params, // search term
+                        code: 'utf-8',
+                        extras: 1
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.value
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; },
+            id: function(){ return true},
+            formatResult: formatResult, // 下拉列表生成模板
+            formatSelection: formatSelection // 选中结果生成模板
+        });
+    });
+    function getOrgNameTag(){
+        return parent.$('#orgNameTag').val();
+    }
+    function getOrgTag(){
+        return parent.$('#orgIdTag').val();
+    }
+</script>
+</body>
+</html>

@@ -3,10 +3,11 @@ package com.alan.dm.web.controller;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.SessionUtils;
 import com.alan.dm.entity.Admin;
+import com.alan.dm.entity.Person;
 import com.alan.dm.service.IAdminService;
+import com.alan.dm.service.IPersonService;
 import com.alan.dm.web.Constants;
 import com.alan.dm.web.util.IPUtils;
-import com.alan.dm.web.util.WebUtils;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
@@ -32,6 +33,9 @@ public class LoginController extends BaseController{
 
     @Resource(name = "adminService")
     private IAdminService adminService;
+
+    @Resource(name = "personService")
+    private IPersonService personService;
 
     /**
      * 获取当前用户信息
@@ -71,7 +75,7 @@ public class LoginController extends BaseController{
         Request request = getRequest(httpServletRequest);
         String number=request.getString("number");
         String password=request.getString("password");
-        boolean isAdmin=request.getBoolean("admin");
+        boolean isAdmin=request.getString("admin","false").equals("on");
         if(isAdmin){
             Admin admin = adminService.getBySchoolNumber(number);
             if(admin==null){
@@ -98,11 +102,36 @@ public class LoginController extends BaseController{
             //返回结果
             JSONObject jsonObject=new JSONObject();
             jsonObject.put("success",true);
+            jsonObject.put("type","admin");
             return JsonUtils.fromObject(jsonObject);
         }else{
+            //学生用户
+            Person person=personService.getByNumber(number);
+            if(person==null){
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("success",false);
+                jsonObject.put("msg","用户不存在:"+number);
+                return JsonUtils.fromObject(jsonObject);
+            }else{
+                if(!password.equals(person.getPassword())){
+                    JSONObject jsonObject=new JSONObject();
+                    jsonObject.put("success",false);
+                    jsonObject.put("msg","用户名或密码错误");
+                    return JsonUtils.fromObject(jsonObject);
+                }
+            }
+            //设置COOKIE和session
+            String cookie=SessionUtils.generateCookie(person.getId(), IPUtils.getRequestIp(httpServletRequest),System.currentTimeMillis(),2*60*60*1000L);
+            Cookie cookieInfo = new Cookie(Constants.COOKIE_NAME_PERSON,cookie);
+            cookieInfo.setPath("/");
+            httpServletResponse.addCookie(cookieInfo);
+            //设置session
+            HttpSession session=httpServletRequest.getSession();
+            session.setAttribute(Constants.SESSION_PERSONID_NAME,String.valueOf(person.getId()));
+            //返回结果
             JSONObject jsonObject=new JSONObject();
-            jsonObject.put("success",false);
-            jsonObject.put("msg","暂时不支持其他用户登录");
+            jsonObject.put("success",true);
+            jsonObject.put("type","person");
             return JsonUtils.fromObject(jsonObject);
         }
     }
@@ -112,9 +141,14 @@ public class LoginController extends BaseController{
         cookieInfo.setPath("/");
         cookieInfo.setMaxAge(0);
         httpServletResponse.addCookie(cookieInfo);
-        //设置session
+        Cookie cookieInfoP = new Cookie(Constants.COOKIE_NAME_PERSON, null);
+        cookieInfoP.setPath("/");
+        cookieInfoP.setMaxAge(0);
+        httpServletResponse.addCookie(cookieInfoP);
+
         HttpSession session=httpServletRequest.getSession();
         session.removeAttribute(Constants.SESSION_ADMINID_NAME);
+        session.removeAttribute(Constants.SESSION_PERSONID_NAME);
         return "redirect:/html/login.html";
     }
 }

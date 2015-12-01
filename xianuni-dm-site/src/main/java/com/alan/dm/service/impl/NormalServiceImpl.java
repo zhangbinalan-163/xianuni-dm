@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -15,7 +16,6 @@ import java.util.Date;
  */
 @Service(value = "normalService")
 public class NormalServiceImpl implements INormalService {
-
     @Autowired
     private NormalInfoMapper normalInfoMapper;
 
@@ -33,5 +33,10 @@ public class NormalServiceImpl implements INormalService {
     @Override
     public NormalInfo getById(int normalId) throws DMException {
         return normalInfoMapper.getById(normalId);
+    }
+
+    @Override
+    public int countByOrgWithTime(List<Integer> orgIdlist, Date start, Date end) throws DMException {
+        return normalInfoMapper.countByOrgWithTime(orgIdlist,start,end);
     }
 }

@@ -14,6 +14,12 @@ import java.util.List;
  */
 public interface IPersonService {
     /**
+     *
+     * @param person
+     * @throws DMException
+     */
+    void updatePassword(Person person) throws DMException;
+    /**
      * 统计某个党组织特定状态的党员的数量,包含下属组织
      * @param orgnization
      * @param status

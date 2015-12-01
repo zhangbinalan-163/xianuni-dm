@@ -1,14 +1,14 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IRelationTransferInfoDao;
+import com.alan.dm.dao.mapper.RelationTransferMapper;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.RelationTransferInfo;
 import com.alan.dm.entity.condition.RelationTransferCondition;
 import com.alan.dm.service.IRelationTransferService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -17,31 +17,31 @@ import java.util.List;
 @Service(value = "relationTransferService")
 public class RelationTransferServiceImpl implements IRelationTransferService {
 
-    @Resource(name = "relationTransferDao")
-    private IRelationTransferInfoDao relationTransferInfoDao;
+    @Autowired
+    private RelationTransferMapper relationTransferMapper;
 
     @Override
     public List<RelationTransferInfo> getByCondition(RelationTransferCondition condition, Page page) throws DMException {
-        return relationTransferInfoDao.getByCondition(condition,page);
+        return relationTransferMapper.getByCondition(condition,page);
     }
 
     @Override
     public int countByCondition(RelationTransferCondition condition) throws DMException {
-        return relationTransferInfoDao.countByCondition(condition);
+        return relationTransferMapper.countByCondition(condition);
     }
 
     @Override
     public void createTransfer(RelationTransferInfo relationTransferInfo) throws DMException {
-        relationTransferInfoDao.insert(relationTransferInfo);
+        relationTransferMapper.insert(relationTransferInfo);
     }
 
     @Override
     public void deleteTransfer(RelationTransferInfo relationTransferInfo) throws DMException {
-        relationTransferInfoDao.delete(relationTransferInfo);
+        relationTransferMapper.delete(relationTransferInfo);
     }
 
     @Override
     public RelationTransferInfo getById(int id) throws DMException{
-        return relationTransferInfoDao.getById(id);
+        return relationTransferMapper.getById(id);
     }
 }

@@ -37,6 +37,13 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-sm-2 control-label">缴纳金额：</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="fee">
+        </div>
+    </div>
+
+    <div class="form-group">
         <label class="col-sm-2 control-label">缴费时间：</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="payTime">
@@ -44,17 +51,17 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">缴纳开始日期：</label>
+        <label class="col-sm-2 control-label">缴纳开始月份：</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="startTime">
-            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#startTime'});"></label>
+            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#startTime',format: 'YYYY-MM'});"></label>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">缴纳截止日期：</label>
+        <label class="col-sm-2 control-label">缴纳截止月份：</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="endTime">
-            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#endTime'});"></label>
+            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#endTime',format: 'YYYY-MM'});"></label>
         </div>
     </div>
 </form>

@@ -5,10 +5,7 @@ import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.RelationTransferCondition;
-import com.alan.dm.service.IAdminService;
-import com.alan.dm.service.IOrgnizationService;
-import com.alan.dm.service.IPersonService;
-import com.alan.dm.service.IRelationTransferService;
+import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -42,6 +39,44 @@ public class RelationController extends BaseController{
 	@Resource(name = "personService")
 	private IPersonService personService;
 
+	@Resource(name = "applierService")
+	private IApplierService applierService;
+
+	@Resource(name = "activitistService")
+	private IActivitistService activitistService;
+
+	@Resource(name = "intentionService")
+	private IIntentionService intentionService;
+
+	@Resource(name = "prepareService")
+	private IPrepareService prepareService;
+
+	@Resource(name = "normalService")
+	private INormalService normalService;
+
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/transfer/delete.do")
+	@ResponseBody
+	public String inDelete(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer id=request.getInt("id");
+		RelationTransferInfo transferInfo = relationTransferService.getById(id);
+		if(transferInfo==null){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", false);
+			jsonObject.put("msg", "记录不存在");
+			return JsonUtils.fromObject(jsonObject);
+		}
+		relationTransferService.deleteTransfer(transferInfo);
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", true);
+		return JsonUtils.fromObject(jsonObject);
+	}
 	/**
 	 *
 	 * @param httpServletRequest
@@ -53,12 +88,12 @@ public class RelationController extends BaseController{
 	public String inAdd(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId=request.getInt("orgId");
-		String orgName=request.getString("orgName");
-		String name=request.getString("name");
 		String number=request.getString("number");
 		Integer type=request.getInt("type", 0);
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		if(type==1){
+			String orgName=request.getString("orgName");
+			String name=request.getString("name");
 			//校外转入
 			Person person = personService.getByNumber(number);
 			if(person!=null){
@@ -76,6 +111,27 @@ public class RelationController extends BaseController{
 			person.setName(name);
 			person.setStatus(PersonStatus.NORMAL.getId());
 			personService.createPerson(person);
+
+			ApplierInfo applierInfo=new ApplierInfo();
+			applierService.createApplier(applierInfo);
+			ActivitistInfo activitistInfo=new ActivitistInfo();
+			activitistService.createActivitist(activitistInfo);
+			IntentionInfo intentionInfo=new IntentionInfo();
+			intentionService.createIntention(intentionInfo);
+			PrepareInfo prepareInfo=new PrepareInfo();
+			prepareService.createPrepare(prepareInfo);
+			NormalInfo normalInfo=new NormalInfo();
+			normalService.createNormal(normalInfo);
+
+			//修改基础人员状态
+			person.setStatus(PersonStatus.NORMAL.getId());
+			person.setNormalInfoId(normalInfo.getId());
+			person.setApplierInfoId(applierInfo.getId());
+			person.setActivitistInfoId(activitistInfo.getId());
+			person.setIntentionInfoId(intentionInfo.getId());
+			person.setPrepareInfoId(prepareInfo.getId());
+			personService.updatePerson(person);
+
 			//创建转入记录
 			RelationTransferInfo transferInfo=new RelationTransferInfo();
 			transferInfo.setTransferType(RelationTransferType.IN_OTHER.getId());
@@ -85,14 +141,88 @@ public class RelationController extends BaseController{
 			transferInfo.setToOrgId(orgnization.getId());
 			transferInfo.setToOrgName(orgnization.getName());
 			relationTransferService.createTransfer(transferInfo);
-		}else{
-			//
 
+		}else{
+			//校内转入
+			Person person = personService.getByNumber(number);
+			if(person==null){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success",false);
+				jsonObject.put("msg","该学号不存在");
+				return JsonUtils.fromObject(jsonObject);
+			}
+			//创建转入记录
+			RelationTransferInfo transferInfo=new RelationTransferInfo();
+			transferInfo.setTransferType(RelationTransferType.INNER.getId());
+			transferInfo.setPerson(person);
+			//获取原来的部门信息
+			Orgnization oldOrg = orgnizationService.getOrgById(person.getOrgId());
+			transferInfo.setFromOrgId(oldOrg.getId());
+			transferInfo.setFromOrgName(oldOrg.getName());
+			transferInfo.setToOrgId(orgnization.getId());
+			transferInfo.setToOrgName(orgnization.getName());
+			transferInfo.setTransferTime(new Date());
+
+			relationTransferService.createTransfer(transferInfo);
+
+			//设置新部门
+			person.setOrgnization(orgnization);
+			person.setUpdateTime(new Date());
+			personService.updatePerson(person);
 		}
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success",true);
 		jsonObject.put("msg","success");
 		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 * 转出
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/transfer/out/add.do")
+	@ResponseBody
+	public String outAdd(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer type=request.getInt("type", 2);
+		if(type==2){
+			String toOrgName=request.getString("orgName");
+			String number=request.getString("number");
+			Person person = personService.getByNumber(number);
+			if(person==null){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success",false);
+				jsonObject.put("msg","该学号不存在");
+				return JsonUtils.fromObject(jsonObject);
+			}
+			//创建转入记录
+			RelationTransferInfo transferInfo=new RelationTransferInfo();
+			transferInfo.setTransferType(RelationTransferType.OUT_OTHER.getId());
+			transferInfo.setPerson(person);
+			Orgnization oldOrg = orgnizationService.getOrgById(person.getOrgId());
+			transferInfo.setFromOrgId(oldOrg.getId());
+			transferInfo.setFromOrgName(oldOrg.getName());
+			transferInfo.setToOrgName(toOrgName);
+			transferInfo.setTransferTime(new Date());
+			relationTransferService.createTransfer(transferInfo);
+			//设置为历史党员
+			person.setStatus(PersonStatus.HISTORY_OUT.getId());
+			person.setUpdateTime(new Date());
+			personService.updatePerson(person);
+
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success",true);
+			jsonObject.put("msg","success");
+			return JsonUtils.fromObject(jsonObject);
+		}else{
+			//校内转出,需要调用out/add.do即可
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success",false);
+			jsonObject.put("msg","不支持该操作");
+			return JsonUtils.fromObject(jsonObject);
+		}
 	}
 	/**
 	 *

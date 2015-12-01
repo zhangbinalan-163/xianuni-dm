@@ -1,5 +1,6 @@
 package com.alan.dm.web.controller;
 
+import com.alan.dm.common.exception.DMException;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
@@ -21,10 +22,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 委员会相关接口
+ */
 @Controller
 @RequestMapping("/committee")
 public class OrgCommitteeController extends BaseController{
-	private static Logger LOGGER= LoggerFactory.getLogger(OrgCommitteeController.class);
 
 	@Resource(name = "committeeService")
 	private ICommitteeService committeeService;
@@ -37,8 +40,9 @@ public class OrgCommitteeController extends BaseController{
 
 	@Resource(name = "adminService")
 	private IAdminService adminService;
+
 	/**
-	 *
+	 * 新增委员会信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -47,26 +51,27 @@ public class OrgCommitteeController extends BaseController{
 	@ResponseBody
 	public String add(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
+
 		int orgId=request.getInt("orgId");
 		String number=request.getString("number");
 		int job=request.getInt("job",CommitteeJobType.NORMAL.getId());
+
 		Person person = personService.getByNumber(number);
 		JSONObject jsonObject=new JSONObject();
-		if(person==null){
-			jsonObject.put("success", false);
-			jsonObject.put("msg","用户不存在");
-			return JsonUtils.fromObject(jsonObject);
+		if(person==null||person.getStatus()!=PersonStatus.NORMAL.getId()){
+			throw new DMException("该学工号不存在或者不是正式党员");
 		}
+		//todo 对权限的检查，当前管理员只能管理有权限的组织和下属组织
 		Orgnization orgnization = orgnizationService.getOrgById(orgId);
 		if(orgnization==null){
-			jsonObject.put("success", false);
-			jsonObject.put("msg","部门不存在");
-			return JsonUtils.fromObject(jsonObject);
+			throw new DMException("部门不存在");
 		}
+
 		CommitteeInfo committeeInfo=new CommitteeInfo();
 		committeeInfo.setOrgnization(orgnization);
 		committeeInfo.setPerson(person);
 		committeeInfo.setJob(job);
+
 		committeeService.createCommitteeInfo(committeeInfo);
 
 		jsonObject.put("success", true);
@@ -75,7 +80,7 @@ public class OrgCommitteeController extends BaseController{
 	}
 
 	/**
-	 *
+	 * 删除委员会任职信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -86,31 +91,32 @@ public class OrgCommitteeController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String[] ids=request.getStringArray("id",",");
 		for(String id:ids){
-			CommitteeInfo committeeInfo=committeeService.getById(Integer.parseInt(id));
+			CommitteeInfo committeeInfo=new CommitteeInfo();
+			committeeInfo.setId(Integer.parseInt(id));
 			if(committeeInfo!=null){
 				committeeService.deleteCommitteeInfo(committeeInfo);
 			}
 		}
+		//为了兼容jqgrid的框架，用status字段返回
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("status",true);
 		return JsonUtils.fromObject(jsonObject);
-
 	}
 
 	/**
-	 *
+	 * 查询委员会列表信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
 	 */
 	@RequestMapping("/list.do")
 	@ResponseBody
-	public String rewardList(HttpServletRequest httpServletRequest) throws Exception {
+	public String list(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer limit = request.getInt("rows", 10);
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId",0);
-		String number=request.getString("number", null);
+		String number=request.getString("number", null);//可以按照学号查询
 		boolean containSubOrg=request.getBoolean("containSub", true);
 
 		//如果没有传入orgId，设置为管理员所管理的ORG
@@ -122,24 +128,25 @@ public class OrgCommitteeController extends BaseController{
 			}
 		}
 		CommitteeCondition condition=new CommitteeCondition();
-		List<Integer> orgIdList=new ArrayList<Integer>();
-		orgIdList.add(orgId);
-
-		if(containSubOrg){
-			Orgnization orgnization=null;
-			if(orgId==0){
-				orgnization =new Orgnization();
-				orgnization.setId(-1);
-			}else{
-				orgnization= orgnizationService.getOrgById(orgId);
-			}
-			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
-			if(subOrgList!=null){
-				for (Orgnization subOrg:subOrgList){
-					orgIdList.add(subOrg.getId());
+		if(orgId!=0){
+			List<Integer> orgIdList=new ArrayList<Integer>();
+			orgIdList.add(orgId);
+			if(containSubOrg){
+				Orgnization orgnization=null;
+				if(orgId==0){
+					orgnization =new Orgnization();
+					orgnization.setId(-1);
+				}else{
+					orgnization= orgnizationService.getOrgById(orgId);
 				}
+				List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+				if(subOrgList!=null){
+					for (Orgnization subOrg:subOrgList){
+						orgIdList.add(subOrg.getId());
+					}
+				}
+				condition.setOrgList(orgIdList);
 			}
-			condition.setOrgList(orgIdList);
 		}
 
 		Page pageInfo=new Page();
@@ -177,7 +184,7 @@ public class OrgCommitteeController extends BaseController{
 	}
 
 	/**
-	 * 查询可以成为管理员的党员信息
+	 * 查询某个部门和所有的子部门中可以成为委员会成员的党员信息
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -191,7 +198,7 @@ public class OrgCommitteeController extends BaseController{
 
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		Page page=new Page();
-		page.setSize(20);
+		page.setSize(20);//最多获取20个
 		page.setCurrent(0);
 
 		List<Person> personList=committeeService.getCandidatePerson(Arrays.asList(orgnization),number,page);

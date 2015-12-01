@@ -21,7 +21,12 @@
     <!-- 更新数据，暂时只有状态修改-->
     <update id="update">
         UPDATE <include refid="PERSON_TABLE"/>
-        SET status=#{person.status},updateTime=#{person.updateTime},applierInfoId=#{person.applierInfoId},activitistInfoId=#{person.activitistInfoId},intentionInfoId=#{person.intentionInfoId},prepareInfoId=#{person.prepareInfoId},normalInfoId=#{person.normalInfoId}
+        SET orgId=#{person.orgId},status=#{person.status},updateTime=#{person.updateTime},applierInfoId=#{person.applierInfoId},activitistInfoId=#{person.activitistInfoId},intentionInfoId=#{person.intentionInfoId},prepareInfoId=#{person.prepareInfoId},normalInfoId=#{person.normalInfoId}
+        WHERE id=#{person.id}
+    </update>
+    <update id="updatePass">
+        UPDATE <include refid="PERSON_TABLE"/>
+        SET password=#{person.password},updateTime=#{person.updateTime},passUpdateTime=#{person.passUpdateTime}
         WHERE id=#{person.id}
     </update>
 

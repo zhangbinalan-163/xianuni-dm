@@ -37,6 +37,9 @@ public enum CommitteeJobType {
         if(id==3){
             return OTHER;
         }
+        if(id==4){
+            return LEAD;
+        }
         return null;
     }
 }

@@ -63,6 +63,11 @@ public interface PersonInfoMapper {
      * @param person
      */
     void update(@Param(value = "person")Person person);
+    /**
+     *
+     * @param person
+     */
+    void updatePass(@Param(value = "person")Person person);
 
     /**
      *

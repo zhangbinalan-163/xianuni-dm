@@ -32,7 +32,7 @@
         <div class="col-sm-9">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>统计信息</h5>
+                    <h5>党员数量统计</h5>
                 </div>
                 <div class="ibox-content">
                     <div id="helpInfo">请选择一个组织查看具体信息</div>
@@ -125,7 +125,7 @@
                 data = this.formatData(data);
                 return {
                     title : {
-                        text: '党员分布'
+                        text: '党员统计信息'
                     },
                     tooltip : {
                         trigger: 'axis'
@@ -152,8 +152,8 @@
                             data : data.x,
                             axisLabel : {
                                 rotate: -40, // 标签的倾斜程度
-                                margin : 2, // 标签距离x轴的距离
-                            },
+                                margin : 2 // 标签距离x轴的距离
+                            }
                         }
                     ],
                     yAxis : [
@@ -183,25 +183,8 @@
                 var self = this;
                 $('#helpInfo').hide();
                 self.chart.showLoading();
-
-                // 返回数据的格式
-                self.initChart({
-                    // x轴标识
-                    x: ['组织1','组织2','组织3','组织4'],
-                    // 数据集合
-                    series: [
-                        {
-                            name:'正式党员',
-                            data:[8, 4, 9, 11],
-                        },
-                        {
-                            name:'预备党员',
-                            data:[6, 10, 9, 8],
-                        }
-                    ]
-                });
                 $.ajax({
-                    url: '/xianuni-dm/person/statis.do', // 接口地址
+                    url: '/xianuni-dm/person/statis.do?type=byorg', // 接口地址
                     type: 'get',
                     data: {
                         orgId: orgId

@@ -1,5 +1,6 @@
 package com.alan.dm.web.controller;
 
+import com.alan.dm.common.exception.DMException;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
@@ -19,10 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/person")
@@ -101,17 +99,17 @@ public class PersonController extends BaseController{
 	@ResponseBody
 	public String activitistInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int activitistId = request.getInt("activitistId");
-		ActivitistInfo activitistInfo=activitistService.getById(activitistId);
+		int personId = request.getInt("personId");
+
+		Person person=personService.getById(personId);
 		JSONObject jsonObject=new JSONObject();
-		if(activitistInfo==null){
+		if(person==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
 		}
-
-		Person person = personService.getById(activitistInfo.getPersonId());
-		if(person==null){
+		ActivitistInfo activitistInfo=activitistService.getById(person.getActivitistInfoId());
+		if(activitistInfo==null){
 			jsonObject.put("success", false);
 			jsonObject.put("msg","不存在该记录");
 			return JsonUtils.fromObject(jsonObject);
@@ -147,7 +145,7 @@ public class PersonController extends BaseController{
 	@ResponseBody
 	public String applierInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int personId = request.getInt("personId");
+		int personId = request.getInt("applierId");
 
 		Person person=personService.getById(personId);
 		JSONObject jsonObject=new JSONObject();
@@ -349,6 +347,7 @@ public class PersonController extends BaseController{
 		person.setPersonDesc(desc);
 		person.setSex(sex);
 		person.setProfession(profession);
+		person.setPassword(number);//默认密码就是学工号
 		Person oldPerson=personService.getByNumber(number);
 		if(oldPerson!=null){
 			JSONObject jsonObject=new JSONObject();
@@ -434,9 +433,9 @@ public class PersonController extends BaseController{
 		String number=request.getString("number");
 		String meetContent=request.getString("meetContent", null);
 		String evaContent=request.getString("evaContent", null);
-		String directorNumber=request.getString("directorNumber",null);
+		String directorNumber=request.getString("directorNumber", null);
 		Date meetTime=request.getDate("meetTime", null);
-		Date evaTime=request.getDate("evaTime",null);
+		Date evaTime=request.getDate("evaTime", null);
 
 		ActivitistInfo activitistInfo=new ActivitistInfo();
 		if(!StringUtils.isEmpty(directorNumber)){
@@ -493,7 +492,7 @@ public class PersonController extends BaseController{
 		String number=request.getString("number");
 		int classHour=request.getInt("trainHour", 0);
 		int publiced=request.getInt("publiced", 0);
-		String directorNumber=request.getString("directorId", null);
+		String directorNumber=request.getString("directorNumber", null);
 		Date meetTime=request.getDate("meetTime", null);
 		String meetContent=request.getString("meetContent", null);
 		String politicalCheck=request.getString("politicalCheck",null);
@@ -617,7 +616,7 @@ public class PersonController extends BaseController{
 		return JsonUtils.fromObject(jsonObject);
 	}
 	/**
-	 * 正式党员查询接口
+	 * 查询接口
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -627,29 +626,46 @@ public class PersonController extends BaseController{
 	public String listQuery(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId=request.getInt("orgId", 0);
-		String[] statusArray=request.getStringArray("status", ",");
+		String statusParam=request.getString("status", null);
+		String[] statusArray=null;
+		if(!StringUtils.isEmpty(statusParam)){
+			statusArray=statusParam.split(",");
+		}
+		boolean withSubOrg=request.getBoolean("withAllSubOrg",false);
 
 		String number=request.getString("number", null);
 		PersonCondition condition=new PersonCondition();
 		List<Integer> orgIdList=new ArrayList<Integer>();
 		orgIdList.add(orgId);
+		if(withSubOrg){
+			Orgnization orgnization=new Orgnization();
+			orgnization.setId(orgId);
+			List<Orgnization> subOrgs=orgnizationService.getOrgByParent(orgnization,true);
+			if(subOrgs!=null){
+				for(Orgnization subOrg:subOrgs){
+					orgIdList.add(subOrg.getId());
+				}
+			}
+		}
+		condition.setOrgList(orgIdList);
 
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
-		List<Integer> statuslist=new ArrayList<Integer>();
-		for(String statusParam:statusArray){
-			statuslist.add(Integer.parseInt(statusParam));
+		if(statusArray!=null){
+			List<Integer> statuslist=new ArrayList<Integer>();
+			for(String status:statusArray){
+				statuslist.add(Integer.parseInt(status));
+			}
+			condition.setStatus(statuslist);
 		}
-		condition.setOrgList(orgIdList);
-		condition.setStatus(statuslist);
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent(0);
 		pageInfo.setSize(10);
 
 		PersonResult result=new PersonResult();
-		result.setIncludeOrgnization(false);
+		result.setIncludeOrgnization(true);
 		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
 
 		JSONArray rowsArray=new JSONArray();
@@ -660,6 +676,7 @@ public class PersonController extends BaseController{
 				keyObject.put("personName",person.getName());
 				keyObject.put("personNumber", person.getNumber());
 				keyObject.put("personStatus",PersonStatus.getInstance(person.getStatus()).getName());
+				keyObject.put("orgName",person.getOrgnization().getName());
 				rowsArray.add(keyObject);
 			}
 		}
@@ -681,7 +698,7 @@ public class PersonController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		Integer limit = request.getInt("rows", 10);
 		Integer page = request.getInt("page", 1);
-		Integer orgId=request.getInt("orgId",0);
+		Integer orgId=request.getInt("orgId", 0);
 		String name=request.getString("name", null);
 		String number=request.getString("number", null);
 		boolean containSubOrg=request.getBoolean("containSub", true);
@@ -714,7 +731,7 @@ public class PersonController extends BaseController{
 			condition.setOrgList(orgIdList);
 		}
 		Page pageInfo=new Page();
-		pageInfo.setCurrent((page-1)*limit);
+		pageInfo.setCurrent((page - 1) * limit);
 		pageInfo.setSize(limit);
 
 		if(!StringUtils.isEmpty(name)){
@@ -836,6 +853,92 @@ public class PersonController extends BaseController{
 				cellList.add(StringUtils.isEmpty(applyTime)?"未提交申请书":applyTime);
 				String talkTime=TimeUtils.convertToDateString(applierInfo.getTalkTime());
 				cellList.add(StringUtils.isEmpty(talkTime)?"未谈话":talkTime);
+				subOrgObject.put("cell", cellList);
+				rowsArray.add(subOrgObject);
+			}
+		}
+		jsonObject.put("rows",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 * 历史党员信息列表
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/historyList.do")
+	@ResponseBody
+	public String historyList(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer limit = request.getInt("rows", 10);
+		Integer page = request.getInt("page", 1);
+		Integer orgId=request.getInt("orgId", 0);
+		String number=request.getString("number", null);
+		boolean containSubOrg=request.getBoolean("containSub", true);
+
+		//如果没有传入orgId，设置为管理员所管理的ORG
+		if(orgId==0){
+			Integer adminId = getOnlineAdminId(httpServletRequest);
+			Admin adminInfo = adminService.getById(adminId);
+			if(adminInfo.getType()==Admin.ORG_ADMIN){
+				orgId=adminInfo.getOrgId();
+			}
+		}
+		PersonCondition condition=new PersonCondition();
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+
+		if(containSubOrg){
+			Orgnization orgnization=null;
+			if(orgId==0){
+				orgnization =new Orgnization();
+				orgnization.setId(-1);
+			}else{
+				orgnization= orgnizationService.getOrgById(orgId);
+			}
+			List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+			if(subOrgList!=null){
+				for (Orgnization subOrg:subOrgList){
+					orgIdList.add(subOrg.getId());
+				}
+			}
+			condition.setOrgList(orgIdList);
+		}
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent((page-1)*limit);
+		pageInfo.setSize(limit);
+		condition.setStatus(Arrays.asList(PersonStatus.HISTORY_OUT.getId(), PersonStatus.HISTORY_PUNISH.getId(), PersonStatus.HISTORY_DEATH.getId()));
+		if(!StringUtils.isEmpty(number)){
+			condition.setNumber(number);
+		}
+
+		int subCount = personService.countByCondition(condition);
+
+		PersonResult result=new PersonResult();
+		result.setIncludeOrgnization(true);
+		result.setIncludeApplierInfo(true);
+		List<Person> personList=personService.getByCondition(condition,pageInfo,result);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("page",page);
+		jsonObject.put("total",subCount==0?0:subCount/limit+1);
+		jsonObject.put("records",subCount);
+		JSONArray rowsArray=new JSONArray();
+		if(personList!=null){
+			for(Person person:personList){
+				JSONObject subOrgObject=new JSONObject();
+				subOrgObject.put("id", person.getId());
+				List<String> cellList=new ArrayList<String>();
+				cellList.add(String.valueOf(person.getId()));
+				Orgnization orgInfo = person.getOrgnization();
+				cellList.add(orgInfo.getName());
+				cellList.add(person.getName());
+				cellList.add(person.getNumber());
+				cellList.add(PersonStatus.getInstance(person.getStatus()).getName());
+				String updateTime=TimeUtils.convertToTimeString(person.getUpdateTime());
+				cellList.add(updateTime);
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}
@@ -1321,48 +1424,6 @@ public class PersonController extends BaseController{
 		jsonObject.put("status",true);
 		return JsonUtils.fromObject(jsonObject);
 	}
-	/**
-	 * 删除信息
-	 * @param httpServletRequest
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping("/delete.do")
-	@ResponseBody
-	public String delete(HttpServletRequest httpServletRequest) throws Exception {
-		Request request = getRequest(httpServletRequest);
-		String[] ids=request.getStringArray("id", ",");
-		for(String id:ids){
-			Person person=personService.getById(Integer.parseInt(id));
-			if(person!=null){
-//				NormalInfo normalInfo = normalService.getByPerson(person);
-//				if(normalInfo!=null){
-//					normalService.deleteNormal(normalInfo);
-//				}
-//				PrepareInfo prepareInfo = prepareService.getByPerson(person);
-//				if(prepareInfo!=null){
-//					prepareService.deletePrepare(prepareInfo);
-//				}
-//				IntentionInfo intentionInfo=intentionService.getByPerson(person);
-//				if(intentionInfo!=null){
-//					intentionService.deleteIntention(intentionInfo);
-//				}
-//				ActivitistInfo activitistInfo=activitistService.getByPerson(person);
-//				if(activitistInfo!=null){
-//					activitistService.deleteActivitist(activitistInfo);
-//				}
-				//ApplierInfo applierInfo=applierService.getByPerson(person);
-				//if(applierInfo!=null){
-				//	applierService.deleteApplier(applierInfo);
-				//}
-				//TODO 其他信息
-				personService.deletePerson(person);
-			}
-		}
-		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("status",true);
-		return JsonUtils.fromObject(jsonObject);
-	}
 
 	/**
 	 * 党员统计图表信息
@@ -1375,6 +1436,7 @@ public class PersonController extends BaseController{
 	public String statisPersonInfo(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId=request.getInt("orgId", 0);
+		String type=request.getString("type","byorg");
 		//如果没有传入orgId，设置为管理员所管理的ORG
 		if(orgId==0){
 			Integer adminId = getOnlineAdminId(httpServletRequest);
@@ -1385,7 +1447,10 @@ public class PersonController extends BaseController{
 				orgId=1;//默认的设置为校党委
 			}
 		}
+		return type.equals("byorg")?statisByOrg(orgId):statisByTime(orgId);
+	}
 
+	private String statisByOrg(Integer orgId) throws DMException {
 		List<String> orgNames=new ArrayList<>();
 		List<Integer> normalCountArray=new ArrayList<>();
 		List<Integer> prepareCountArray=new ArrayList<>();
@@ -1435,4 +1500,160 @@ public class PersonController extends BaseController{
 		return JsonUtils.fromObject(resObje);
 	}
 
+	private String statisByTime(Integer orgId) throws DMException {
+		List<String> yearList=new ArrayList<>();
+		List<Integer> normalCountArray=new ArrayList<>();
+		List<Integer> prepareCountArray=new ArrayList<>();
+
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
+		List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+		List<Integer> orgIdList=new ArrayList<>();
+		orgIdList.add(orgId);
+		if(subOrgList!=null){
+			for (Orgnization subOrg:subOrgList){
+				orgIdList.add(subOrg.getId());
+			}
+		}
+
+		//明年
+		Calendar nowCalender=Calendar.getInstance();
+		nowCalender.setTime(new Date());
+		int endYear=nowCalender.get(Calendar.YEAR)+1;
+
+		for(int i=2015;i<endYear;i++){
+			yearList.add(i+"年");
+			Calendar startCalender=Calendar.getInstance();
+			startCalender.set(i, 0, 1, 0, 0, 0);
+
+			Calendar endCalender=Calendar.getInstance();
+			endCalender.set(i+1, 0, 1, 0, 0, 0);
+
+			int prepareCount=prepareService.countByOrgWithTime(orgIdList, startCalender.getTime(), endCalender.getTime());
+			prepareCountArray.add(prepareCount);
+
+			int normalCount=normalService.countByOrgWithTime(orgIdList, startCalender.getTime(), endCalender.getTime());
+			normalCountArray.add(normalCount);
+		}
+
+		JSONObject resObje=new JSONObject();
+		resObje.put("success",true);
+
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("x", yearList);
+
+		JSONArray dataArray=new JSONArray();
+		JSONObject aDataObject=new JSONObject();
+		aDataObject.put("name", "正式党员");
+		aDataObject.put("data", normalCountArray);
+		dataArray.add(aDataObject);
+
+		JSONObject bDataObject=new JSONObject();
+		bDataObject.put("name","预备党员");
+		bDataObject.put("data",prepareCountArray);
+		dataArray.add(bDataObject);
+
+		jsonObject.put("series", dataArray);
+
+		resObje.put("data",jsonObject);
+
+		return JsonUtils.fromObject(resObje);
+	}
+	/**
+	 * 快速转换人员为下一个状态
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/fastChange.do")
+	@ResponseBody
+	public String fastChange(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		int id=request.getInt("id");
+		JSONObject jsonObject=new JSONObject();
+
+		Person person=personService.getById(id);
+		if(person==null){
+			jsonObject.put("success", false);
+			jsonObject.put("msg","不存在该记录");
+			return JsonUtils.fromObject(jsonObject);
+		}
+		if(person.getStatus()==PersonStatus.NO.getId()){
+			//转换为申请人
+			ApplierInfo applierInfo=new ApplierInfo();
+			applierService.createApplier(applierInfo);
+			//修改基础人员状态
+			person.setStatus(PersonStatus.APPLIER.getId());
+			person.setApplierInfoId(applierInfo.getId());
+			personService.updatePerson(person);
+		}else if(person.getStatus()==PersonStatus.APPLIER.getId()){
+			ActivitistInfo activitistInfo=new ActivitistInfo();
+			activitistService.createActivitist(activitistInfo);
+			//修改基础人员状态
+			person.setStatus(PersonStatus.ACTIVISTS.getId());
+			person.setActivitistInfoId(activitistInfo.getId());
+			personService.updatePerson(person);
+		}else if(person.getStatus()==PersonStatus.ACTIVISTS.getId()){
+			IntentionInfo intentionInfo=new IntentionInfo();
+			intentionService.createIntention(intentionInfo);
+			//修改基础人员状态
+			person.setStatus(PersonStatus.INTENTION.getId());
+			person.setIntentionInfoId(intentionInfo.getId());
+			personService.updatePerson(person);
+		}else if(person.getStatus()==PersonStatus.INTENTION.getId()){
+			PrepareInfo prepareInfo=new PrepareInfo();
+			prepareService.createPrepare(prepareInfo);
+			//修改基础人员状态
+			person.setStatus(PersonStatus.PERPARE.getId());
+			person.setPrepareInfoId(prepareInfo.getId());
+			personService.updatePerson(person);
+
+		}else if(person.getStatus()==PersonStatus.PERPARE.getId()){
+			NormalInfo normalInfo=new NormalInfo();
+			normalService.createNormal(normalInfo);
+			//修改基础人员状态
+			person.setStatus(PersonStatus.NORMAL.getId());
+			person.setNormalInfoId(normalInfo.getId());
+			personService.updatePerson(person);
+		}
+		jsonObject.put("status", true);
+		return JsonUtils.fromObject(jsonObject);
+	}
+
+	/**
+	 * 添加历史党员信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/historyAdd.do")
+	@ResponseBody
+	public String historyAdd(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId = request.getInt("orgId");
+		String number=request.getString("number");
+		int type=request.getInt("type", 2);
+
+		JSONObject jsonObject=new JSONObject();
+
+		Person person=personService.getByNumber(number);
+		if(person==null){
+			jsonObject.put("success", false);
+			jsonObject.put("msg","不存在该记录");
+			return JsonUtils.fromObject(jsonObject);
+		}
+		if(type==2){
+			//开除党籍
+			person.setStatus(PersonStatus.HISTORY_PUNISH.getId());
+			person.setUpdateTime(new Date());
+		}else if(type==1){
+			//死亡
+			person.setStatus(PersonStatus.HISTORY_DEATH.getId());
+			person.setUpdateTime(new Date());
+		}
+		personService.updatePerson(person);
+
+		jsonObject.put("success", true);
+		jsonObject.put("msg", "success");
+		return JsonUtils.fromObject(jsonObject);
+	}
 }

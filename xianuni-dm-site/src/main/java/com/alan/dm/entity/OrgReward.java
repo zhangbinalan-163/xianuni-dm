@@ -10,11 +10,21 @@ public class OrgReward {
 
     private int id;
     private Orgnization orgnization;
+    private int orgId;
     private String name;
     private String rewardDesc;
     private int type;
     private int level;
     private Date rewardTime;
+    private Date createTime;
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
     public int getId() {
         return id;
@@ -70,5 +80,13 @@ public class OrgReward {
 
     public void setOrgnization(Orgnization orgnization) {
         this.orgnization = orgnization;
+    }
+
+    public int getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
     }
 }

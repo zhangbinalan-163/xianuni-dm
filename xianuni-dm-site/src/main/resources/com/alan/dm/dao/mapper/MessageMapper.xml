@@ -24,8 +24,8 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="message.id">
         INSERT INTO
         <include refid="OUT_TABLE"/>
-        (orgId,toSub,title,content,createTime)
-        VALUES(#{message.orgnization.id},#{message.toSub},#{message.title},#{message.content},#{message.createTime})
+        (orgId,toSub,title,content,createTime,urlList)
+        VALUES(#{message.orgnization.id},#{message.toSub},#{message.title},#{message.content},#{message.createTime},#{message.urlList})
     </insert>
 
     <delete id="delete">

@@ -52,7 +52,24 @@ public class TimeUtils {
             return "";
         }
     }
-
+    /**
+     * 将日期转换成字符串
+     * @param date
+     * @return
+     */
+    public static String convertToDateString(Date date,String pattern) {
+        if(date == null) {
+            return "";
+        }
+        try {
+            DateFormat df = new SimpleDateFormat(pattern);
+            String reportDate = df.format(date);
+            return reportDate;
+        } catch (Exception e) {
+            LOGGER.warn("convert data to string fail");
+            return "";
+        }
+    }
     /**
      * 将字符串转换成日期
      * @param source

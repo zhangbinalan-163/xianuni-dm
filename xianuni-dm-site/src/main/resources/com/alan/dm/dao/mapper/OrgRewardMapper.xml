@@ -16,13 +16,17 @@
         <id property="id" column="id"/>
         <result property="name" column="rewardName"/>
         <result property="rewardTime" column="rewardTime"/>
+        <result property="type" column="type"/>
+        <result property="level" column="level"/>
+        <result property="createTime" column="createTime"/>
         <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
     </resultMap>
 
     <select id="getByCondition" resultMap="OUT_INFO">
-        SELECT O.id AS id,O.orgId AS orgId,P.name AS orgName,O.rewardTime AS rewardTime,O.name as rewardName
-        FROM  <include refid="OUT_TABLE" /> O LEFT JOIN <include refid="ORG_TABLE"/> P
-        ON O.orgId=P.id
+        SELECT O.id AS id,O.orgId AS orgId,P.name AS orgName,O.rewardTime AS rewardTime,O.name as rewardName,O.type as type,O.level as level,
+        O.createTime as createTime
+        FROM  <include refid="OUT_TABLE" /> O
+        JOIN <include refid="ORG_TABLE"/> P ON O.orgId=P.id
         <where>
             <if test="condition.orgList != null">
                 O.orgId in
@@ -36,7 +40,7 @@
                 AND O.name LIKE #{pattern}
             </if>
         </where>
-        ORDER BY createTime DESC
+        ORDER BY O.createTime DESC
         <if test="page!=null">
             LIMIT #{page.current}, #{page.size}
         </if>
@@ -70,7 +74,14 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="reward.id">
         INSERT INTO
         <include refid="OUT_TABLE"/>
-        (orgId,name,rewardTime,type,level,rewardDesc)
-        VALUES(#{reward.orgnization.id},#{reward.name},#{reward.rewardTime},#{reward.type},#{reward.level},#{reward.rewardDesc})
+        (orgId,name,rewardTime,type,level,rewardDesc,createTime)
+        VALUES(#{reward.orgnization.id},#{reward.name},#{reward.rewardTime},#{reward.type},#{reward.level},#{reward.rewardDesc},#{reward.createTime})
     </insert>
+
+    <select id="getById" resultType="com.alan.dm.entity.OrgReward">
+        select *
+        FROM  <include refid="OUT_TABLE"/>
+        where id=#{id}
+    </select>
+
 </mapper>

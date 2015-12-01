@@ -110,7 +110,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var title,toSub,content;
+                            var title,toSub,content,fileUrlList;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -120,6 +120,9 @@
                                         return;
                                     }
                                     title=inputValue;
+                                }
+                                if(inputName=='fileUrlList'){
+                                    fileUrlList=inputValue;
                                 }
                             }
                             var selects=layer.getChildFrame('body',index).find('select');
@@ -144,7 +147,8 @@
                                     orgId : node.id,
                                     title:title,
                                     content:content,
-                                    toSub:toSub
+                                    toSub:toSub,
+                                    fileUrlList:fileUrlList
                                 },
                                 type:'post',
                                 dataType:'json',

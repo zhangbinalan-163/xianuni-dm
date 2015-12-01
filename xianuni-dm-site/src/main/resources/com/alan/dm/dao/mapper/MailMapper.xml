@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.MailMapper">
+
+    <sql id="MAIL_TABLE">tb_mail</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+        <result property="type" column="personType"/>
+        <result property="orgId" column="orgId"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap id="MAIL_INFO" type="com.alan.dm.entity.MailInfo">
+        <id property="id" column="mailId" />
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <result property="adminId" column="adminId"/>
+        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+    </resultMap>
+
+    <!-- 根据条件，分页获取信息-->
+    <select id="getByCondition" resultMap="MAIL_INFO">
+        SELECT M.id as mailId,M.title as title,M.content as content,M.createTime as createTime,
+        M.adminId as adminId,M.personId as personId,P.orgId as orgId,
+        P.name as personName,P.number as personNumber,P.type as personType,
+        P.status as status
+        FROM  <include refid="MAIL_TABLE" /> M
+        JOIN <include refid="PERSON_TABLE" /> P ON M.personId=P.id
+        JOIN <include refid="ORG_TABLE" /> O ON P.orgId=O.id
+        <where>
+            M.adminId= #{condition.adminId}
+            <if test="condition.orgList != null">
+                AND P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
+            </if>
+        </where>
+        ORDER BY createTime desc
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        select count(*)
+        FROM  <include refid="MAIL_TABLE" /> M
+        JOIN <include refid="PERSON_TABLE" /> P ON M.personId=P.id
+        JOIN <include refid="ORG_TABLE" /> O ON P.orgId=O.id
+        <where>
+            M.adminId= #{condition.adminId}
+            <if test="condition.orgList != null">
+                AND P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
+            </if>
+        </where>
+    </select>
+
+    <select id="getByPerson" resultType="com.alan.dm.entity.MailInfo">
+        SELECT *
+        FROM <include refid="MAIL_TABLE" />
+        WHERE personId=#{person.id}
+        ORDER BY createTime DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <delete id="delete" parameterType="Integer">
+        delete FROM
+        <include refid="MAIL_TABLE" />
+        where id=#{id}
+    </delete>
+
+    <select id="getById" resultType="com.alan.dm.entity.MailInfo">
+        SELECT *
+        FROM <include refid="MAIL_TABLE" />
+        WHERE id=#{id}
+    </select>
+
+    <insert id="insert" parameterType="com.alan.dm.entity.MailInfo" useGeneratedKeys="true"
+            keyColumn="id" keyProperty="mailInfo.id">
+        INSERT INTO <include refid="MAIL_TABLE"/>
+        (title,content,personId,createTime,readed,adminId)
+        VALUES(#{mailInfo.title},#{mailInfo.content},#{mailInfo.personId},
+        #{mailInfo.createTime},#{mailInfo.readed},#{mailInfo.adminId})
+    </insert>
+
+</mapper>

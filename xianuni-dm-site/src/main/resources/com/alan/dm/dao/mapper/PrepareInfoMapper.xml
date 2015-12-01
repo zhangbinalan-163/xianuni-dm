@@ -5,6 +5,7 @@
 <mapper namespace="com.alan.dm.dao.mapper.PrepareInfoMapper">
 
     <sql id="A_TABLE">tb_party_prepare</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
 
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="prepareInfo.id">
         INSERT INTO
@@ -24,5 +25,21 @@
         FROM  <include refid="A_TABLE" />
         WHERE id=#{prepareInfo.id}
     </delete>
+
+    <select id="countByOrgWithTime" resultType="Integer">
+        select count(*)
+        from <include refid="PERSON_TABLE" /> A
+        join <include refid="A_TABLE" /> P ON A.prepareInfoId=P.id
+        <where>
+            <if test="orgIdList != null">
+                A.orgId in
+                <foreach collection="orgIdList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            AND P.createTime BETWEEN #{start} AND #{end}
+        </where>
+    </select>
 
 </mapper>

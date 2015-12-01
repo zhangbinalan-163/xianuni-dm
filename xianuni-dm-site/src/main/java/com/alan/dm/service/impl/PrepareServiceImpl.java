@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -15,7 +16,6 @@ import java.util.Date;
  */
 @Service(value = "prepareService")
 public class PrepareServiceImpl implements IPrepareService {
-
     @Autowired
     private PrepareInfoMapper prepareInfoMapper;
 
@@ -33,5 +33,10 @@ public class PrepareServiceImpl implements IPrepareService {
     @Override
     public PrepareInfo getById(int prepareId) throws DMException {
         return prepareInfoMapper.getById(prepareId);
+    }
+
+    @Override
+    public int countByOrgWithTime(List<Integer> orgIdlist, Date start, Date end) throws DMException {
+        return prepareInfoMapper.countByOrgWithTime(orgIdlist,start,end);
     }
 }

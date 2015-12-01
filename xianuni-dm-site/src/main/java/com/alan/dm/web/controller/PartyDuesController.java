@@ -1,5 +1,7 @@
 package com.alan.dm.web.controller;
 
+import com.alan.dm.common.exception.DMException;
+import com.alan.dm.common.exception.InvalidParamException;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -74,19 +77,28 @@ public class PartyDuesController extends BaseController{
 	@ResponseBody
 	public String add(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		Date startTime = request.getDate("startTime");
-		Date endTime = request.getDate("endTime");
+		Date startTime = getYM(request, "startTime");
+		Date endTime = getYM(request, "endTime");
 		Date payTime = request.getDate("payTime");
 		int orgId=request.getInt("orgId");
 		String number=request.getString("number");
+		Float fee;
+		try{
+			fee=Float.parseFloat(request.getString("fee"));
+		}catch (Exception e){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", false);
+			jsonObject.put("msg", "费用格式错误");
+			return JsonUtils.fromObject(jsonObject);
+		}
 		Person person=personService.getByNumber(number);
 
 		PartyDuesPay partyDues=new PartyDuesPay();
 		partyDues.setPerson(person);
 		partyDues.setPayEndTime(endTime);
 		partyDues.setPayStartTime(startTime);
-		partyDues.setPayTime(payTime==null?new Date():payTime);
-
+		partyDues.setPayTime(payTime == null ? new Date() : payTime);
+		partyDues.setFee(fee);
 		partyDuesService.involvePay(partyDues);
 
 		JSONObject jsonObject=new JSONObject();
@@ -94,6 +106,16 @@ public class PartyDuesController extends BaseController{
 		return JsonUtils.fromObject(jsonObject);
 	}
 
+	private Date getYM(Request request,String param) throws DMException {
+		String value=request.getString(param);
+		value=value+"-01";
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+		try {
+			return dateFormat.parse(value);
+		} catch (Exception e) {
+			throw new InvalidParamException("参数缺失或格式错误:" + param);
+		}
+	}
 	/**
 	 *
 	 * @param httpServletRequest
@@ -166,10 +188,10 @@ public class PartyDuesController extends BaseController{
 				cellList.add(org.getName());
 				cellList.add(person.getName());
 				cellList.add(person.getNumber());
-				cellList.add(PersonStatus.getInstance(person.getStatus()).getName());
+				cellList.add(String.valueOf(duesPay.getFee()));
 				cellList.add(TimeUtils.convertToDateString(duesPay.getPayTime()));
-				cellList.add(TimeUtils.convertToDateString(duesPay.getPayStartTime()));
-				cellList.add(TimeUtils.convertToDateString(duesPay.getPayEndTime()));
+				cellList.add(TimeUtils.convertToDateString(duesPay.getPayStartTime(), "yyyy-MM"));
+				cellList.add(TimeUtils.convertToDateString(duesPay.getPayEndTime(),"yyyy-MM"));
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}

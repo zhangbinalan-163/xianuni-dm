@@ -40,6 +40,15 @@ public class Person {
     private int prepareInfoId;
     private NormalInfo normalInfo;//正式党员所需要的信息
     private int normalInfoId;
+    private Date passUpdateTime;//密码修改事件
+
+    public Date getPassUpdateTime() {
+        return passUpdateTime;
+    }
+
+    public void setPassUpdateTime(Date passUpdateTime) {
+        this.passUpdateTime = passUpdateTime;
+    }
 
     public int getSource() {
         return source;

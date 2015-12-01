@@ -52,6 +52,8 @@
         </div>
     </div>
 </div>
+<input type="text" hidden="hidden" id="orgIdTag"/>
+<input type="text" hidden="hidden" id="idTag"/>
 
 <!-- 全局js -->
 <script src="../static/js/jquery.min.js?v=2.1.4"></script>
@@ -236,27 +238,19 @@
                                 }
                                 $('.J_edit').on('click', function () {
                                     var id = $(this).data('id');
-                                    // todo 根据id获取数据 打开编辑弹窗
                                     var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    $('#idTag').val(id);
                                     layer.open({
-                                        type: 1, //page层
-                                        area: ['360px', '160px'],
-                                        title: '编辑信息',
+                                        type: 2,
+                                        content: 'reward/update.html',
+                                        area: ['100%', '100%'],
+                                        maxmin: false,
+                                        title: '修改<strong>' + data.org+'</strong>的奖惩信息',
                                         shade: 0.6, //遮罩透明度
                                         shift: 5, //0-6的动画形式，-1不开启
-                                        btn: ['更新', '取消'],
-                                        content: '<form class="form-horizontal" style="padding: 15px 15px 0">' +
-                                        '<div class="form-group">' +
-                                        '<label class="control-label col-sm-3">名称</label>' +
-                                        '<div class="col-sm-9"><input type="text" id="p_name" class="form-control"/></div>' +
-                                        '</div>' +
-                                        '</form>',
+                                        btn: ['Sorry，暂时不支持修改', '取消'],
                                         yes: function (index) {
-                                            // todo 读取表单信息 调用创建接口
-                                            var name = $('#p_name').val().trim();
-                                            layer.close(index);
-                                            // todo 请求服务端编辑 成功后重新获取列表
-                                            self.fetchData();
+                                            //todo
                                         },
                                         no: function (index) {
                                             layer.close(index);
@@ -347,6 +341,7 @@
                 }
             },
             updateTable: function (event, treeId, treeNode) {
+                $('#orgIdTag').val(treeNode.id);
                 table.fetchData({
                     orgId: treeNode.id,
                     orgName:treeNode.name

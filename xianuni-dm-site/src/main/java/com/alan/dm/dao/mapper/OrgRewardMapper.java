@@ -37,4 +37,11 @@ public interface OrgRewardMapper {
      * @param orgReward
      */
     void insert(@Param(value="reward") OrgReward orgReward);
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    OrgReward getById(@Param(value="id") int id);
 }
