@@ -238,35 +238,4 @@ public class MessageController extends BaseController{
 		jsonObject.put("rows",rowsArray);
 		return JsonUtils.fromObject(jsonObject);
 	}
-
-	/**
-	 * 消息资源的上传
-	 * @param file
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping("/resource/file/upload.do")
-	@ResponseBody
-	public String resourceFileUpload(@RequestParam(value = "file") MultipartFile file,
-									 HttpServletRequest request) throws Exception {
-		String fileName = file.getOriginalFilename();
-		String extType=fileName.substring(fileName.lastIndexOf("."));
-		String newFileName=StringUtils.md5(fileName+System.currentTimeMillis())+extType;
-
-		String path=request.getServletContext().getRealPath("/resource/");
-		String today=TimeUtils.convertToDateString(new Date());
-		path=path+today;
-
-		File targetFile = new File(path, newFileName);
-		targetFile.mkdirs();
-
-		//保存
-		file.transferTo(targetFile);
-
-		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("success",true);
-		jsonObject.put("url",request.getContextPath()+"/resource/"+today+"/"+newFileName);
-		return JsonUtils.fromObject(jsonObject);
-	}
 }

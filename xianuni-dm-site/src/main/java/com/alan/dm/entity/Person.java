@@ -22,11 +22,14 @@ public class Person {
     private String hometown;
     private String password;
     private Date birth;
-    private int profession;//职称
+    private String profession;//职称
     private Date createTime;
     private Date updateTime;
     private String personDesc;
     private int source;
+    private Date bePartyDate;//入党时间
+    private Date rollDate;//入学、参加工作时间
+    private String professionalClass;//专业班级
 
     private Orgnization orgnization;//党组织
     private int orgId;//
@@ -162,13 +165,6 @@ public class Person {
         this.birth = birth;
     }
 
-    public int getProfession() {
-        return profession;
-    }
-
-    public void setProfession(int profession) {
-        this.profession = profession;
-    }
 
     public Date getCreateTime() {
         return createTime;
@@ -280,5 +276,37 @@ public class Person {
 
     public void setNormalInfoId(int normalInfoId) {
         this.normalInfoId = normalInfoId;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public Date getBePartyDate() {
+        return bePartyDate;
+    }
+
+    public void setBePartyDate(Date bePartyDate) {
+        this.bePartyDate = bePartyDate;
+    }
+
+    public Date getRollDate() {
+        return rollDate;
+    }
+
+    public void setRollDate(Date rollDate) {
+        this.rollDate = rollDate;
+    }
+
+    public String getProfessionalClass() {
+        return professionalClass;
+    }
+
+    public void setProfessionalClass(String professionalClass) {
+        this.professionalClass = professionalClass;
     }
 }

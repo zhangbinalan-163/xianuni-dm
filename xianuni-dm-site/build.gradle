@@ -11,6 +11,8 @@ dependencies {
 
     compile('commons-fileupload:commons-fileupload:1.2.2')
     compile('commons-io:commons-io:2.4')
+    //compile('org.apache.poi:poi:3.9')
+    //compile('org.apache.poi:poi-ooxml:3.9')
 
     compile ('commons-dbcp:commons-dbcp:1.4')
     compile ('mysql:mysql-connector-java:5.1.36')
@@ -22,4 +24,5 @@ dependencies {
     testCompile ('junit:junit:4.12')
 
     compile('javax.servlet:javax.servlet-api:3.1.0')
+    compile fileTree(dir: 'libs', include: '*.jar')
 }

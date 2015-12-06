@@ -24,13 +24,26 @@
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>姓名</small></label>
         <div class="col-sm-5">
-            <p id="pName" class="form-control-static"></p>
+            <p id="name" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>学工号</small></label>
         <div class="col-sm-5">
-            <p id="pNumber" class="form-control-static"></p>
+            <p id="number" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>职称</small></label>
+        <div class="col-sm-5">
+            <p id="profession" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>职位</small></label>
+        <div class="col-sm-5">
+            <p id="job" class="form-control-static"></p>
         </div>
     </div>
     <div class="hr-line-dashed"></div>
@@ -41,40 +54,21 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>修改时间</small></label>
+        <label class="col-sm-2 control-label"><small>电话</small></label>
         <div class="col-sm-5">
-            <p id="updateTime" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="hr-line-dashed"></div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>民主评议时间</small></label>
-        <div class="col-sm-5">
-            <p id="evaTime" class="form-control-static"></p>
+            <p id="tel" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>民主评议内容</small></label>
+        <label class="col-sm-2 control-label"><small>第几届</small></label>
         <div class="col-sm-5">
-            <p id="evaContent" class="form-control-static"></p>
+            <p id="level" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>党支部会议时间</small></label>
+        <label class="col-sm-2 control-label"><small>备注</small></label>
         <div class="col-sm-5">
-            <p id="meetTime" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>党支部会议内容</small></label>
-        <div class="col-sm-5">
-            <p id="meetContent" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>培养人</small></label>
-        <div class="col-sm-5">
-            <p id="director" class="form-control-static"></p>
+            <p id="desc" class="form-control-static"></p>
         </div>
     </div>
 </form>
@@ -99,11 +93,11 @@
 <script>
     $(document).ready(function () {
         //获取信息
-        var activitistId=getIdTag();
+        var id=getIdTag();
         $.ajax( {
-            url:'/xianuni-dm/person/activitist/info.do',
+            url:'/xianuni-dm/committee/info.do',
             data:{
-                activitistId : activitistId
+                id : id
             },
             type:'get',
             cache:false,
@@ -111,15 +105,14 @@
             success:function(data) {
                 if(data.success){
                     $('#orgName').html(data.orgName);
+                    $('#name').html(data.name);
+                    $('#number').html(data.number);
                     $('#createTime').html(data.createTime);
-                    $('#updateTime').html(data.updateTime);
-                    $('#pNumber').html(data.number);
-                    $('#pName').html(data.name);
-                    $('#evaTime').html(data.evaTime);
-                    $('#evaContent').html(data.evaContent);
-                    $('#meetTime').html(data.meetTime);
-                    $('#meetContent').html(data.meetContent);
-                    $('#director').html(data.director);
+                    $('#profession').html(data.profession);
+                    $('#level').html(data.level);
+                    $('#tel').html(data.tel);
+                    $('#desc').html(data.desc);
+                    $('#job').html(data.job);
                 }else{
                     layer.alert('获取信息失败>'+data.msg, {icon: 5});
                 }

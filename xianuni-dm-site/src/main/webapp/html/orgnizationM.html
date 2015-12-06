@@ -37,36 +37,49 @@
                     <form method="get" class="form-horizontal">
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><small>党组织名称</small></label>
+                            <label class="col-sm-2 control-label"><small>党组织名称：</small></label>
                             <div class="col-sm-5">
                                 <input id="orgName" type="text" class="form-control">
                             </div>
                         </div>
-                        <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><small>创建时间</small></label>
+                            <label class="col-sm-2 control-label"><small>当前状态：</small></label>
                             <div class="col-sm-5">
-                                <p id="createTime" class="form-control-static"></p>
+                                <p id="status" class="form-control-static"></p>
                             </div>
                         </div>
-                        <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><small>修改时间</small></label>
-                            <div class="col-sm-5">
-                                <p id="updateTime" class="form-control-static"></p>
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label"><small>是否有下属组织</small></label>
+                            <label class="col-sm-2 control-label"><small>是否有下属组织：</small></label>
                             <div class="col-sm-5">
                                 <p id="hasSub" class="form-control-static"></p>
                             </div>
                         </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><small>创建时间：</small></label>
+                            <div class="col-sm-5">
+                                <p id="createTime" class="form-control-static"></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><small>换届日期：</small></label>
+                            <div class="col-sm-6">
+                                <input readonly class="form-control layer-date" id="evaTime">
+                                <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#evaTime'});"></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><small>撤销时间：</small></label>
+                            <div class="col-sm-5">
+                                <p id="removeTime" class="form-control-static"></p>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label"></label>
                             <div class="col-sm-5">
                                 <button id="updateBtn" class="btn btn-primary" type="button">修改</button>
+                                <button id="removeBtn" class="btn btn-success " type="button">撤销</button>
                                 <button id="deleteBtn" class="btn btn-danger" type="button">删除</button>
                             </div>
                         </div>
@@ -91,14 +104,18 @@
 <!-- layer javascript -->
 <script src="../static/js/plugins/layer/layer.min.js"></script>
 
+<!-- layerDate plugin javascript -->
+<script src="../static/js/plugins/layer/laydate/laydate.js"></script>
+
 <script>
     $(document).ready(function () {
+        checkLogin();
 
         var orgInfo = ({
             init: function () {
                 this.orgId = '0';
                 this.bindEvents();
-                return this
+                return this;
             },
             fetchData: function (data) {
                 this.orgId = data.orgId;
@@ -113,8 +130,11 @@
                     success:function(data) {
                         if(data.success){
                             $('#orgName').val(data.data.name);
+                            $('#status').html(data.data.status);
                             $('#createTime').html(data.data.createTime);
                             $('#updateTime').html(data.data.updateTime);
+                            $('#evaTime').val(data.data.evaTime);
+                            $('#removeTime').html(data.data.removeTime);
                             $('#hasSub').html(data.data.isParent);
                         }else{
                             alert("异常！");
@@ -127,6 +147,48 @@
             },
 
             bindEvents: function(){
+                var self = this;
+                $('#removeBtn').on('click', function(){
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    var msg ="确认撤销吗?";
+                    if (node.children && node.children.length > 0) {
+                        msg="将撤销该组织的所有下属党组织，是否撤销？";
+                    }
+                    var index=layer.confirm(msg, {
+                        btn: ['确定','取消'],
+                        shade: false
+                    }, function(){
+                        layer.close(index);
+                        $.ajax( {
+                            url:'/xianuni-dm/orgnization/chexiao.do',
+                            data:{
+                                orgId : node.id
+                            },
+                            type:'get',
+                            cache:false,
+                            dataType:'json',
+                            success:function(data) {
+                                if(data.success){
+                                    self.fetchData({orgId:node.id});
+                                    layer.alert('撤销成功>' + node.name, {icon: 1});
+                                }else{
+                                    layer.alert('撤销信息失败>'+data.msg, {icon: 5});
+                                }
+                            },
+                            error : function() {
+                                alert("异常");
+                            }
+                        });
+                    }, function(){
+                        layer.close(index);
+                    });
+                });
+
                 $('#deleteBtn').on('click', function(){
                     // 选中的节点
                     var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
@@ -158,6 +220,9 @@
                                     $('#createTime').html('');
                                     $('#updateTime').html('');
                                     $('#hasSub').html('');
+                                    $('#evaTime').val('');
+                                    $('#removeTime').html('');
+                                    $('#status').html('');
                                     layer.alert('删除党组织信息成功>' + node.name, {icon: 1});
                                 }else{
                                     layer.alert('删除党组织信息失败>'+data.msg, {icon: 5});
@@ -184,11 +249,13 @@
                         layer.alert('党组织名称不能为空', {icon: 5});
                         return;
                     }
+                    var evaTime=$('#evaTime').val().trim()
                     $.ajax( {
                         url:'/xianuni-dm/orgnization/update.do',
                         data:{
                             orgId : node.id,
-                            orgName : orgName
+                            orgName : orgName,
+                            evaTime : evaTime
                         },
                         type:'get',
                         cache:false,
@@ -308,7 +375,28 @@
             }
         }).init();
     });
-
+    function checkLogin(){
+        $.ajax({
+            url: "/xianuni-dm/login/userInfo.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+                }else{
+                    if(data.msg=='NOTLOGIN'){
+                        layer.confirm('需要重新登录', {
+                            btn: ['前往登录'], //按钮
+                            shade: 0.6
+                        }, function(){
+                            location.href ="/xianuni-dm/html/login.html";
+                        });
+                    }
+                }
+            },
+            error:function(){
+            }
+        })
+    }
 </script>
 </body>
 </html>

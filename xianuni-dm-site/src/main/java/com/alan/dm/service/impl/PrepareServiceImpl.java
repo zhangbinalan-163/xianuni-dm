@@ -26,6 +26,12 @@ public class PrepareServiceImpl implements IPrepareService {
     }
 
     @Override
+    public void updatePrepare(PrepareInfo prepareInfo) throws DMException {
+        prepareInfo.setUpdateTime(new Date());
+        prepareInfoMapper.update(prepareInfo);
+    }
+
+    @Override
     public void deletePrepare(PrepareInfo prepareInfo) throws DMException {
         prepareInfoMapper.delete(prepareInfo);
     }

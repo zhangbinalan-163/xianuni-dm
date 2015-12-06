@@ -71,7 +71,7 @@ public class MailController extends BaseController{
 	}
 
 	/**
-	 *
+	 * 发站内信
 	 * @param httpServletRequest
 	 * @return
 	 * @throws Exception
@@ -82,8 +82,9 @@ public class MailController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		String content = request.getString("content");
 		String title = request.getString("title");
-		String number = request.getString("number");
+		String[] personIdArray = request.getStringArray("number",",");
 		int orgId=request.getInt("orgId");
+
 		Integer adminId = getOnlineAdminId(httpServletRequest);
 		Admin admin=adminService.getById(adminId);
 		if(admin==null){
@@ -91,16 +92,21 @@ public class MailController extends BaseController{
 			jsonObject.put("success", false);
 			return JsonUtils.fromObject(jsonObject);
 		}
-		Person person = personService.getByNumber(number);
-		if(person!=null){
-			MailInfo mailInfo=new MailInfo();
-			mailInfo.setContent(content);
-			mailInfo.setTitle(title);
-			mailInfo.setCreateTime(new Date());
-			mailInfo.setPersonId(person.getId());
-			mailInfo.setReaded(false);
-			mailInfo.setAdminId(admin.getId());
-			mailService.sendMail(mailInfo);
+		for(String personId:personIdArray){
+			if(StringUtils.isEmpty(personId)){
+				continue;
+			}
+			Person person = personService.getById(Integer.parseInt(personId));
+			if(person!=null){
+				MailInfo mailInfo=new MailInfo();
+				mailInfo.setContent(content);
+				mailInfo.setTitle(title);
+				mailInfo.setCreateTime(new Date());
+				mailInfo.setPersonId(person.getId());
+				mailInfo.setReaded(false);
+				mailInfo.setAdminId(admin.getId());
+				mailService.sendMail(mailInfo);
+			}
 		}
 		JSONObject jsonObject=new JSONObject();
 		jsonObject.put("success", true);

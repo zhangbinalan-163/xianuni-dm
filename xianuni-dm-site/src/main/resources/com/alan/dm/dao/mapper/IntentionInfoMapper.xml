@@ -9,9 +9,22 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="intentionInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (trainHour,publiced,meetTime,meetContent,introducer,politicalChcekContent,recorded,schoolApproval,createTime)
-        VALUES(#{intentionInfo.trainHour},#{intentionInfo.publiced},#{intentionInfo.meetTime},#{intentionInfo.meetContent},#{intentionInfo.introducer},#{intentionInfo.politicalChcekContent},#{intentionInfo.recorded},#{intentionInfo.schoolApproval},#{intentionInfo.createTime})
+        (trainHour,publiced,meetTime,meetContent,introducerIds,politicalCheckContent,schoolApproval,createTime,profession,degree,recorded,yushen,beAcTime)
+        VALUES(#{intentionInfo.trainHour},#{intentionInfo.publiced},#{intentionInfo.meetTime},#{intentionInfo.meetContent},
+        #{intentionInfo.introducerIds},#{intentionInfo.politicalCheckContent},#{intentionInfo.schoolApproval},#{intentionInfo.createTime},
+        #{intentionInfo.profession},#{intentionInfo.degree}
+        ,#{intentionInfo.recorded},#{intentionInfo.yushen},#{intentionInfo.beAcTime})
     </insert>
+
+    <update id="update">
+        update <include refid="A_TABLE"/>
+        set
+        updateTime=#{intentionInfo.updateTime},
+        trainHour=#{intentionInfo.trainHour},publiced=#{intentionInfo.publiced},meetTime=#{intentionInfo.meetTime},meetContent=#{intentionInfo.meetContent},
+        introducerIds=#{intentionInfo.introducerIds},politicalCheckContent=#{intentionInfo.politicalCheckContent},schoolApproval=#{intentionInfo.schoolApproval},
+        profession=#{intentionInfo.profession},degree=#{intentionInfo.degree},recorded=#{intentionInfo.recorded},yushen=#{intentionInfo.yushen},beAcTime=#{intentionInfo.beAcTime}
+        where id=#{intentionInfo.id}
+    </update>
 
     <select id="getById" resultType="com.alan.dm.entity.IntentionInfo">
         select *

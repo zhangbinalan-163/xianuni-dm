@@ -32,4 +32,10 @@ public class ActivitistServiceImpl implements IActivitistService{
     public ActivitistInfo getById(int activitistId) throws DMException {
         return activitistInfoMapper.getById(activitistId);
     }
+
+    @Override
+    public void updateActivitist(ActivitistInfo activitistInfo) throws DMException {
+        activitistInfo.setUpdateTime(new Date());
+        activitistInfoMapper.update(activitistInfo);
+    }
 }

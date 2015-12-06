@@ -8,6 +8,11 @@ import org.apache.ibatis.annotations.Param;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface ApplierInfoMapper {
+    /**
+     *
+     * @param applierInfo
+     */
+    void update(@Param(value="applier")ApplierInfo applierInfo);
 
     /**
      *

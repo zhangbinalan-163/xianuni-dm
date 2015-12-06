@@ -16,6 +16,12 @@ import java.util.List;
 public interface IAdminService {
     /**
      *
+     * @param admin
+     * @throws DMException
+     */
+    void updatePassword(Admin admin) throws DMException;
+    /**
+     *
      * @param orgnizationList
      * @return
      * @throws DMException

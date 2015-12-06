@@ -1,14 +1,14 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IOrgnizationDao;
+import com.alan.dm.dao.mapper.OrgnizationMapper;
 import com.alan.dm.entity.Orgnization;
 import com.alan.dm.service.IOrgnizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,13 +21,13 @@ import java.util.List;
 public class OrgnizationServiceImpl implements IOrgnizationService {
     private static Logger LOG= LoggerFactory.getLogger(OrgnizationServiceImpl.class);
 
-    @Resource(name = "orgnizationDao")
-    private IOrgnizationDao orgnizationDao;
+    @Autowired
+    private OrgnizationMapper orgnizationMapper;
 
     @Override
     public List<Orgnization> getOrgByParent(Orgnization parentOrg,boolean withAllSub) throws DMException {
         //获取直属的组织
-        List<Orgnization> directSubOrgList = orgnizationDao.getByParentOrg(parentOrg.getId());
+        List<Orgnization> directSubOrgList = orgnizationMapper.getByParentOrg(parentOrg.getId());
         if(!withAllSub){
             return directSubOrgList;
         }
@@ -46,24 +46,24 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
 
     @Override
     public Orgnization getOrgById(int id) throws DMException {
-        return orgnizationDao.getById(id);
+        return orgnizationMapper.getById(id);
     }
 
     @Override
     public int countSubOrg(Orgnization parentOrg) throws DMException {
-        return orgnizationDao.countSubOrg(parentOrg.getId());
+        return orgnizationMapper.countSubOrg(parentOrg.getId());
     }
 
     @Override
     public void createOrg(Orgnization orgnization) throws DMException {
         orgnization.setCreateTime(new Date());
-        orgnizationDao.insert(orgnization);
+        orgnizationMapper.insert(orgnization);
     }
 
     @Override
     public void updateOrg(Orgnization orgnization) throws DMException {
         orgnization.setUpdateTime(new Date());
-        orgnizationDao.update(orgnization);
+        orgnizationMapper.update(orgnization);
     }
 
     @Override
@@ -78,17 +78,37 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
             }
         }
         //删除党组织
-        orgnizationDao.delete(orgnization);
+        orgnizationMapper.delete(orgnization);
         //todo 其他信息是否需要删除
         LOG.info("delete orgnization success,orgId={},orgName={}", orgnization.getId(), orgnization.getName());
     }
 
     @Override
+    public void removeOrg(Orgnization orgnization, boolean withSubOrgs) throws DMException {
+        if(withSubOrgs){
+            //先删除子节点
+            List<Orgnization> subOrgs = getOrgByParent(orgnization,false);
+            if(subOrgs!=null){
+                for(Orgnization subOrg:subOrgs){
+                    removeOrg(subOrg, true);
+                }
+            }
+        }
+        //删除党组织
+        orgnization.setStatus(Orgnization.CANCEL);
+        orgnization.setUpdateTime(new Date());
+        orgnization.setCancelTime(new Date());
+        orgnizationMapper.cancel(orgnization);
+        //todo 其他信息是否需要删除
+        LOG.info("cancel orgnization success,orgId={},orgName={}", orgnization.getId(), orgnization.getName());
+    }
+
+    @Override
     public List<Orgnization> getParentOrg(Orgnization orgnization) throws DMException {
-        List<Orgnization> orgnizationList=new ArrayList<>();
+        List<Orgnization> orgnizationList=new ArrayList<Orgnization>();
         int parent=orgnization.getParent();
         while(parent!=-1){
-            Orgnization parentOrg = orgnizationDao.getById(parent);
+            Orgnization parentOrg = orgnizationMapper.getById(parent);
             parent=parentOrg.getParent();
             orgnizationList.add(parentOrg);
         }

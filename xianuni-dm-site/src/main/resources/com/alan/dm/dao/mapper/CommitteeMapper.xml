@@ -34,8 +34,10 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="committeeInfo.id">
         INSERT INTO
         <include refid="COMMITTEE_TABLE"/>
-        (personId,orgId,createTime,job)
-        VALUES(#{committeeInfo.person.id},#{committeeInfo.orgnization.id},#{committeeInfo.createTime},#{committeeInfo.job})
+        (personId,orgId,createTime,job,level,cdesc,tel,profession)
+        VALUES(#{committeeInfo.person.id},#{committeeInfo.orgnization.id},
+        #{committeeInfo.createTime},#{committeeInfo.job},
+        #{committeeInfo.level},#{committeeInfo.cdesc},#{committeeInfo.tel},#{committeeInfo.profession})
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.CommitteeInfo">

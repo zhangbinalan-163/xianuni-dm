@@ -77,6 +77,8 @@
 
 <script>
     $(document).ready(function () {
+        checkLogin();
+
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         var table = ({
@@ -120,7 +122,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var name,number,idNumber,birth,desc,nation,degree,sex,type;
+                            var name,number,idNumber,birth,desc,nation,degree,sex,type,pHometown='',profession;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -151,6 +153,13 @@
                                         return;
                                     }
                                     birth=inputValue;
+                                }
+                                if(inputName=='profession'){
+                                    if(!inputValue){
+                                        layer.alert('职称不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    profession=inputValue;
                                 }
                             }
                             var selects=layer.getChildFrame('body',index).find('select');
@@ -185,6 +194,12 @@
                                     }
                                     type=inputValue;
                                 }
+                                if(inputName=='pProvince'){
+                                    pHometown=pHometown+inputValue;
+                                }
+                                if(inputName=='pCity'){
+                                    pHometown=pHometown+"-"+inputValue;
+                                }
                             }
                             var textareas=layer.getChildFrame('body',index).find('textarea');
                             for(var i=0; i<textareas.length; i++){
@@ -206,21 +221,23 @@
                                     desc:desc,
                                     birth:birth,
                                     number:number,
-                                    idNumber:idNumber
+                                    idNumber:idNumber,
+                                    homeTown:pHometown,
+                                    profession:profession
                                 },
                                 type:'post',
                                 dataType:'json',
                                 success:function(data) {
                                     if(data.success){
-                                        layer.alert('添加奖基础信息成功', {icon: 1});
+                                        layer.alert('添加基础信息成功', {icon: 1});
                                         layer.close(index);
                                         self.fetchData({});
                                     }else{
-                                        layer.alert('添加奖基础信息失败！'+data.msg, {icon: 5});
+                                        layer.alert('添加基础信息失败！'+data.msg, {icon: 5});
                                     }
                                 },
                                 error : function() {
-                                    layer.alert('添加奖基础信息失败', {icon: 5});
+                                    layer.alert('添加基础信息失败', {icon: 5});
                                 }
                             });
                         }
@@ -235,13 +252,20 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名','人员类型', '学工号', '创建日期','操作'],
+                            colNames: ['ID','党组织', '姓名', '学工号','人员类型','身份证', '性别','民族', '学历','籍贯', '出生日期','职称', '创建日期','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
-                                {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left"},
+                                {name: 'idcard', index: 'idcard',width: 60, align: "left"},
+                                {name: 'sex', index: 'sex',width: 60, align: "left"},
+                                {name: 'nation', index: 'nation',width: 60, align: "left"},
+                                {name: 'degree', index: 'degree',width: 60, align: "left"},
+                                {name: 'jiguan', index: 'jiguan',width: 60, align: "left"},
+                                {name: 'birth', index: 'birth',width: 60, align: "left"},
+                                {name: 'zhicheng', index: 'zhicheng',width: 60, align: "left"},
                                 {name: 'create', index: 'create',width: 60, align: "left"},
                                 {name: 'actions', index: 'actions', width: 120, align: "center"}
                             ],
@@ -268,7 +292,6 @@
                                 }
                                 $('.J_edit').on('click', function () {
                                     var id = $(this).data('id');
-                                    // todo 根据id获取数据 打开编辑弹窗
                                     var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
                                     $('#personIdTag').val(id);
                                     layer.open({
@@ -279,9 +302,89 @@
                                         title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的基础人员信息',
                                         shade: 0.6, //遮罩透明度
                                         shift: 5, //0-6的动画形式，-1不开启
-                                        btn: ['Sorry，暂时不支持修改', '取消'],
-                                        yes: function (index) {
-                                           //todo
+                                        btn: ['提交修改', '取消'],
+                                        yes: function(index){
+                                            var inputs=layer.getChildFrame('body',index).find('input');
+                                            var name,idNumber,birth,desc,degree,sex,type,nation,profession;
+                                            for(var i=0; i<inputs.length; i++){
+                                                var inputName=inputs[i].id;
+                                                var inputValue=inputs[i].value;
+                                                if(inputName=='pName'){
+                                                    if(!inputValue){
+                                                        layer.alert('名字不能为空', {icon: 5});
+                                                        return;
+                                                    }
+                                                    name=inputValue;
+                                                }
+                                                if(inputName=='pIdNumber'){
+                                                    if(!inputValue){
+                                                        layer.alert('身份证不能为空', {icon: 5});
+                                                        return;
+                                                    }
+                                                    idNumber=inputValue;
+                                                }
+                                                if(inputName=='pBirth'){
+                                                    birth=inputValue;
+                                                }
+                                                if(inputName=='pProfession'){
+                                                    profession=inputValue;
+                                                }
+                                            }
+                                            var selects=layer.getChildFrame('body',index).find('select');
+                                            for(var i=0; i<selects.length; i++){
+                                                var inputName=selects[i].id;
+                                                var inputValue=selects[i].value;
+
+                                                if(inputName=='pDegree'){
+                                                    degree=inputValue;
+                                                }
+                                                if(inputName=='pSex'){
+                                                    sex=inputValue;
+                                                }
+                                                if(inputName=='pType'){
+                                                    type=inputValue;
+                                                }
+                                                if(inputName=='pNation'){
+                                                    nation=inputValue;
+                                                }
+                                            }
+                                            var textareas=layer.getChildFrame('body',index).find('textarea');
+                                            for(var i=0; i<textareas.length; i++){
+                                                var inputName=textareas[i].id;
+                                                var inputValue=textareas[i].value;
+                                                if(inputName=='pDesc'){
+                                                    desc=inputValue;
+                                                }
+                                            }
+                                            $.ajax( {
+                                                url:'/xianuni-dm/person/basicUpdate.do',
+                                                data:{
+                                                    personId : id,
+                                                    name:name,
+                                                    type:type,
+                                                    degree:degree,
+                                                    sex:sex,
+                                                    desc:desc,
+                                                    birth:birth,
+                                                    idNumber:idNumber,
+                                                    nation:nation,
+                                                    profession:profession
+                                                },
+                                                type:'post',
+                                                dataType:'json',
+                                                success:function(data) {
+                                                    if(data.success){
+                                                        layer.alert('修改基础信息成功', {icon: 1});
+                                                        layer.close(index);
+                                                        self.fetchData({});
+                                                    }else{
+                                                        layer.alert('修改信息失败！'+data.msg, {icon: 5});
+                                                    }
+                                                },
+                                                error : function() {
+                                                    layer.alert('修改基础信息失败', {icon: 5});
+                                                }
+                                            });
                                         },
                                         no: function (index) {
                                             layer.close(index);
@@ -354,7 +457,7 @@
                         {},
                         {},
                         {   reloadAfterSubmit:true,
-                            url: '/xianuni-dm/person/delete.do',
+                            url: '/xianuni-dm/person/basic/delete.do',
                             afterSubmit : function(response, postdata) {
                                 var json = eval('('+response.responseText+')');
                                 if(json.status){
@@ -417,6 +520,28 @@
             $('#list').setGridWidth(width);
         });
     });
+    function checkLogin(){
+        $.ajax({
+            url: "/xianuni-dm/login/userInfo.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+                }else{
+                    if(data.msg=='NOTLOGIN'){
+                        layer.confirm('需要重新登录', {
+                            btn: ['前往登录'], //按钮
+                            shade: 0.6
+                        }, function(){
+                            location.href ="/xianuni-dm/html/login.html";
+                        });
+                    }
+                }
+            },
+            error:function(){
+            }
+        })
+    }
 </script>
 </body>
 </html>

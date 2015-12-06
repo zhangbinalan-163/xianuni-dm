@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body class="gray-bg">
+<form class="form-horizontal" id="updateForm">
+    <div class="form-group">
+
+    </div>
+    <div class="form-group">
+
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">旧密码:</label>
+        <div class="col-sm-4">
+            <input id="oldPass" type="password" class="form-control" name="title">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">新密码:</label>
+        <div class="col-sm-4">
+            <input id="newPass" type="password" class="form-control" name="title">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">验证新密码:</label>
+        <div class="col-sm-4">
+            <input id="newPassAgain" type="password" class="form-control" name="title">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label"></label>
+        <div class="col-sm-4">
+            <button id="loginSubmit" type="submit" class="btn btn-primary block m-b">修改</button>
+        </div>
+    </div>
+</form>
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
+<!-- 自定义js -->
+<script src="../static/js/content.js?v=1.0.0"></script>
+<!-- layer javascript -->
+<script src="../static/js/plugins/layer/layer.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $("#updateForm").submit(function () {
+            if($('#oldPass').val()==''){
+                layer.alert('旧密码不能为空', {icon: 5});
+                return false;
+            }
+            if($('#newPass').val()==''){
+                layer.alert('新密码不能为空', {icon: 5});
+                return false;
+            }
+            if($('#newPassAgain').val()==''){
+                layer.alert('重复新密码不能为空', {icon: 5});
+                return false;
+            }
+            $.ajax( {
+                url:'/xianuni-dm/admin/my/passupdate.do',
+                data:{
+                    oldPass:$('#oldPass').val(),
+                    newPass:$('#newPass').val(),
+                    newPassAgain:$('#newPassAgain').val()
+                },
+                type:'post',
+                dataType:'json',
+                success:function(data) {
+                    if(data.success){
+                        layer.alert('修改密码成功', {icon: 1});
+                        layer.close(index);
+                        self.fetchData({});
+                    }else{
+                        layer.alert('修改密码失败！'+data.msg, {icon: 5});
+                    }
+                },
+                error : function() {
+                    layer.alert('修改密码失败', {icon: 5});
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+
+</html>

@@ -75,6 +75,8 @@
 
 <script>
     $(document).ready(function () {
+        checkLogin();
+
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         var table = ({
@@ -117,7 +119,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var number,job;
+                            var number,job,profession,tel,level,desc;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -128,6 +130,15 @@
                                     }
                                     number=inputValue;
                                 }
+                                if(inputName=='desc'){
+                                    desc=inputValue;
+                                }
+                                if(inputName=='tel'){
+                                    tel=inputValue;
+                                }
+                                if(inputName=='profession'){
+                                    profession=profession;
+                                }
                             }
                             var selects=layer.getChildFrame('body',index).find('select');
                             for(var i=0; i<selects.length; i++){
@@ -136,13 +147,20 @@
                                 if(inputName=='job'){
                                     job=inputValue;
                                 }
+                                if(inputName=='level'){
+                                    level=inputValue;
+                                }
                             }
                             $.ajax( {
                                 url:'/xianuni-dm/committee/add.do',
                                 data:{
                                     orgId : node.id,
                                     number:number,
-                                    job:job
+                                    job:job,
+                                    profession:profession,
+                                    tel:tel,
+                                    level:level,
+                                    desc:desc
                                 },
                                 type:'post',
                                 dataType:'json',
@@ -194,12 +212,35 @@
                                 var ids = self.$el.jqGrid('getDataIDs');
                                 for (var i = 0; i < ids.length; i++) {
                                     var id = ids[i],
+                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>',
                                             b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
                                     self.$el.jqGrid('setRowData', ids[i],
                                             {
-                                                actions: [b].join(' ')
+                                                actions: [a,b].join(' ')
                                             });
                                 }
+                                $('.J_edit').on('click', function () {
+                                    var id = $(this).data('id');
+                                    // todo 根据id获取数据 打开编辑弹窗
+                                    var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    $('#idTag').val(id);
+                                    layer.open({
+                                        type: 2,
+                                        content: 'committee/update.html',
+                                        area: ['100%', '100%'],
+                                        maxmin: false,
+                                        title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的积极分子信息',
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5, //0-6的动画形式，-1不开启
+                                        btn: ['Sorry，暂时不支持修改', '取消'],
+                                        yes: function (index) {
+                                            //todo
+                                        },
+                                        no: function (index) {
+                                            layer.close(index);
+                                        }
+                                    });
+                                })
                                 $('.J_delete').on('click', function () {
                                     var id = $(this).data('id');
                                     var index=layer.confirm('确定要删除该信息吗？', {
@@ -301,6 +342,28 @@
             $('#list').setGridWidth(width);
         });
     });
+    function checkLogin(){
+        $.ajax({
+            url: "/xianuni-dm/login/userInfo.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+                }else{
+                    if(data.msg=='NOTLOGIN'){
+                        layer.confirm('需要重新登录', {
+                            btn: ['前往登录'], //按钮
+                            shade: 0.6
+                        }, function(){
+                            location.href ="/xianuni-dm/html/login.html";
+                        });
+                    }
+                }
+            },
+            error:function(){
+            }
+        })
+    }
 </script>
 </body>
 </html>

@@ -113,7 +113,7 @@ public class PersonServiceImpl implements IPersonService{
         if(withAllSub){
             List<Orgnization> subOrgList=orgnizationService.getOrgByParent(orgnization,true);
             if(subOrgList!=null&&subOrgList.size()>0){
-                List<Integer> orgIdList=new ArrayList<>();
+                List<Integer> orgIdList=new ArrayList<Integer>();
                 for(Orgnization subOrg:subOrgList){
                     orgIdList.add(subOrg.getId());
                 }

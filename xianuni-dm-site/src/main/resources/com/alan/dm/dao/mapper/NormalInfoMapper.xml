@@ -10,8 +10,19 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="normalInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (approval,branchApproval,schoolApproval,applyTime,createTime)
-        VALUES(#{normalInfo.approval},#{normalInfo.branchApproval},#{normalInfo.schoolApproval},#{normalInfo.applyTime},#{normalInfo.createTime})
+        (approval,branchApproval,schoolApproval,applyTime,createTime,profession,degree,meetTime,meetContent)
+        VALUES(#{normalInfo.approval},#{normalInfo.branchApproval},#{normalInfo.schoolApproval},#{normalInfo.applyTime},#{normalInfo.createTime},
+        #{normalInfo.profession},#{normalInfo.degree},#{normalInfo.meetTime},#{normalInfo.meetContent})
+    </insert>
+
+    <insert id="update">
+        update
+        <include refid="A_TABLE"/>
+        SET
+        approval=#{normalInfo.approval},branchApproval=#{normalInfo.branchApproval},schoolApproval=#{normalInfo.schoolApproval},applyTime=#{normalInfo.applyTime},
+        updateTime=#{normalInfo.updateTime},
+        profession=#{normalInfo.profession},degree=#{normalInfo.degree},meetTime=#{normalInfo.meetTime},meetContent=#{normalInfo.meetContent}
+        where id=#{normalInfo.id}
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.NormalInfo">

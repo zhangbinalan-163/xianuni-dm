@@ -65,6 +65,8 @@
 
 <script>
     $(document).ready(function () {
+        checkLogin();
+
         var tree = ({
             init: function () {
                 $.fn.zTree.init($("#orgTree"), this.config());
@@ -208,6 +210,28 @@
         }).init();
         window.chart = barChart;
     });
+    function checkLogin(){
+        $.ajax({
+            url: "/xianuni-dm/login/userInfo.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+                }else{
+                    if(data.msg=='NOTLOGIN'){
+                        layer.confirm('需要重新登录', {
+                            btn: ['前往登录'], //按钮
+                            shade: 0.6
+                        }, function(){
+                            location.href ="/xianuni-dm/html/login.html";
+                        });
+                    }
+                }
+            },
+            error:function(){
+            }
+        })
+    }
 </script>
 </body>
 </html>

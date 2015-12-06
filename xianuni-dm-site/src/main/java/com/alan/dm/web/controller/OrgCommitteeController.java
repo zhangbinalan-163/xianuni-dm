@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,6 +43,37 @@ public class OrgCommitteeController extends BaseController{
 	private IAdminService adminService;
 
 	/**
+	 * 委员会信息
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/info.do")
+	@ResponseBody
+	public String info(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		int orgId=request.getInt("id");
+		CommitteeInfo committeeInfo = committeeService.getById(orgId);
+		JSONObject jsonObject=new JSONObject();
+		if(committeeInfo!=null){
+			jsonObject.put("success", true);
+			Person person = personService.getById(committeeInfo.getPersonId());
+			Orgnization orgnization = orgnizationService.getOrgById(person.getOrgId());
+			jsonObject.put("orgName",orgnization.getName());
+			jsonObject.put("personName",person.getName());
+			jsonObject.put("job",committeeInfo.getJob());
+			jsonObject.put("desc",committeeInfo.getCdesc());
+			jsonObject.put("tel", committeeInfo.getTel());
+			jsonObject.put("level","第"+committeeInfo.getLevel()+"届");
+			jsonObject.put("createTime", TimeUtils.convertToTimeString(committeeInfo.getCreateTime()));
+			jsonObject.put("profession",committeeInfo.getProfession());
+			return JsonUtils.fromObject(jsonObject);
+		}
+		jsonObject.put("success", true);
+		jsonObject.put("msg","success");
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
 	 * 新增委员会信息
 	 * @param httpServletRequest
 	 * @return
@@ -54,7 +86,11 @@ public class OrgCommitteeController extends BaseController{
 
 		int orgId=request.getInt("orgId");
 		String number=request.getString("number");
-		int job=request.getInt("job",CommitteeJobType.NORMAL.getId());
+		int job=request.getInt("job", CommitteeJobType.NORMAL.getId());
+		String tel=request.getString("tel",null);
+		String profession=request.getString("profession",null);
+		int level=request.getInt("level", 1);
+		String desc=request.getString("desc",null);
 
 		Person person = personService.getByNumber(number);
 		JSONObject jsonObject=new JSONObject();
@@ -71,6 +107,11 @@ public class OrgCommitteeController extends BaseController{
 		committeeInfo.setOrgnization(orgnization);
 		committeeInfo.setPerson(person);
 		committeeInfo.setJob(job);
+		committeeInfo.setCreateTime(new Date());
+		committeeInfo.setCdesc(desc);
+		committeeInfo.setLevel(level);
+		committeeInfo.setProfession(profession);
+		committeeInfo.setTel(tel);
 
 		committeeService.createCommitteeInfo(committeeInfo);
 

@@ -1,7 +1,7 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IAdminDao;
+import com.alan.dm.dao.mapper.AdminMapper;
 import com.alan.dm.dao.mapper.PersonInfoMapper;
 import com.alan.dm.entity.Admin;
 import com.alan.dm.entity.Orgnization;
@@ -11,6 +11,7 @@ import com.alan.dm.entity.condition.AdminCondition;
 import com.alan.dm.entity.query.PersonCondition;
 import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgnizationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,10 +25,11 @@ import java.util.List;
  */
 @Service(value = "adminService")
 public class AdminServiceImpl implements IAdminService{
-    @Resource(name = "adminDao")
-    private IAdminDao adminDao;
 
-    @Resource(name = "personInfoMapper")
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
     private PersonInfoMapper personInfoMapper;
 
     @Resource(name = "orgnizationService")
@@ -35,7 +37,7 @@ public class AdminServiceImpl implements IAdminService{
 
     @Override
     public Admin getBySchoolNumber(String schoolNumber) throws DMException {
-        return adminDao.getByNumber(schoolNumber);
+        return adminMapper.getByNumber(schoolNumber);
     }
 
     @Override
@@ -53,29 +55,35 @@ public class AdminServiceImpl implements IAdminService{
     }
 
     @Override
+    public void updatePassword(Admin admin) throws DMException {
+        admin.setPasswordUpdateTime(new Date());
+        adminMapper.updatePass(admin);
+    }
+
+    @Override
     public Admin getById(int adminId) throws DMException {
-        return adminDao.getById(adminId);
+        return adminMapper.getById(adminId);
     }
 
     @Override
     public void createAdmin(Admin admin) throws DMException {
         admin.setCreateTime(new Date());
-        adminDao.insert(admin);
+        adminMapper.insert(admin);
     }
 
     @Override
     public void deleteAdmin(Admin admin) throws DMException {
-        adminDao.delete(admin);
+        adminMapper.delete(admin);
     }
 
     @Override
     public List<Admin> getByCondition(AdminCondition condition, Page page) throws DMException {
-        return adminDao.getByCondition(condition,page);
+        return adminMapper.getByCondition(condition,page);
     }
 
     @Override
     public int countByCondition(AdminCondition condition) throws DMException {
-        return adminDao.countByCondition(condition);
+        return adminMapper.countByCondition(condition);
     }
 
     @Override

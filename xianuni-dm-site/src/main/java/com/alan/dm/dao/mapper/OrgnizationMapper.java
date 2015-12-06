@@ -51,4 +51,9 @@ public interface OrgnizationMapper {
      * @param orgnization
      */
     void delete(@Param(value="orgnization")Orgnization orgnization);
+    /**
+     *
+     * @param orgnization
+     */
+    void cancel(@Param(value="orgnization")Orgnization orgnization);
 }

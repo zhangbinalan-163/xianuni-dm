@@ -19,6 +19,7 @@ public class Orgnization {
     private Date createTime;//创建时间
     private Date updateTime;//更新时间
     private Date electionTime;//上次换届时间
+    private Date cancelTime;//上次换届时间
     private String orgDesc;//描述
 
     public int getId() {
@@ -91,5 +92,13 @@ public class Orgnization {
 
     public void setHasSon(boolean hasSon) {
         this.hasSon = hasSon;
+    }
+
+    public Date getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(Date cancelTime) {
+        this.cancelTime = cancelTime;
     }
 }

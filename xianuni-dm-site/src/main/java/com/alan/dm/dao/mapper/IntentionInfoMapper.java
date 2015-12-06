@@ -9,7 +9,12 @@ import org.apache.ibatis.annotations.Param;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface IntentionInfoMapper {
-
+    /**
+     *
+     * @param intentionInfo
+     * @throws DMException
+     */
+    void update(@Param(value="intentionInfo")IntentionInfo intentionInfo) throws DMException;
     /**
      *
      * @param intentionInfo

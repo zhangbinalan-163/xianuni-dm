@@ -12,18 +12,24 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="person.id">
         INSERT INTO
         <include refid="PERSON_TABLE"/>
-        (orgId,name,status,type,number,idNumber,sex,nation,degree,password,birth,createTime,personDesc,applierInfoId,activitistInfoId,intentionInfoId,prepareInfoId,normalInfoId)
+        (orgId,name,status,type,number,idNumber,hometown,sex,nation,degree,password,birth,createTime,personDesc,applierInfoId,activitistInfoId,intentionInfoId,prepareInfoId,normalInfoId,profession)
         VALUES(#{person.orgnization.id},#{person.name},#{person.status},#{person.type},
-        #{person.number},#{person.idNumber},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},
-        #{person.personDesc},#{person.applierInfoId},#{person.activitistInfoId},#{person.intentionInfoId},#{person.prepareInfoId},#{person.normalInfoId})
+        #{person.number},#{person.idNumber},#{person.hometown},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},
+        #{person.personDesc},#{person.applierInfoId},#{person.activitistInfoId},#{person.intentionInfoId},#{person.prepareInfoId},#{person.normalInfoId},#{person.profession})
     </insert>
 
     <!-- 更新数据，暂时只有状态修改-->
     <update id="update">
         UPDATE <include refid="PERSON_TABLE"/>
-        SET orgId=#{person.orgId},status=#{person.status},updateTime=#{person.updateTime},applierInfoId=#{person.applierInfoId},activitistInfoId=#{person.activitistInfoId},intentionInfoId=#{person.intentionInfoId},prepareInfoId=#{person.prepareInfoId},normalInfoId=#{person.normalInfoId}
+        SET
+        orgId=#{person.orgId},name=#{person.name},status=#{person.status},type=#{person.type},number=#{person.number},
+        idNumber=#{person.idNumber},hometown=#{person.hometown},sex=#{person.sex},nation=#{person.nation},degree=#{person.degree},
+        birth=#{person.birth},personDesc=#{person.personDesc},applierInfoId=#{person.applierInfoId},activitistInfoId=#{person.activitistInfoId},
+        intentionInfoId=#{person.intentionInfoId},prepareInfoId=#{person.prepareInfoId},normalInfoId=#{person.normalInfoId},profession=#{person.profession},
+        updateTime=#{person.updateTime}
         WHERE id=#{person.id}
     </update>
+
     <update id="updatePass">
         UPDATE <include refid="PERSON_TABLE"/>
         SET password=#{person.password},updateTime=#{person.updateTime},passUpdateTime=#{person.passUpdateTime}
@@ -149,7 +155,7 @@
                 <bind name="patternName" value="condition.number+ '%'" />
                 AND number LIKE #{patternName}
             </if>
-            and status=5
+            and status=9
             and id not in(
             select distinct(personId)
             from <include refid="COMMITTEE_TABLE" />

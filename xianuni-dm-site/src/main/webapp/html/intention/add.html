@@ -29,6 +29,13 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-sm-2 control-label">积极分子确定时间：</label>
+        <div class="col-sm-4">
+            <input readonly class="form-control layer-date" id="beAcTime">
+            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#beAcTime'});"></label>
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-sm-2 control-label">培训课时：</label>
         <div class="col-sm-1">
             <select id="classHour" class="chosen-select" style="width:100px;" tabindex="2">
@@ -40,19 +47,14 @@
                 <option value="25" hassubinfo="true">25课时</option>
             </select>
         </div>
-        <label class="col-sm-1 control-label">是否公示：</label>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">是否公示：</label>
         <div class="col-sm-1">
             <select id="publiced" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">已公示</option>
                 <option value="1" hassubinfo="true">未公示</option>
             </select>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">入党介绍人：</label>
-        <div class="col-sm-4">
-            <input type="text" id="directorId" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部正式党员库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -69,9 +71,61 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">政治审核情况：</label>
+        <label class="col-sm-2 control-label">政审情况：</label>
         <div class="col-sm-5">
             <textarea id="politicalCheck" name="politicalCheck" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">入党介绍人：</label>
+        <div class="col-sm-4">
+            <input type="text" id="directorId" class="js-example-data-ajax" style="width: 100%"/>
+            <span class="help-block m-b-none">请从本党支部正式党员库查询</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-4">
+            <div id="partnerDiv"></div>
+        </div>
+        <input id="numberList" hidden="hidden">
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">是否上级备案：</label>
+        <div class="col-sm-1">
+            <select id="beian" class="chosen-select" style="width:100px;" tabindex="2">
+                <option value="0" hassubinfo="true">否</option>
+                <option value="1" hassubinfo="true">是</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">是否校党委预审：</label>
+        <div class="col-sm-1">
+            <select id="yushen" class="chosen-select" style="width:100px;" tabindex="2">
+                <option value="0" hassubinfo="true">否</option>
+                <option value="1" hassubinfo="true">是</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">职称：</label>
+        <div class="col-sm-3">
+            <input id="profession" type="text" class="form-control" name="profession">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">学历：</label>
+        <div class="col-sm-1">
+            <select id="degree" class="chosen-select" style="width:100px;" tabindex="2">
+                <option value="0" hassubinfo="true">初中及以下</option>
+                <option value="1" hassubinfo="true">高中</option>
+                <option value="2" hassubinfo="true">专科</option>
+                <option value="3" hassubinfo="true">本科</option>
+                <option value="4" hassubinfo="true">研究生</option>
+                <option value="5" hassubinfo="true">博士</option>
+                <option value="6" hassubinfo="true">其他</option>
+            </select>
         </div>
     </div>
 </form>
@@ -143,6 +197,8 @@
         });
         var $pNumber = $("#pNumber");
         var $directorId= $("#directorId");
+        var $partnerDiv = $("#partnerDiv");
+
         var formatResult = function(result, container, query, escapeMarkup) {
             return "<div>学工号:" + result.personNumber+ " 姓名:" + result.personName+"</div>";
         };
@@ -150,9 +206,31 @@
             $pNumber.val(data.personNumber);
             return data.personNumber;
         };
+        var formatResult2 = function(result, container, query, escapeMarkup) {
+            return "<div>"+result.title+"</div>";
+        };
         var formatSelection2 = function (data, container, escapeMarkup) {
-            $directorId.val(data.personNumber);
-            return data.personNumber;
+            //最多两个
+            if($('.data_delete').length>1){
+                layer.alert('最多选择两个', {icon: 5});
+                return '选择人员到下面的列表中';
+            }
+            //判断是否已经添加
+            var selectedDiv=$('#J_delete'+data.id);
+            if(selectedDiv.length>0){
+                layer.alert('请勿重复选择', {icon: 5});
+                return '选择人员到下面的列表中';
+            }
+            $partnerDiv.append('<div id="div_'+data.id+'">'+data.title+'&nbsp;&nbsp;<a id="J_delete'+data.id+'" class="data_delete" data-id="' + data.id + '"><i class="fa fa-trash"></i>删除</a></div>');
+            $directorId.val(getSelectedPersonId());
+            //增加删除操作
+            $('#J_delete'+data.id).on('click', function () {
+                var id = $(this).data('id');
+                $('#div_'+data.id).remove();
+                $directorId.val(getSelectedPersonId());
+            })
+            //获取所有的已选择内容
+            return '选择人员到下面的列表中';
         };
         $pNumber.select2({
             ajax: {
@@ -182,7 +260,7 @@
         });
         $directorId.select2({
             ajax: {
-                url: "/xianuni-dm/person/listQuery.do?status=5&orgId="+getOrgTag(),
+                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=9&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',
@@ -203,10 +281,17 @@
             },
             escapeMarkup: function (markup) { return markup; },
             id: function(){ return true},
-            formatResult: formatResult, // 下拉列表生成模板
+            formatResult: formatResult2, // 下拉列表生成模板
             formatSelection: formatSelection2 // 选中结果生成模板
         });
     });
+    function getSelectedPersonId(){
+        var str='';
+        $(".data_delete").each(function(){
+            str=str+','+$(this).data('id');
+        });
+        return str;
+    }
     function getOrgTag(){
         return parent.$('#orgIdTag').val();
     }

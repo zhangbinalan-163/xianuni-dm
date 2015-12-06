@@ -11,7 +11,12 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/16.
  */
 public interface INormalService {
-
+    /**
+     *
+     * @param normalInfo
+     * @throws DMException
+     */
+    void updateNormal(NormalInfo normalInfo) throws DMException;
     /**
      *
      * @param normalInfo

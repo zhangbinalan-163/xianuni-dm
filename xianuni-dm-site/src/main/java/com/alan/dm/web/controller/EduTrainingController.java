@@ -3,13 +3,9 @@ package com.alan.dm.web.controller;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
-import com.alan.dm.dao.IEduTrainingDao;
-import com.alan.dm.entity.EduTraining;
-import com.alan.dm.entity.MediaResource;
-import com.alan.dm.entity.Page;
+import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.EduTrainingCondition;
-import com.alan.dm.entity.condition.MediaCondition;
-import com.alan.dm.service.IEduTrainingService;
+import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -17,10 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,214 +29,234 @@ import java.util.List;
  * @author: fan
  */
 @Controller
-@RequestMapping(value = "/edu")
+@RequestMapping(value = "/train")
 public class EduTrainingController extends BaseController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EduTrainingController.class);
 
-    @Resource(name = "eduTrainingService")
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrgMeetingController.class);
+
+    @javax.annotation.Resource(name = "eduTrainingService")
     private IEduTrainingService eduTrainingService;
 
-    @RequestMapping("/addOrUpdateTraining.do")
-    @ResponseBody
-    public String addOrUpdateTraining(HttpServletRequest httpServletRequest) throws Exception {
-        Request request = getRequest(httpServletRequest);
+    @javax.annotation.Resource(name = "personService")
+    private IPersonService personService;
 
-        // todo request parser
-        int trainingId = request.getInt("id", 0);
-        try {
-            EduTraining eduTraining = new EduTraining();
-            //  todo set
-            if(trainingId == 0) {
-                trainingId = eduTrainingService.addTraining(eduTraining);
-            } else {
-                eduTrainingService.modifyTraining(eduTraining);
+    @javax.annotation.Resource(name = "adminService")
+    private IAdminService adminService;
+
+    @javax.annotation.Resource(name = "orgnizationService")
+    private IOrgnizationService orgnizationService;
+
+    /**
+     *
+     */
+    @RequestMapping("/add.do")
+    @ResponseBody
+    public String add(HttpServletRequest httpServletRequest) throws Exception {
+        Request request=getRequest(httpServletRequest);
+
+        Integer orgId=request.getInt("orgId");
+        Date startTime=request.getDate("startTime", "YYYY-MM-DD hh:mm:ss");
+        Date endTime=request.getDate("endTime", "YYYY-MM-DD hh:mm:ss");
+        String theme=request.getString("theme");
+        String content=request.getString("content", "");
+        String filUrlList=request.getString("fileUrlList",null);
+        String filNameList=request.getString("fileNameList",null);
+
+        EduTraining eduTraining=new EduTraining();
+        eduTraining.setEndTime(endTime);
+        eduTraining.setStartTime(startTime);
+        eduTraining.setCreateTime(new Date());
+        eduTraining.setContent(content);
+        Orgnization orgnization=orgnizationService.getOrgById(orgId);
+        eduTraining.setOrganization(orgnization);
+        eduTraining.setTitle(theme);
+
+        if(!StringUtils.isEmpty(filUrlList)&&!StringUtils.isEmpty(filNameList)){
+            String[] fileArray=filUrlList.split(",");
+            String[] fileNameArray=filNameList.split(",");
+            List<Resource> resources=new ArrayList<Resource>();
+            for(int i=0;i<fileArray.length;i++){
+                if(!StringUtils.isEmpty(fileArray[i])){
+                    Resource resource=new Resource();
+                    resource.setRealName(fileNameArray[i]);
+                    resource.setResourcePath(fileArray[i]);
+                    resource.setCreateTime(new Date());
+                    resources.add(resource);
+                }
             }
-        } catch (Exception e) {
-            LOGGER.error("insert edu training fail");
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("status", false);
-            jsonObject.put("msg","新增或更新失败");
-            return JsonUtils.fromObject(jsonObject);
+            eduTraining.setResourceList(resources);
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("status", true);
-        jsonObject.put("trainingId", trainingId);
+
+        eduTrainingService.addTraining(eduTraining);
+
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("success", true);
+        return JsonUtils.fromObject(jsonObject);
+    }
+    /**
+     * 列表
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/list.do")
+    @ResponseBody
+    public String list(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        Integer orgId = request.getInt("orgId", 0);
+        Integer limit = request.getInt("rows", 10);
+        Integer page = request.getInt("page", 1);
+        Integer type = request.getInt("type", 1);
+
+        boolean containSubOrg=request.getBoolean("containSub", true);
+        //如果没有传入orgId，设置为管理员所管理的ORG
+        if(orgId==0){
+            Integer adminId = getOnlineAdminId(httpServletRequest);
+            Admin adminInfo = adminService.getById(adminId);
+            if(adminInfo.getType()==Admin.ORG_ADMIN){
+                orgId=adminInfo.getOrgId();
+            }
+        }
+        EduTrainingCondition condition=new EduTrainingCondition();
+        List<Integer> orgIdList=new ArrayList<Integer>();
+        orgIdList.add(orgId);
+
+        if(containSubOrg){
+            Orgnization orgnization=null;
+            if(orgId == 0) {
+                orgnization =new Orgnization();
+                orgnization.setId(-1);
+            }else{
+                orgnization= orgnizationService.getOrgById(orgId);
+            }
+            List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+            if(subOrgList!=null){
+                for (Orgnization subOrg:subOrgList){
+                    orgIdList.add(subOrg.getId());
+                }
+            }
+            condition.setOrgList(orgIdList);
+        }
+
+        Page pageInfo=new Page();
+        pageInfo.setCurrent((page - 1) * limit);
+        pageInfo.setSize(limit);
+
+        int count = eduTrainingService.countTrainByCondtion(condition);
+        List<EduTraining> trainingList=eduTrainingService.getTrainingByCondtion(condition, pageInfo);
+
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("page", page);
+        jsonObject.put("total", count == 0 ? 0 : count / limit + 1);
+        jsonObject.put("records", count);
+
+        JSONArray rowsArray = new JSONArray();
+        if (trainingList!=null){
+            for (EduTraining eduTraining : trainingList) {
+                JSONObject subOrgObject = new JSONObject();
+                subOrgObject.put("id", eduTraining.getId());
+                List<String> cellList=new ArrayList<String>();
+                cellList.add(String.valueOf(eduTraining.getId()));
+                cellList.add(eduTraining.getOrganization().getName());
+                cellList.add(eduTraining.getTitle());
+                cellList.add(TimeUtils.convertToTimeString(eduTraining.getStartTime()));
+                cellList.add(TimeUtils.convertToTimeString(eduTraining.getEndTime()));
+                subOrgObject.put("cell", cellList);
+                rowsArray.add(subOrgObject);
+            }
+        }
+        jsonObject.put("rows",rowsArray);
         return JsonUtils.fromObject(jsonObject);
     }
 
-    @RequestMapping("/addOrUpdateMedia.do")
+    /**
+     *
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/delete.do")
     @ResponseBody
-    public String addOrUpdateMedia(HttpServletRequest httpServletRequest) throws Exception {
+    public String delete(HttpServletRequest httpServletRequest) throws Exception {
         Request request = getRequest(httpServletRequest);
-
-        // todo request parser
-        int mediaId = request.getInt("id", 0);
-        try {
-            MediaResource mediaResource = new MediaResource();
-            //  todo set
-            if(mediaId == 0) {
-                mediaId = eduTrainingService.addMediaResource(mediaResource);
-            } else {
-                eduTrainingService.modifyMediaResource(mediaResource);
-            }
-        } catch (Exception e) {
-            LOGGER.error("insert media resource fail");
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("status", false);
-            jsonObject.put("msg","新增或更新失败");
-            return JsonUtils.fromObject(jsonObject);
-        }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("status", true);
-        jsonObject.put("mediaId", mediaId);
-        return JsonUtils.fromObject(jsonObject);
-    }
-
-    @RequestMapping("/deleteTraining.do")
-    @ResponseBody
-    public String deleteTraining(HttpServletRequest httpServletRequest) throws Exception {
-        Request request = getRequest(httpServletRequest);
-        int id = request.getInt("id");
-
-        try{
-            if(id != 0) {
-                EduTraining eduTraining = new EduTraining();
-                eduTraining.setId(id);
+        String[] ids=request.getStringArray("id", ",");
+        for(String id:ids){
+            EduTraining eduTraining=eduTrainingService.getById(Integer.parseInt(id));
+            if(eduTraining!=null){
                 eduTrainingService.deleteTraining(eduTraining);
             }
-        }catch (Exception e){
-            LOGGER.error("delete edu training fail,id={}", id);
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("status", false);
-            jsonObject.put("msg","删除失败");
-            return JsonUtils.fromObject(jsonObject);
         }
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("status",true);
         return JsonUtils.fromObject(jsonObject);
     }
-
-    @RequestMapping("/deleteMedia.do")
+    /**
+     *
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/info.do")
     @ResponseBody
-    public String deleteMedia(HttpServletRequest httpServletRequest) throws Exception {
+    public String info(HttpServletRequest httpServletRequest) throws Exception {
         Request request = getRequest(httpServletRequest);
-        int id = request.getInt("id");
-
-        try{
-            if(id != 0) {
-                MediaResource mediaResource = new MediaResource();
-                mediaResource.setId(id);
-                eduTrainingService.deleteMediaResource(mediaResource);
+        int trainId=request.getInt("id");
+        EduTraining trainInfo = eduTrainingService.getById(trainId);
+        JSONObject jsonObject=new JSONObject();
+        if(trainInfo!=null){
+            jsonObject.put("success",true);
+            jsonObject.put("title",trainInfo.getTitle());
+            Orgnization orgnization = orgnizationService.getOrgById(trainInfo.getId());
+            jsonObject.put("orgName",orgnization.getName());
+            jsonObject.put("content",trainInfo.getContent());
+            jsonObject.put("createTime", TimeUtils.convertToTimeString(trainInfo.getCreateTime()));
+            jsonObject.put("endTime",TimeUtils.convertToTimeString(trainInfo.getEndTime()));
+            jsonObject.put("startTime",TimeUtils.convertToTimeString(trainInfo.getStartTime()));
+            JSONArray jsonArray=new JSONArray();
+            List<Resource> resourceList = trainInfo.getResourceList();
+            if(resourceList!=null){
+                for(Resource resource:resourceList){
+                    JSONObject fileObj=new JSONObject();
+                    fileObj.put("name",resource.getRealName());
+                    fileObj.put("url",request.getHttpServletRequest().getContextPath()+resource.getResourcePath());
+                    jsonArray.add(fileObj);
+                }
             }
-        }catch (Exception e){
-            LOGGER.error("delete media resource fail,id={}", id);
-            JSONObject jsonObject=new JSONObject();
-            jsonObject.put("status", false);
-            jsonObject.put("msg","删除失败");
+            jsonObject.put("fileUrlList",jsonArray);
             return JsonUtils.fromObject(jsonObject);
         }
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("status",true);
+        jsonObject.put("success",true);
         return JsonUtils.fromObject(jsonObject);
     }
-
-    @RequestMapping("/trainingList.do")
+    /**
+     * 资源的上传
+     * @param file
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/file/upload.do")
     @ResponseBody
-    public String trainingList(HttpServletRequest httpServletRequest) throws Exception {
-        Request request = getRequest(httpServletRequest);
-        Integer limit = request.getInt("rows", 10);
-        Integer page = request.getInt("page", 1);
-        Integer orgId=request.getInt("orgId", 0);
-        Integer type = request.getInt("type", 1);
-        String orgName = request.getString("orgName", null);
-        Integer trainingType = request.getInt("trainingType", 0);
+    public String resourceFileUpload(@RequestParam(value = "file") MultipartFile file,
+                                     HttpServletRequest request) throws Exception {
+        String fileName = file.getOriginalFilename();
+        String extType=fileName.substring(fileName.lastIndexOf("."));
+        String newFileName=StringUtils.md5(fileName+System.currentTimeMillis())+extType;
 
-        Page pageInfo=new Page();
-        pageInfo.setCurrent((page-1)*limit);
-        pageInfo.setSize(limit);
-        EduTrainingCondition condition=new EduTrainingCondition();
-        if(orgId!=0){
-            //condition.setOrgId(orgId);
-        }
-        condition.setType(type);
-        condition.setTrainingType(trainingType);
-        int subCount = eduTrainingService.countTrain(condition);
+        String path=request.getServletContext().getRealPath("/resource/");
+        String today=TimeUtils.convertToDateString(new Date());
+        path=path+today;
 
-        List<EduTraining> meetingList=eduTrainingService.getTraining(condition, pageInfo);
+        File targetFile = new File(path, newFileName);
+        targetFile.mkdirs();
+
+        //保存
+        file.transferTo(targetFile);
 
         JSONObject jsonObject=new JSONObject();
-        jsonObject.put("page",page);
-        jsonObject.put("total",subCount==0?0:subCount/limit+1);
-        jsonObject.put("trainings",subCount);
-        JSONArray rowsArray=new JSONArray();
-        if(meetingList!=null){
-            for(EduTraining training:meetingList){
-                JSONObject subOrgObject=new JSONObject();
-                subOrgObject.put("id", training.getId());
-                subOrgObject.put("title", training.getTitle());
-                subOrgObject.put("startTime", TimeUtils.convertToDateString(training.getStartTime()));
-                subOrgObject.put("endTime", TimeUtils.convertToDateString(training.getEndTime()));
-                subOrgObject.put("trainingType", training.getTrainingType());
-                subOrgObject.put("orgName", training.getOrganization().getName());
-                subOrgObject.put("period", training.getPeriod());
-                subOrgObject.put("trainingObject", training.getTrainingObject());
-                subOrgObject.put("content", training.getContent());
-                subOrgObject.put("personName", training.getPerson().getName());
-                subOrgObject.put("harvest", training.getHarvest());
-                subOrgObject.put("opinion", training.getOpinion());
-                rowsArray.add(subOrgObject);
-            }
-        }
-        jsonObject.put("rows",rowsArray);
-        return JsonUtils.fromObject(jsonObject);
-    }
-
-    @RequestMapping("/mediaList.do")
-    @ResponseBody
-    public String mediaList(HttpServletRequest httpServletRequest) throws Exception {
-        Request request = getRequest(httpServletRequest);
-        Integer limit = request.getInt("rows", 10);
-        Integer page = request.getInt("page", 1);
-        Integer mediaType = request.getInt("mediaType", 0);
-        String mediaName = request.getString("mediaName", null);
-        Boolean forbidden = request.getBoolean("forbidden");
-        // 上传时间
-
-
-        Page pageInfo=new Page();
-        pageInfo.setCurrent((page-1)*limit);
-        pageInfo.setSize(limit);
-        MediaCondition condition=new MediaCondition();
-
-        condition.setMediaType(mediaType);
-        if(!StringUtils.isEmpty(mediaName)){
-            condition.setMediaName(mediaName);
-        }
-        if(forbidden != null) {
-            condition.setForbidden(forbidden);
-        }
-        int subCount = eduTrainingService.countMediaResource(condition);
-
-        List<MediaResource> mediaResourceList=eduTrainingService.getMediaResource(condition, pageInfo);
-
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("page",page);
-        jsonObject.put("total",subCount==0?0:subCount/limit+1);
-        jsonObject.put("medias",subCount);
-        JSONArray rowsArray=new JSONArray();
-        if(mediaResourceList!=null){
-            for(MediaResource mediaResource:mediaResourceList){
-                JSONObject subOrgObject=new JSONObject();
-                subOrgObject.put("id", mediaResource.getId());
-                subOrgObject.put("mediaName", mediaResource.getName());
-                subOrgObject.put("updateTime", TimeUtils.convertToDateString(mediaResource.getUploadDate()));
-                subOrgObject.put("mediaType", mediaResource.getType());
-                subOrgObject.put("description", mediaResource.getDescription());
-                subOrgObject.put("forbidden", mediaResource.isForbidden());
-                rowsArray.add(subOrgObject);
-            }
-        }
-        jsonObject.put("rows",rowsArray);
+        jsonObject.put("success",true);
+        jsonObject.put("url","/resource/"+today+"/"+newFileName);
+        jsonObject.put("name",fileName.replace(",","_"));
         return JsonUtils.fromObject(jsonObject);
     }
 }

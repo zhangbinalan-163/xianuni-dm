@@ -12,6 +12,13 @@ import java.util.List;
  */
 public interface IOrgnizationService {
     /**
+     * 撤销党组织，可以撤销子部门
+     * @param orgnization
+     * @param withSubOrgs
+     * @throws DMException
+     */
+    void removeOrg(Orgnization orgnization, boolean withSubOrgs) throws DMException;
+    /**
      * 删除党组织，可以级联删除子部门
      * @param orgnization
      * @param withSubOrgs

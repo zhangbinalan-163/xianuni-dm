@@ -8,7 +8,7 @@ public enum PersonStatus {
     NO(0,"基础人员"),APPLIER(1,"申请人"),
     ACTIVISTS(2,"积极分子"),INTENTION(3,"发展对象"),
     PERPARE(4,"预备党员"),NORMAL(5,"正式党员"),
-    HISTORY_OUT(6,"历史党员(关系迁出)"),HISTORY_DEATH(7,"历史党员(死亡)"),HISTORY_PUNISH(8,"历史党员(处分)");
+    HISTORY_OUT(6,"历史党员(关系迁出)"),HISTORY_DEATH(7,"历史党员(死亡)"),HISTORY_PUNISH(8,"历史党员(处分)"),FORMAL(9,"在编党员");
 
     private int id;
     private String name;
@@ -53,6 +53,9 @@ public enum PersonStatus {
         }
         if(id==8){
             return HISTORY_PUNISH;
+        }
+        if(id==9){
+            return FORMAL;
         }
         return null;
     }

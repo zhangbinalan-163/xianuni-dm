@@ -10,8 +10,18 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="prepareInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (approval,branchApproval,schoolApproval,application,meetTime,meetContent,createTime)
-        VALUES(#{prepareInfo.approval},#{prepareInfo.branchApproval},#{prepareInfo.schoolApproval},#{prepareInfo.application},#{prepareInfo.meetTime},#{prepareInfo.meetContent},#{prepareInfo.createTime})
+        (approval,branchApproval,schoolApproval,application,meetTime,meetContent,createTime,profession,degree,yushen,publiced)
+        VALUES(#{prepareInfo.approval},#{prepareInfo.branchApproval},#{prepareInfo.schoolApproval},#{prepareInfo.application},#{prepareInfo.meetTime},#{prepareInfo.meetContent},#{prepareInfo.createTime},#{prepareInfo.profession},#{prepareInfo.degree},#{prepareInfo.yushen},#{prepareInfo.publiced})
+    </insert>
+
+    <insert id="update">
+        update
+        <include refid="A_TABLE"/>
+        SET
+        approval=#{prepareInfo.approval},branchApproval=#{prepareInfo.branchApproval},schoolApproval=#{prepareInfo.schoolApproval},application=#{prepareInfo.application},
+        meetTime=#{prepareInfo.meetTime},meetContent=#{prepareInfo.meetContent},updateTime=#{prepareInfo.updateTime},profession=#{prepareInfo.profession},degree=#{prepareInfo.degree},
+        yushen=#{prepareInfo.yushen},publiced=#{prepareInfo.publiced}
+        where id=#{prepareInfo.id}
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.PrepareInfo">

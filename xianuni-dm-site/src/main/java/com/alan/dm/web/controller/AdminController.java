@@ -48,6 +48,73 @@ public class AdminController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
+	@RequestMapping("/my/passupdate.do")
+	@ResponseBody
+	public String updateMyPass(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		String oldPass=request.getString("oldPass");
+		String newPass=request.getString("newPass");
+		String newPassAgain=request.getString("newPassAgain");
+
+		if(!newPassAgain.equals(newPass)){
+			JSONObject itemObj=new JSONObject();
+			itemObj.put("success", false);
+			itemObj.put("msg", "新密码两次不一致");
+			return JsonUtils.fromObject(itemObj);
+		}
+		Integer adminId = getOnlineAdminId(httpServletRequest);
+		Admin adminInfo=adminService.getById(adminId);
+		if(adminInfo!=null){
+			if(!oldPass.equals(adminInfo.getPassword())){
+				JSONObject itemObj=new JSONObject();
+				itemObj.put("success", false);
+				itemObj.put("msg","旧密码错误");
+				return JsonUtils.fromObject(itemObj);
+			}else{
+				adminInfo.setPassword(newPass);
+				adminService.updatePassword(adminInfo);
+				JSONObject itemObj=new JSONObject();
+				itemObj.put("success", true);
+				itemObj.put("msg","success");
+				return JsonUtils.fromObject(itemObj);
+			}
+		}else{
+			JSONObject itemObj=new JSONObject();
+			itemObj.put("success", false);
+			itemObj.put("msg","请重新登录");
+			return JsonUtils.fromObject(itemObj);
+		}
+	}
+	/**
+	 * 修改管理员的密码
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/updatePass.do")
+	@ResponseBody
+	public String updatePass(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		int adminId = request.getInt("adminId");
+		String password=request.getString("password");
+
+		Admin admin=adminService.getById(adminId);
+		if(admin!=null){
+			admin.setPassword(password);
+			admin.setPasswordUpdateTime(new Date());
+			adminService.updatePassword(admin);
+		}
+		JSONObject orgObject=new JSONObject();
+		orgObject.put("success",true);
+		orgObject.put("message", "success");
+		return JsonUtils.fromObject(orgObject);
+	}
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/delete.do")
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {

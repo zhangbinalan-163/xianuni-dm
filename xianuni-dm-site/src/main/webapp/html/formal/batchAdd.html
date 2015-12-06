@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../static/css/plugins/webuploader/webuploader.css">
+    <base target="_blank">
+</head>
+
+<body>
+<form class="form-horizontal">
+    <div class="form-group">
+        <div class="input-group">
+            <div class="col-sm-4">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">模板下载：</label>
+        <div class="col-sm-6">
+            <div class="file-box">
+                <div class="file">
+                    <a href="/xianuni-dm/resource/mb/批量导入模板.xlsx">
+                        <span class="corner"></span>
+                        <div class="icon">
+                            <i class="fa fa-file"></i>
+                        </div>
+                        <div class="file-name">
+                            <br/>
+                            <small>在编党员批量导入模板</small>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</form>
+
+<label class="col-sm-2 control-label">上传数据文件(一次操作不超过50人)：</label>
+<div class="col-sm-6">
+    <p>请选择上传的文件</p>
+    <div id="uploader" class="wu-example">
+        <!--用来存放文件信息-->
+        <div id="thelist" class="uploader-list"></div>
+        <div class="btns">
+            <div id="picker">选择文件</div>
+            <button id="ctlBtn" class="btn btn-primary">开始上传</button>
+        </div>
+    </div>
+</div>
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+<!-- Web Uploader -->
+<script type="text/javascript">
+    // 添加全局站点信息
+    var BASE_URL = '../../static/js/plugins/webuploader';
+</script>
+<script src="../../static/js/plugins/webuploader/webuploader.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var $list = $('#thelist'),
+                $btn = $('#ctlBtn'),
+                state = 'pending',
+                uploader;
+
+        uploader = WebUploader.create({
+            resize: false,
+            swf: '../../static/js/plugins/webuploader/Uploader.swf',
+            server: '/xianuni-dm/person/formal/import.do?orgId='+getOrgTag(),
+            pick: '#picker',
+            fileNumLimit:1,//最多允许上传1个文件
+            accept:
+            {
+                extensions: 'xlsx,xls'
+            }
+        });
+
+        // 当有文件添加进来的时候
+        uploader.on( 'fileQueued', function( file ) {
+            $list.append( '<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '</h4>' +
+            '<p class="state">等待上传...</p>' +
+            '</div>' );
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on( 'uploadProgress', function( file, percentage ) {
+            var $li = $( '#'+file.id ),
+                    $percent = $li.find('.progress .progress-bar');
+            // 避免重复创建
+            if ( !$percent.length ) {
+                $percent = $('<div class="progress progress-striped active">' +
+                '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                '</div>' +
+                '</div>').appendTo( $li ).find('.progress-bar');
+            }
+            $li.find('p.state').text('上传中');
+            $percent.css( 'width', percentage * 100 + '%' );
+        });
+
+        uploader.on( 'uploadSuccess', function( file ,data) {
+            if(data.success){
+                layer.alert('批量导入成功,导入在编党员数量:'+data.successCount, {icon: 1});
+            }else{
+                layer.alert('导入发生错误.'+data.msg, {icon: 5});
+            }
+        });
+
+        uploader.on( 'uploadError', function( file ) {
+            $( '#'+file.id ).find('p.state').text('批量导入失败');
+        });
+
+        uploader.on( 'uploadComplete', function( file ) {
+            $( '#'+file.id ).find('.progress').fadeOut();
+        });
+
+        uploader.on( 'all', function( type ) {
+            if ( type === 'startUpload' ) {
+                state = 'uploading';
+            } else if ( type === 'stopUpload' ) {
+                state = 'paused';
+            } else if ( type === 'uploadFinished' ) {
+                state = 'done';
+            }
+
+            if ( state === 'uploading' ) {
+                $btn.text('暂停上传');
+            } else {
+                $btn.text('开始上传');
+            }
+        });
+
+        $btn.on( 'click', function() {
+            if ( state === 'uploading' ) {
+                uploader.stop();
+            } else {
+                uploader.upload();
+            }
+        });
+    });
+    function getOrgTag(){
+        return parent.$('#orgIdTag').val();
+    }
+</script>
+</body>
+</html>

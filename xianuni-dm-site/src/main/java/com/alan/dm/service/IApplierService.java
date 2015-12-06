@@ -13,6 +13,12 @@ public interface IApplierService {
      * @param applierInfo
      * @throws DMException
      */
+    void updateApplier(ApplierInfo applierInfo) throws DMException;
+    /**
+     *
+     * @param applierInfo
+     * @throws DMException
+     */
     void createApplier(ApplierInfo applierInfo) throws DMException;
 
     /**

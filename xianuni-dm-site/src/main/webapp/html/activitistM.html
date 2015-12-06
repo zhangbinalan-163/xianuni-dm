@@ -75,6 +75,9 @@
 
 <script>
     $(document).ready(function () {
+        //检查登录
+        checkLogin();
+
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         var table = ({
@@ -117,7 +120,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var number,directorNumber,meetTime,meetContent,evaTime,evaContent;
+                            var number,directorNumber,meetTime,meetContent,evaTime,evaContent,profession,degree,quntuan,beian,talked;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -137,7 +140,26 @@
                                 if(inputName=='directorId'){
                                     directorNumber=inputValue;
                                 }
-
+                                if(inputName=='profession'){
+                                    profession=inputValue;
+                                }
+                            }
+                            var selects=layer.getChildFrame('body',index).find('select');
+                            for(var i=0; i<selects.length; i++){
+                                var inputName=selects[i].id;
+                                var inputValue=selects[i].value;
+                                if(inputName=='degree'){
+                                    degree=inputValue;
+                                }
+                                if(inputName=='quntuan'){
+                                    quntuan=inputValue;
+                                }
+                                if(inputName=='talked'){
+                                    talked=inputValue;
+                                }
+                                if(inputName=='beian'){
+                                    beian=inputValue;
+                                }
                             }
                             var textareas=layer.getChildFrame('body',index).find('textarea');
                             for(var i=0; i<textareas.length; i++){
@@ -155,11 +177,16 @@
                                 data:{
                                     orgId : node.id,
                                     number:number,
-                                    directorNumber:directorNumber,
+                                    directorIds:directorNumber,
                                     meetTime:meetTime,
                                     meetContent:meetContent,
                                     evaTime:evaTime,
-                                    evaContent:evaContent
+                                    evaContent:evaContent,
+                                    profession :profession,
+                                    degree : degree,
+                                    quntuan:quntuan,
+                                    beian:beian,
+                                    talked:talked
                                 },
                                 type:'post',
                                 dataType:'json',
@@ -188,13 +215,20 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '人员类型', '学工号', '民主测评时间','支部大会','培养人','操作'],
+                            colNames: ['ID','党组织', '姓名', '学工号','人员类型','身份证', '性别','民族', '学历','籍贯', '出生日期','职称', '民主测评时间','支部大会','培养人','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
-                                {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left"},
+                                {name: 'idcard', index: 'idcard',width: 60, align: "left"},
+                                {name: 'sex', index: 'sex',width: 60, align: "left"},
+                                {name: 'nation', index: 'nation',width: 60, align: "left"},
+                                {name: 'degree', index: 'degree',width: 60, align: "left"},
+                                {name: 'jiguan', index: 'jiguan',width: 60, align: "left"},
+                                {name: 'birth', index: 'birth',width: 60, align: "left"},
+                                {name: 'zhicheng', index: 'zhicheng',width: 60, align: "left"},
                                 {name: 'evaTime', index: 'evaTime',width: 60, align: "left"},
                                 {name: 'meetTime', index: 'meetTime',width: 60, align: "left"},
                                 {name: 'director', index: 'director',width: 60, align: "left"},
@@ -223,7 +257,6 @@
                                 }
                                 $('.J_edit').on('click', function () {
                                     var id = $(this).data('id');
-                                    // todo 根据id获取数据 打开编辑弹窗
                                     var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
                                     $('#idTag').val(id);
                                     layer.open({
@@ -234,9 +267,81 @@
                                         title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的积极分子信息',
                                         shade: 0.6, //遮罩透明度
                                         shift: 5, //0-6的动画形式，-1不开启
-                                        btn: ['Sorry，暂时不支持修改', '取消'],
-                                        yes: function (index) {
-                                            //todo
+                                        btn: ['提交修改', '取消'],
+                                        yes: function(index){
+                                            var inputs=layer.getChildFrame('body',index).find('input');
+                                            var number,directorNumber,meetTime,meetContent,evaTime,evaContent,profession,degree,quntuan,beian,talked;
+                                            for(var i=0; i<inputs.length; i++){
+                                                var inputName=inputs[i].id;
+                                                var inputValue=inputs[i].value;
+
+                                                if(inputName=='meetTime'){
+                                                    meetTime=inputValue;
+                                                }
+                                                if(inputName=='evaTime'){
+                                                    evaTime=inputValue;
+                                                }
+                                                if(inputName=='profession'){
+                                                    profession=inputValue;
+                                                }
+                                            }
+                                            var selects=layer.getChildFrame('body',index).find('select');
+                                            for(var i=0; i<selects.length; i++){
+                                                var inputName=selects[i].id;
+                                                var inputValue=selects[i].value;
+                                                if(inputName=='degree'){
+                                                    degree=inputValue;
+                                                }
+                                                if(inputName=='quntuan'){
+                                                    quntuan=inputValue;
+                                                }
+                                                if(inputName=='talked'){
+                                                    talked=inputValue;
+                                                }
+                                                if(inputName=='beian'){
+                                                    beian=inputValue;
+                                                }
+                                            }
+                                            var textareas=layer.getChildFrame('body',index).find('textarea');
+                                            for(var i=0; i<textareas.length; i++){
+                                                var inputName=textareas[i].id;
+                                                var inputValue=textareas[i].value;
+                                                if(inputName=='evaContent'){
+                                                    evaContent=inputValue;
+                                                }
+                                                if(inputName=='meetContent'){
+                                                    meetContent=inputValue;
+                                                }
+                                            }
+                                            $.ajax( {
+                                                url:'/xianuni-dm/person/activitistUpdate.do',
+                                                data:{
+                                                    personId : id,
+                                                    meetTime:meetTime,
+                                                    meetContent:meetContent,
+                                                    evaTime:evaTime,
+                                                    evaContent:evaContent,
+                                                    profession :profession,
+                                                    degree : degree,
+                                                    quntuan:quntuan,
+                                                    beian:beian,
+                                                    talked:talked
+                                                },
+                                                type:'post',
+                                                dataType:'json',
+                                                success:function(data) {
+                                                    if(data.success){
+                                                        layer.alert('修改积极分子信息成功', {icon: 1});
+                                                        layer.close(index);
+                                                        self.fetchData({});
+                                                    }else{
+                                                        layer.alert('修改积极分子信息失败！'+data.msg, {icon: 5});
+                                                    }
+                                                },
+                                                error : function() {
+                                                    layer.alert('添加积极分子信息失败', {icon: 5});
+                                                }
+                                            });
                                         },
                                         no: function (index) {
                                             layer.close(index);
@@ -374,6 +479,28 @@
             $('#list').setGridWidth(width);
         });
     });
+    function checkLogin(){
+        $.ajax({
+            url: "/xianuni-dm/login/userInfo.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+                }else{
+                    if(data.msg=='NOTLOGIN'){
+                        layer.confirm('需要重新登录', {
+                            btn: ['前往登录'], //按钮
+                            shade: 0.6
+                        }, function(){
+                            location.href ="/xianuni-dm/html/login.html";
+                        });
+                    }
+                }
+            },
+            error:function(){
+            }
+        })
+    }
 </script>
 </body>
 </html>

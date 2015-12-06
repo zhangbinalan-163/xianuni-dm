@@ -1,6 +1,7 @@
 package com.alan.dm.entity;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 组织活动会议信息
@@ -8,23 +9,47 @@ import java.util.Date;
  * @author: fan
  */
 public class OrgMeeting {
+    public static int DZLX=1;
+    public static int MZPY=2;
+    public static int MZSHH=3;
+    public static int SHYK=4;
+
     private int id;
-    private int activity; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-三会一课
+    private int meetingType; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-三会一课
+    private int orgId;
     private Orgnization orgnization; // 组织关系
-    private int meetingType; // 会议类型
     private Date startTime; // 会议开始时间
-    private Date endTime; // 会议结束时间
     private String location; // 会议地点
     private String theme; // 会议主题
-    private Person compere; // 主持人
+    private String compere; // 主持人
+    private String recorder; // 主持人
     private int shouldNumberOfPeople; // 应到人数
     private int realNumberOfPeople; // 实到人数
     private String content; // 主要内容
-    private String filePath; // 附件地址
     private String attendancePeople; // 出勤人员
     private String absencePeople; // 缺勤人员
     private Date createTime; //
     private Date updateTime; //
+
+    private List<Person> invitePersons;//会议邀请人
+    private boolean sendMail;//是否发通知信
+    private List<Resource> resourceList;//
+
+    public List<Person> getInvitePersons() {
+        return invitePersons;
+    }
+
+    public void setInvitePersons(List<Person> invitePersons) {
+        this.invitePersons = invitePersons;
+    }
+
+    public boolean isSendMail() {
+        return sendMail;
+    }
+
+    public void setSendMail(boolean sendMail) {
+        this.sendMail = sendMail;
+    }
 
     public int getId() {
         return id;
@@ -32,14 +57,6 @@ public class OrgMeeting {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getActivity() {
-        return activity;
-    }
-
-    public void setActivity(int activity) {
-        this.activity = activity;
     }
 
     public int getMeetingType() {
@@ -50,6 +67,22 @@ public class OrgMeeting {
         this.meetingType = meetingType;
     }
 
+    public int getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(int orgId) {
+        this.orgId = orgId;
+    }
+
+    public Orgnization getOrgnization() {
+        return orgnization;
+    }
+
+    public void setOrgnization(Orgnization orgnization) {
+        this.orgnization = orgnization;
+    }
+
     public Date getStartTime() {
         return startTime;
     }
@@ -58,13 +91,6 @@ public class OrgMeeting {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
 
     public String getLocation() {
         return location;
@@ -82,11 +108,11 @@ public class OrgMeeting {
         this.theme = theme;
     }
 
-    public Person getCompere() {
+    public String getCompere() {
         return compere;
     }
 
-    public void setCompere(Person compere) {
+    public void setCompere(String compere) {
         this.compere = compere;
     }
 
@@ -114,14 +140,6 @@ public class OrgMeeting {
         this.content = content;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
     public String getAttendancePeople() {
         return attendancePeople;
     }
@@ -138,14 +156,6 @@ public class OrgMeeting {
         this.absencePeople = absencePeople;
     }
 
-    public Orgnization getOrgnization() {
-        return orgnization;
-    }
-
-    public void setOrgnization(Orgnization orgnization) {
-        this.orgnization = orgnization;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -160,5 +170,21 @@ public class OrgMeeting {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getRecorder() {
+        return recorder;
+    }
+
+    public void setRecorder(String recorder) {
+        this.recorder = recorder;
+    }
+
+    public List<Resource> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<Resource> resourceList) {
+        this.resourceList = resourceList;
     }
 }

@@ -39,4 +39,9 @@ public class NormalServiceImpl implements INormalService {
     public int countByOrgWithTime(List<Integer> orgIdlist, Date start, Date end) throws DMException {
         return normalInfoMapper.countByOrgWithTime(orgIdlist,start,end);
     }
+
+    @Override
+    public void updateNormal(NormalInfo normalInfo) throws DMException {
+        normalInfoMapper.update(normalInfo);
+    }
 }

@@ -17,6 +17,13 @@ import java.util.List;
  * @author: fan
  */
 public interface IEduTrainingService {
+    /**
+     *
+     * @param id
+     * @return
+     * @throws DMException
+     */
+    EduTraining getById(int id) throws DMException;
 
     /**
      * 新增教育培训
@@ -24,29 +31,29 @@ public interface IEduTrainingService {
      * @return
      * @throws DMException
      */
-    int addTraining(EduTraining trainingInfo) throws DMException;
+    void addTraining(EduTraining trainingInfo) throws DMException;
 
     /**
-     * 新增媒体资源
-     * @param mediaResource
+     *
+     * @param id
+     * @throws DMException
+     */
+    void deleteTraining(EduTraining id) throws DMException;
+
+    /**
+     *
+     * @param condition
+     * @param page
      * @return
      * @throws DMException
      */
-    int addMediaResource(MediaResource mediaResource) throws DMException;
+    List<EduTraining> getTrainingByCondtion(EduTrainingCondition condition, Page page) throws DMException;
 
-    void deleteTraining(EduTraining id) throws DMException;
-
-    void deleteMediaResource(MediaResource id) throws DMException;
-
-    void modifyTraining(EduTraining trainingInfo) throws DMException;
-
-    void modifyMediaResource(MediaResource mediaResource) throws DMException;
-
-    List<EduTraining> getTraining(EduTrainingCondition condition, Page page) throws DMException;
-
-    int countTrain(EduTrainingCondition condition) throws DMException;
-
-    List<MediaResource> getMediaResource(MediaCondition condition, Page page) throws DMException;
-
-    int countMediaResource(MediaCondition condition) throws DMException;
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
+    int countTrainByCondtion(EduTrainingCondition condition) throws DMException;
 }

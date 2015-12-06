@@ -1,19 +1,15 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IEduTrainingDao;
-import com.alan.dm.dao.IMediaResourceDao;
-import com.alan.dm.entity.MediaResource;
+import com.alan.dm.dao.mapper.EduTrainingMapper;
 import com.alan.dm.entity.Page;
 import com.alan.dm.entity.EduTraining;
-import com.alan.dm.entity.StudyRecord;
-import com.alan.dm.entity.condition.MediaCondition;
-import com.alan.dm.entity.condition.StudyRecordCondition;
+import com.alan.dm.entity.Resource;
 import com.alan.dm.entity.condition.EduTrainingCondition;
 import com.alan.dm.service.IEduTrainingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -24,59 +20,41 @@ import java.util.List;
 @Service(value = "eduTrainingService")
 public class EduTrainingServiceImpl implements IEduTrainingService {
 
-    @Resource(name = "eduTrainingDao")
-    private IEduTrainingDao eduTrainingDao;
-
-    @Resource(name = "mediaResourceDao")
-    private IMediaResourceDao mediaResourceDao;
+    @Autowired
+    private EduTrainingMapper eduTrainingMapper;
 
     @Override
-    public int addTraining(EduTraining trainingInfo) throws DMException {
-        return eduTrainingDao.insert(trainingInfo);
+    public EduTraining getById(int id) throws DMException {
+        return eduTrainingMapper.getById(id);
     }
 
     @Override
-    public int addMediaResource(MediaResource mediaResource) throws DMException {
-        return mediaResourceDao.insert(mediaResource);
+    public void addTraining(EduTraining trainingInfo) throws DMException {
+        //培训信息增加
+        eduTrainingMapper.insert(trainingInfo);
+        //附件信息增加
+        List<Resource> resourceList = trainingInfo.getResourceList();
+        if(resourceList!=null){
+            for(Resource resource:resourceList){
+                resource.setTrainId(trainingInfo.getId());
+                eduTrainingMapper.insertResource(resource);
+            }
+        }
     }
 
     @Override
-    public void deleteTraining(EduTraining eduTraining) throws DMException {
-        eduTrainingDao.delete(eduTraining);
+    public void deleteTraining(EduTraining trainingInfo) throws DMException {
+        eduTrainingMapper.delete(trainingInfo);
     }
 
     @Override
-    public void deleteMediaResource(MediaResource mediaResource) throws DMException {
-        mediaResourceDao.delete(mediaResource);
+    public List<EduTraining> getTrainingByCondtion(EduTrainingCondition condition, Page page) throws DMException {
+        return eduTrainingMapper.getByCondition(condition,page);
     }
 
     @Override
-    public void modifyTraining(EduTraining trainingInfo) throws DMException {
-        eduTrainingDao.update(trainingInfo);
+    public int countTrainByCondtion(EduTrainingCondition condition) throws DMException {
+        return eduTrainingMapper.countByCondition(condition);
     }
 
-    @Override
-    public void modifyMediaResource(MediaResource mediaResource) throws DMException {
-        mediaResourceDao.update(mediaResource);
-    }
-
-    @Override
-    public List<EduTraining> getTraining(EduTrainingCondition condition, Page page) throws DMException {
-        return eduTrainingDao.getByCondition(condition, page);
-    }
-
-    @Override
-    public int countTrain(EduTrainingCondition condition) throws DMException {
-        return eduTrainingDao.countByCondition(condition);
-    }
-
-    @Override
-    public List<MediaResource> getMediaResource(MediaCondition condition, Page page) throws DMException {
-        return mediaResourceDao.getByCondition(condition, page);
-    }
-
-    @Override
-    public int countMediaResource(MediaCondition condition) throws DMException {
-        return mediaResourceDao.countByCondition(condition);
-    }
 }

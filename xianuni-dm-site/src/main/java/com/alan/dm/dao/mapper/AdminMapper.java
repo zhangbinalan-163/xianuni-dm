@@ -41,7 +41,12 @@ public interface AdminMapper {
      * @throws DMException
      */
     void update(@Param(value = "admin")Admin admin);
-
+    /**
+     * 修改管理员密码
+     * @param admin
+     * @throws DMException
+     */
+    void updatePass(@Param(value = "admin")Admin admin);
     /**
      *
      * @param condition

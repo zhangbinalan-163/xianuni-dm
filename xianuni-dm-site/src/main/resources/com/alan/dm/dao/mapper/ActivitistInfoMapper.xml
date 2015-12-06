@@ -9,8 +9,21 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="activitistInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (evaluationTime,evaluationContent,meetTime,meetContent,director,recorded,createTime)
-        VALUES(#{activitistInfo.evaluationTime},#{activitistInfo.evaluationContent},#{activitistInfo.meetTime},#{activitistInfo.meetContent},#{activitistInfo.director},#{activitistInfo.recorded},#{activitistInfo.createTime})
+        (evaluationTime,evaluationContent,meetTime,meetContent,directorIds,recorded,createTime,quntuan,talked,profession,degree)
+        VALUES(#{activitistInfo.evaluationTime},#{activitistInfo.evaluationContent},#{activitistInfo.meetTime},#{activitistInfo.meetContent},#{activitistInfo.directorIds},
+        #{activitistInfo.recorded},#{activitistInfo.createTime},#{activitistInfo.quntuan},#{activitistInfo.talked},#{activitistInfo.profession},#{activitistInfo.degree})
+    </insert>
+
+    <insert id="update">
+        update
+        <include refid="A_TABLE"/>
+        set
+        evaluationTime=#{activitistInfo.evaluationTime},evaluationContent=#{activitistInfo.evaluationContent},
+        meetTime=#{activitistInfo.meetTime},meetContent=#{activitistInfo.meetContent},directorIds=#{activitistInfo.directorIds},
+        recorded=#{activitistInfo.recorded},createTime=#{activitistInfo.createTime},
+        quntuan=#{activitistInfo.quntuan},talked=#{activitistInfo.talked},profession=#{activitistInfo.profession},
+        degree=#{activitistInfo.degree},updateTime=#{activitistInfo.updateTime}
+        where id=#{activitistInfo.id}
     </insert>
 
     <select id="getById" resultType="com.alan.dm.entity.ActivitistInfo">

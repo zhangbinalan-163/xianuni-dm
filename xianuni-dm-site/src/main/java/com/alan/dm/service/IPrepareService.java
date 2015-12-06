@@ -16,6 +16,12 @@ public interface IPrepareService {
      * @param prepareInfo
      * @throws DMException
      */
+    void updatePrepare(PrepareInfo prepareInfo) throws DMException;
+    /**
+     *
+     * @param prepareInfo
+     * @throws DMException
+     */
     void createPrepare(PrepareInfo prepareInfo) throws DMException;
 
     /**

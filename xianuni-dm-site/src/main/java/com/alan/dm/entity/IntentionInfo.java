@@ -11,12 +11,50 @@ public class IntentionInfo {
     private int trainHour;
     private Date meetTime;
     private String meetContent;
-    private String politicalChcekContent;
-    private int introducer;
+    private String politicalCheckContent;
+    private String introducerIds;
     private boolean recorded;
     private String schoolApproval;
     private Date createTime;
+    private Date updateTime;
     private boolean publiced;
+    private String profession;
+    private int degree;
+
+    private Date beAcTime;
+    private boolean yushen;
+
+    public Date getBeAcTime() {
+        return beAcTime;
+    }
+
+    public void setBeAcTime(Date beAcTime) {
+        this.beAcTime = beAcTime;
+    }
+
+    public boolean isYushen() {
+        return yushen;
+    }
+
+    public void setYushen(boolean yushen) {
+        this.yushen = yushen;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
+    }
 
     public int getId() {
         return id;
@@ -50,20 +88,20 @@ public class IntentionInfo {
         this.meetContent = meetContent;
     }
 
-    public String getPoliticalChcekContent() {
-        return politicalChcekContent;
+    public String getPoliticalCheckContent() {
+        return politicalCheckContent;
     }
 
-    public void setPoliticalChcekContent(String politicalChcekContent) {
-        this.politicalChcekContent = politicalChcekContent;
+    public void setPoliticalCheckContent(String politicalCheckContent) {
+        this.politicalCheckContent = politicalCheckContent;
     }
 
-    public int getIntroducer() {
-        return introducer;
+    public String getIntroducerIds() {
+        return introducerIds;
     }
 
-    public void setIntroducer(int introducer) {
-        this.introducer = introducer;
+    public void setIntroducerIds(String introducerIds) {
+        this.introducerIds = introducerIds;
     }
 
     public boolean isRecorded() {
@@ -96,5 +134,13 @@ public class IntentionInfo {
 
     public void setPubliced(boolean publiced) {
         this.publiced = publiced;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

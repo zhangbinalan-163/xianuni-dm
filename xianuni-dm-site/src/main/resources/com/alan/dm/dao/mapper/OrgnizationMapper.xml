@@ -18,7 +18,14 @@
     <update id="update">
         update
         <include refid="TABLE" />
-        set name=#{orgnization.name},status=#{orgnization.status},parent=#{orgnization.parent},hasSon=#{orgnization.hasSon},updateTime=#{orgnization.updateTime},orgDesc=#{orgnization.orgDesc}
+        set name=#{orgnization.name},status=#{orgnization.status},parent=#{orgnization.parent},hasSon=#{orgnization.hasSon},updateTime=#{orgnization.updateTime},electionTime=#{orgnization.electionTime},orgDesc=#{orgnization.orgDesc}
+        where id=#{orgnization.id}
+    </update>
+
+    <update id="cancel">
+        update
+        <include refid="TABLE" />
+        set status=#{orgnization.status},updateTime=#{orgnization.updateTime},cancelTime=#{orgnization.cancelTime}
         where id=#{orgnization.id}
     </update>
 

@@ -14,6 +14,42 @@ public class CommitteeInfo {
     private int job;
     private Date createTime;
     private Date updateTime;
+    private int level;//第几届
+    private String tel;
+    private String cdesc;
+    private String profession;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
+
+    public String getCdesc() {
+        return cdesc;
+    }
+
+    public void setCdesc(String cdesc) {
+        this.cdesc = cdesc;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
 
     public int getId() {
         return id;

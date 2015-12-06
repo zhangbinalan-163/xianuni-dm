@@ -4,85 +4,91 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.alan.dm.dao.mapper.EduTrainingMapper">
 
-    <sql id="A_TABLE">tb_party_normal</sql>
-    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="T_TABLE">party_training</sql>
     <sql id="ORG_TABLE">tb_orgnization</sql>
-
-    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
-        <id property="id" column="personId"/>
-        <result property="name" column="personName"/>
-        <result property="number" column="personNumber"/>
-    </resultMap>
+    <sql id="RESOURE_TABLE">tb_train_resource</sql>
 
     <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
         <id property="id" column="orgId"/>
         <result property="name" column="orgName"/>
     </resultMap>
 
-    <resultMap id="A_INFO" type="com.alan.dm.entity.EduTraining">
+    <resultMap id="T_INFO" type="com.alan.dm.entity.EduTraining">
         <id property="id" column="id" />
-        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
-        <association property="org" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+        <result property="title" column="title"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="createTime" column="createTime"/>
+        <association property="organization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
     </resultMap>
+
+    <resultMap id="T_R_INFO" type="com.alan.dm.entity.EduTraining">
+        <id property="id" column="id" />
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="startTime" column="startTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="createTime" column="createTime"/>
+        <collection property="resourceList" ofType="com.alan.dm.entity.Resource">
+            <id property="id" column="resourceId"/>
+            <result property="name" column="name"/>
+            <result property="resourcePath" column="resourcePath"/>
+            <result property="realName" column="resourceName"/>
+        </collection>
+    </resultMap>
+
+    <select id="getById" resultMap="T_R_INFO">
+        select
+        A.id,
+        A.title,
+        A.startTime,
+        A.endTime,
+        A.orgId,
+        A.content,
+        A.createTime,
+        R.id as resourceId,
+        R.resourcePath as resourcePath,
+        R.name as resourceName
+        from <include refid="T_TABLE"/> A
+        left join <include refid="RESOURE_TABLE"/> R
+        on A.id=R.trainId
+        where A.id=#{id}
+    </select>
 
     <insert id="insert" parameterType="com.alan.dm.entity.EduTraining" useGeneratedKeys="true"
             keyColumn="id" keyProperty="training.id">
-        INSERT INTO <include refid="A_TABLE"/>
-        (type,title,trainingType,orgId,startTime,endTime,period,trainingObject,
-        content,personId,harvest,opinion,createTime)
-        VALUES(#{training.type},#{training.title},#{training.trainingType},
-        #{training.organization.id},#{training.startTime},#{training.endTime},#{training.period},
-        #{training.trainingObject},#{training.content},#{training.person.id},
-        #{training.harvest},#{training.opinion},#{training.createTime})
+        INSERT INTO <include refid="T_TABLE"/>
+        (title,orgId,startTime,endTime,content,createTime)
+        VALUES(#{training.title},#{training.organization.id},#{training.startTime},#{training.endTime},#{training.content},#{training.createTime})
     </insert>
 
-    <update id="update" parameterType="com.alan.dm.entity.EduTraining">
-        update
-        <include refid="A_TABLE" />
-        <set>
-            <if test="training.type != 0">type=#{training.type},</if>
-            <if test="training.title != null">title=#{training.title},</if>
-            <if test="training.trainingType != 0">trainingType=#{training.trainingType},</if>
-            <if test="training.organization != null">orgId=#{training.organization.id},</if>
-            <if test="training.startTime != null">startTime=#{training.startTime},</if>
-            <if test="training.endTime != null">endTime=#{training.endTime},</if>
-            <if test="training.period != 0">period=#{training.period},</if>
-            <if test="training.trainingObject != null">trainingObject=#{training.trainingObject},</if>
-            <if test="training.person != null">compere=#{training.person.id},</if>
-            <if test="training.content != null">content=#{training.content},</if>
-            <if test="training.harvest != null">harvest=#{training.harvest},</if>
-            <if test="training.opinion != null">opinion=#{training.opinion},</if>
-            <if test="training.updateTime != null">updateTime=#{training.updateTime}</if>
-        </set>
-        where id=#{training.id}
-    </update>
+    <insert id="insertResource"  useGeneratedKeys="true"
+            keyColumn="id" keyProperty="resource.id">
+        INSERT INTO <include refid="RESOURE_TABLE"/>
+        (trainId,name,resourcePath,createTime)
+        VALUES(#{resource.trainId},#{resource.realName},#{resource.resourcePath},#{resource.createTime})
+    </insert>
 
-    <select id="getByCondition" resultMap="A_INFO">
+    <select id="getByCondition" resultMap="T_INFO">
         SELECT
         A.id,
         A.title,
-        A.trainingType,
         A.startTime,
         A.endTime,
-        A.period,
-        A.trainingObject,
+        A.orgId,
         A.content,
-        A.harvest,
-        A.opinion,
-        P.name as personName,
-        P.number as personNumber,
+        A.createTime,
+        O.id as orgId,
         O.name as orgName
-
-        FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
+        FROM  <include refid="T_TABLE" /> A
+        JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
         <where>
-            A.type=#{condition.type}
-            <if test="condition.orgId != 0">AND A.orgId=#{condition.orgId}</if>
-            <if test="condition.trainingType != 0">AND A.trainingType=#{condition.trainingType}</if>
-            <if test="condition.orgName != null">
-                <bind name="pattern" value="'%' +condition.orgName+ '%'" />
-                AND P.number LIKE #{pattern}
+            <if test="condition.orgList != null">
+                A.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
         </where>
         ORDER BY id DESC
@@ -93,24 +99,23 @@
 
     <select id="countByCondition" resultType="Integer">
         SELECT count(*)
-        FROM  <include refid="A_TABLE" /> A
-        LEFT JOIN <include refid="PERSON_TABLE"/> P ON A.personId=P.id
-        LEFT JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
+        FROM  <include refid="T_TABLE" /> A
+        JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
         <where>
-            A.type=#{condition.type}
-            <if test="condition.orgId != 0">AND A.orgId=#{condition.orgId}</if>
-            <if test="condition.trainingType != 0">AND A.trainingType=#{condition.trainingType}</if>
-            <if test="condition.orgName != null">
-                <bind name="pattern" value="'%' +condition.orgName+ '%'" />
-                AND P.number LIKE #{pattern}
+            <if test="condition.orgList != null">
+                A.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
             </if>
         </where>
     </select>
 
-    <delete id="delete" parameterType="com.alan.dm.entity.EduTraining">
+    <delete id="delete">
         DELETE
-        FROM <include refid="A_TABLE"/>
-        WHERE id=#{id}
+        FROM <include refid="T_TABLE"/>
+        WHERE id=#{training.id}
     </delete>
 
 </mapper>

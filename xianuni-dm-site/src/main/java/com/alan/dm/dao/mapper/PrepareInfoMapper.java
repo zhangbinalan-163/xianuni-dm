@@ -16,6 +16,11 @@ public interface PrepareInfoMapper {
     /**
      *
      * @param prepareInfo
+     */
+    void update(@Param(value="prepareInfo")PrepareInfo prepareInfo);
+    /**
+     *
+     * @param prepareInfo
      * @throws DMException
      */
     void insert(@Param(value="prepareInfo")PrepareInfo prepareInfo);

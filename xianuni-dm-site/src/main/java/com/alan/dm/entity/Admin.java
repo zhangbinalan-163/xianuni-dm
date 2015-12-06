@@ -22,6 +22,15 @@ public class Admin {
     private int status;
     private int type;//0-部门管理员 1-超级管理员
     private int orgId;
+    private Date passwordUpdateTime;
+
+    public Date getPasswordUpdateTime() {
+        return passwordUpdateTime;
+    }
+
+    public void setPasswordUpdateTime(Date passwordUpdateTime) {
+        this.passwordUpdateTime = passwordUpdateTime;
+    }
 
     public int getId() {
         return id;

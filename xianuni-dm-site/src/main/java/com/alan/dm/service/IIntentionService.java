@@ -13,6 +13,12 @@ public interface IIntentionService {
      * @param intentionInfo
      * @throws DMException
      */
+    void updateIntention(IntentionInfo intentionInfo) throws DMException;
+    /**
+     *
+     * @param intentionInfo
+     * @throws DMException
+     */
     void createIntention(IntentionInfo intentionInfo) throws DMException;
 
     /**

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.PersonMeetingMapper">
+
+    <sql id="PERSON_MEETING_TABLE">tb_person_meeting</sql>
+    <sql id="MEETING_TABLE">tb_org_meeting</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <resultMap id="MEETING_INFO" type="com.alan.dm.entity.OrgMeeting">
+        <id property="id" column="meetingId" />
+        <result property="location" column="location"/>
+        <result property="theme" column="theme"/>
+    </resultMap>
+
+    <resultMap id="PERSON_MEETING_INFO" type="com.alan.dm.entity.PersonMeeting">
+        <id property="id" column="id" />
+        <result property="takeIn" column="takeIn"/>
+        <result property="assure" column="assure"/>
+        <result property="harvest" column="harvest"/>
+        <result property="harvestTime" column="harvestTime"/>
+        <association property="person" column="peronId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+        <association property="orgMeeting" column="meetingId" javaType="com.alan.dm.entity.OrgMeeting" resultMap="MEETING_INFO"/>
+    </resultMap>
+
+    <select id="getById" resultType="com.alan.dm.entity.PersonMeeting">
+        select *
+        from <include refid="PERSON_MEETING_TABLE"/>
+        where id=#{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="personMeeting.id">
+        INSERT INTO <include refid="PERSON_MEETING_TABLE"/>
+        (meetingId,personId,takeIn,assure,harvest,harvestTime)
+        VALUES(#{personMeeting.orgMeeting.id},#{personMeeting.person.id},
+        #{personMeeting.takeIn},#{personMeeting.assure},#{personMeeting.harvest},#{personMeeting.harvestTime})
+    </insert>
+
+    <select id="getByCondition" resultMap="PERSON_MEETING_INFO">
+        SELECT
+        PM.id,
+        PM.takeIn,
+        PM.assurce,
+        PM.harvest,
+        PM.harvestTime,
+        PM.personId as personId,
+        PM.meetingId as meetingId,
+        M.location as location,
+        M.theme as theme,
+        P.name as personName,
+        P.number as personNumber,
+        O.name as orgName,
+        O.id as orgId
+
+        FROM  <include refid="PERSON_MEETING_TABLE" /> PM
+        JOIN  <include refid="MEETING_TABLE" /> M ON OM.meetingId=M.id
+        JOIN  <include refid="PERSON_TABLE" /> P ON OM.personId=P.id
+        JOIN  <include refid="ORG_TABLE"/> O ON M.orgId=O.id
+
+        <where>
+            <if test="condition.orgList != null">
+                M.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY id DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="PERSON_MEETING_TABLE" /> PM
+        JOIN  <include refid="MEETING_TABLE" /> M ON OM.meetingId=M.id
+        JOIN  <include refid="PERSON_TABLE" /> P ON OM.personId=P.id
+        JOIN  <include refid="ORG_TABLE"/> O ON M.orgId=O.id
+
+        <where>
+            <if test="condition.orgList != null">
+                M.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM <include refid="PERSON_MEETING_TABLE"/>
+        WHERE id=#{personMeeting.id}
+    </delete>
+
+</mapper>

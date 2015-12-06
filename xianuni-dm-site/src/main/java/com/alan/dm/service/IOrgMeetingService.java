@@ -20,7 +20,7 @@ public interface IOrgMeetingService {
      * @return
      * @throws DMException
      */
-    int addMeeting(OrgMeeting orgMeeting) throws DMException;
+    void addMeeting(OrgMeeting orgMeeting) throws DMException;
 
     /**
      * 删除组织会议
@@ -45,6 +45,12 @@ public interface IOrgMeetingService {
      */
     List<OrgMeeting> getByCondition(OrgMeetingCondition condition, Page page) throws DMException;
 
+    /**
+     *
+     * @param condition
+     * @return
+     * @throws DMException
+     */
     int countByCondition(OrgMeetingCondition condition) throws DMException;
 
     /**
@@ -53,5 +59,5 @@ public interface IOrgMeetingService {
      * @return
      * @throws DMException
      */
-    OrgMeeting getMeeting(int id) throws DMException;
+    OrgMeeting getById(int id) throws DMException;
 }

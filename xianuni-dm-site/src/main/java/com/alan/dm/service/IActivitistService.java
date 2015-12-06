@@ -13,6 +13,12 @@ public interface IActivitistService {
      * @param activitistInfo
      * @throws DMException
      */
+    void updateActivitist(ActivitistInfo activitistInfo) throws DMException;
+    /**
+     *
+     * @param activitistInfo
+     * @throws DMException
+     */
     void createActivitist(ActivitistInfo activitistInfo) throws DMException;
 
     /**

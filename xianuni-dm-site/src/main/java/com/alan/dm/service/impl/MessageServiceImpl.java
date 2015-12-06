@@ -1,14 +1,10 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IAdminDao;
 import com.alan.dm.dao.IMessageDao;
-import com.alan.dm.entity.Admin;
 import com.alan.dm.entity.Message;
 import com.alan.dm.entity.Page;
-import com.alan.dm.entity.condition.AdminCondition;
 import com.alan.dm.entity.condition.MessageCondition;
-import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IMessageService;
 import org.springframework.stereotype.Service;
 

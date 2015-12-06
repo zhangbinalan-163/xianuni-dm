@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.OrgMeetingMapper">
+
+    <sql id="MEETING_TABLE">tb_org_meeting</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+    <sql id="RESOURE_TABLE">tb_resource</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="M_R_INFO" type="com.alan.dm.entity.OrgMeeting">
+        <id property="id" column="id" />
+        <result property="orgId" column="orgId"/>
+        <result property="createTime" column="createTime"/>
+        <result property="startTime" column="startTime"/>
+        <result property="location" column="location"/>
+        <result property="theme" column="theme"/>
+        <result property="content" column="content"/>
+        <result property="recorder" column="recorder"/>
+        <result property="compere" column="compere"/>
+        <result property="shouldNumberOfPeople" column="shouldNumberOfPeople"/>
+        <result property="realNumberOfPeople" column="realNumberOfPeople"/>
+        <result property="attendancePeople" column="attendancePeople"/>
+        <result property="absencePeople" column="absencePeople"/>
+        <result property="meetingType" column="meetingType"/>
+        <collection property="resourceList" ofType="com.alan.dm.entity.Resource">
+            <id property="id" column="resourceId"/>
+            <result property="name" column="name"/>
+            <result property="resourcePath" column="resourcePath"/>
+            <result property="realName" column="resourceName"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="MEETING_INFO" type="com.alan.dm.entity.OrgMeeting">
+        <id property="id" column="id" />
+        <result property="orgId" column="orgId"/>
+        <result property="createTime" column="createTime"/>
+        <result property="startTime" column="startTime"/>
+        <result property="location" column="location"/>
+        <result property="theme" column="theme"/>
+        <result property="recorder" column="recorder"/>
+        <result property="compere" column="compere"/>
+        <result property="content" column="content"/>
+        <result property="shouldNumberOfPeople" column="shouldNumberOfPeople"/>
+        <result property="realNumberOfPeople" column="realNumberOfPeople"/>
+        <result property="attendancePeople" column="attendancePeople"/>
+        <result property="absencePeople" column="absencePeople"/>
+        <result property="meetingType" column="meetingType"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <select id="getById" resultMap="M_R_INFO">
+        select
+        A.id,
+        A.createTime,
+        A.startTime,
+        A.location,
+        A.theme,
+        A.content,
+        A.recorder,
+        A.compere,
+        A.realNumberOfPeople,
+        A.shouldNumberOfPeople,
+        A.attendancePeople,
+        A.absencePeople,
+        A.meetingType,
+        A.orgId as orgId,
+        R.id as resourceId,
+        R.resourcePath as resourcePath,
+        R.name as resourceName
+        from <include refid="MEETING_TABLE"/> A
+        left join <include refid="RESOURE_TABLE"/> R
+        on A.id=R.meetingId
+        where A.id=#{id}
+    </select>
+
+    <insert id="insertResource"  useGeneratedKeys="true"
+            keyColumn="id" keyProperty="resource.id">
+        INSERT INTO <include refid="RESOURE_TABLE"/>
+        (meetingId,name,resourcePath,createTime)
+        VALUES(#{resource.meetingId},#{resource.realName},#{resource.resourcePath},#{resource.createTime})
+    </insert>
+
+    <insert id="deleteResource">
+        delete from <include refid="RESOURE_TABLE"/>
+        where meetingId=#{meetingId}
+    </insert>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="orgMeeting.id">
+        INSERT INTO <include refid="MEETING_TABLE"/>
+        (meetingType,orgId,startTime,location,theme,compere,recorder,
+        shouldNumberOfPeople,realNumberOfPeople,content,attendancePeople,absencePeople,createTime)
+        VALUES(#{orgMeeting.meetingType},#{orgMeeting.orgnization.id},
+        #{orgMeeting.startTime},#{orgMeeting.location},#{orgMeeting.theme},
+        #{orgMeeting.compere}, #{orgMeeting.recorder},#{orgMeeting.shouldNumberOfPeople},#{orgMeeting.realNumberOfPeople},
+        #{orgMeeting.content},#{orgMeeting.attendancePeople},#{orgMeeting.absencePeople},#{orgMeeting.createTime})
+    </insert>
+
+    <insert id="update">
+        update <include refid="MEETING_TABLE"/>
+        set  startTime= #{orgMeeting.startTime},location=#{orgMeeting.location},theme=#{orgMeeting.theme},compere=#{orgMeeting.compere},
+        recorder=#{orgMeeting.recorder},shouldNumberOfPeople=#{orgMeeting.shouldNumberOfPeople},
+        realNumberOfPeople=#{orgMeeting.realNumberOfPeople},content=#{orgMeeting.content},
+        attendancePeople=#{orgMeeting.attendancePeople},
+        absencePeople=#{orgMeeting.absencePeople},
+        updateTime=#{orgMeeting.updateTime}
+        where id=#{orgMeeting.id}
+    </insert>
+
+    <select id="getByCondition" resultMap="MEETING_INFO">
+        SELECT
+        A.id,
+        A.orgId,
+        A.meetingType,
+        A.startTime,
+        A.createTime,
+        A.location,
+        A.theme,
+        A.compere,
+        A.shouldNumberOfPeople,
+        A.realNumberOfPeople,
+        A.content,
+        A.attendancePeople,
+        A.absencePeople,
+        O.name as orgName
+
+        FROM  <include refid="MEETING_TABLE" /> A
+        JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
+
+        <where>
+            <if test="condition.orgList != null">
+                A.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.typeList != null">
+                AND A.meetingType in
+                <foreach collection="condition.typeList" index="index" item="typeList" open="("
+                         separator="," close=")">
+                    #{typeList}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY id DESC
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        SELECT count(*)
+        FROM  <include refid="MEETING_TABLE" /> A
+        JOIN <include refid="ORG_TABLE"/> O ON A.orgId=O.id
+
+        <where>
+            <if test="condition.orgList != null">
+                A.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.typeList != null">
+                AND A.meetingType in
+                <foreach collection="condition.typeList" index="index" item="typeList" open="("
+                         separator="," close=")">
+                    #{typeList}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <delete id="delete">
+        DELETE
+        FROM <include refid="MEETING_TABLE"/>
+        WHERE id=#{orgMeeting.id}
+    </delete>
+
+</mapper>

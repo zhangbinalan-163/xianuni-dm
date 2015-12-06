@@ -15,9 +15,30 @@ public class ActivitistInfo {
     private String evaluationContent;
     private Date meetTime;
     private String meetContent;
-    private int director;
-    private boolean recorded;
+    private String directorIds;
+    private boolean recorded;//是否已备案
     private Date createTime;
+    private Date updateTime;
+    private int degree;
+    private String profession;
+    private boolean quntuan;//是否群团推优
+    private boolean talked;
+
+    public boolean isQuntuan() {
+        return quntuan;
+    }
+
+    public void setQuntuan(boolean quntuan) {
+        this.quntuan = quntuan;
+    }
+
+    public boolean isTalked() {
+        return talked;
+    }
+
+    public void setTalked(boolean talked) {
+        this.talked = talked;
+    }
 
     public int getPersonId() {
         return personId;
@@ -41,6 +62,22 @@ public class ActivitistInfo {
             person.setId(personId);
         }
         return person;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
     }
 
     public void setPerson(Person person) {
@@ -79,12 +116,12 @@ public class ActivitistInfo {
         this.meetContent = meetContent;
     }
 
-    public int getDirector() {
-        return director;
+    public String getDirectorIds() {
+        return directorIds;
     }
 
-    public void setDirector(int director) {
-        this.director = director;
+    public void setDirectorIds(String directorIds) {
+        this.directorIds = directorIds;
     }
 
     public boolean isRecorded() {
@@ -101,5 +138,13 @@ public class ActivitistInfo {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

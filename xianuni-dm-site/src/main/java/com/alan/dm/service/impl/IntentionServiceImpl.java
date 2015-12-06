@@ -15,7 +15,6 @@ import java.util.Date;
  */
 @Service(value = "intentionService")
 public class IntentionServiceImpl implements IIntentionService {
-
     @Autowired
     private IntentionInfoMapper intentionInfoMapper;
 
@@ -33,6 +32,12 @@ public class IntentionServiceImpl implements IIntentionService {
     @Override
     public IntentionInfo getById(int intentionId) throws DMException {
         return intentionInfoMapper.getById(intentionId);
+    }
+
+    @Override
+    public void updateIntention(IntentionInfo intentionInfo) throws DMException {
+        intentionInfo.setUpdateTime(new Date());
+        intentionInfoMapper.update(intentionInfo);
     }
 
 }

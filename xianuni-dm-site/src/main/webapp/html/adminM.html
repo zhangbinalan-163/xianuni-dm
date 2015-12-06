@@ -74,6 +74,8 @@
 
 <script>
     $(document).ready(function () {
+        checkLogin();
+
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
         var table = ({
@@ -193,7 +195,6 @@
                                 }
                                 $('.J_edit').on('click', function () {
                                     var id = $(this).data('id');
-                                    // todo 根据id获取数据 打开编辑弹窗
                                     var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
                                     $('#adminIdTag').val(id);
                                     layer.open({
@@ -205,8 +206,39 @@
                                         shade: 0.6, //遮罩透明度
                                         shift: 5, //0-6的动画形式，-1不开启
                                         btn: ['Sorry，暂时不支持修改', '取消'],
-                                        yes: function (index) {
-                                           //todo
+                                        yes: function(index){
+                                            var inputs=layer.getChildFrame('body',index).find('input');
+                                            var password;
+                                            for(var i=0; i<inputs.length; i++){
+                                                var inputName=inputs[i].id;
+                                                var inputValue=inputs[i].value;
+                                                if(inputName=='password'){
+                                                    password=inputValue;
+                                                }
+                                            }
+                                            if(password!=''){
+                                                $.ajax( {
+                                                    url:'/xianuni-dm/admin/updatePass.do',
+                                                    data:{
+                                                        adminId : id,
+                                                        password:password
+                                                    },
+                                                    type:'post',
+                                                    dataType:'json',
+                                                    success:function(data) {
+                                                        if(data.success){
+                                                            layer.alert('修改管理员信息成功', {icon: 1});
+                                                            layer.close(index);
+                                                            self.fetchData({});
+                                                        }else{
+                                                            layer.alert('修改管理员信息失败！'+data.msg, {icon: 5});
+                                                        }
+                                                    },
+                                                    error : function() {
+                                                        layer.alert('修改管理员信息失败', {icon: 5});
+                                                    }
+                                                });
+                                            }
                                         },
                                         no: function (index) {
                                             layer.close(index);
@@ -313,6 +345,28 @@
             $('#list').setGridWidth(width);
         });
     });
+    function checkLogin(){
+        $.ajax({
+            url: "/xianuni-dm/login/userInfo.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+                }else{
+                    if(data.msg=='NOTLOGIN'){
+                        layer.confirm('需要重新登录', {
+                            btn: ['前往登录'], //按钮
+                            shade: 0.6
+                        }, function(){
+                            location.href ="/xianuni-dm/html/login.html";
+                        });
+                    }
+                }
+            },
+            error:function(){
+            }
+        })
+    }
 </script>
 </body>
 </html>

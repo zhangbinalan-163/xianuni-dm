@@ -15,7 +15,7 @@ public interface MediaResourceMapper {
     int insert(@Param(value = "media") MediaResource mediaResource);
     void delete(MediaResource mediaResource);
     void update(@Param(value = "media") MediaResource mediaResource);
-    MediaResource findOne(int id);
+    MediaResource getById(int id);
 
     List<MediaResource> getByCondition(@Param(value = "condition") MediaCondition condition,
                                        @Param(value = "page") Page page);

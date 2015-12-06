@@ -15,6 +15,11 @@ public interface NormalInfoMapper {
     /**
      *
      * @param normalInfo
+     */
+    void update(@Param(value="normalInfo")NormalInfo normalInfo);
+    /**
+     *
+     * @param normalInfo
      * @throws DMException
      */
     void insert(@Param(value="normalInfo")NormalInfo normalInfo);

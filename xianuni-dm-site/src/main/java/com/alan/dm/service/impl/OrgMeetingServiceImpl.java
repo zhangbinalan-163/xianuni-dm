@@ -1,14 +1,17 @@
 package com.alan.dm.service.impl;
 
 import com.alan.dm.common.exception.DMException;
-import com.alan.dm.dao.IOrgMeetingDao;
-import com.alan.dm.entity.OrgMeeting;
-import com.alan.dm.entity.Page;
+import com.alan.dm.common.util.TimeUtils;
+import com.alan.dm.dao.mapper.MailMapper;
+import com.alan.dm.dao.mapper.OrgMeetingMapper;
+import com.alan.dm.dao.mapper.PersonMeetingMapper;
+import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.OrgMeetingCondition;
 import com.alan.dm.service.IOrgMeetingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,36 +21,81 @@ import java.util.List;
  */
 @Service(value = "orgMeetingService")
 public class OrgMeetingServiceImpl implements IOrgMeetingService {
-    @Resource(name = "orgMeetingDao")
-    private IOrgMeetingDao orgMeetingDao;
+    @Autowired
+    private OrgMeetingMapper orgMeetingMapper;
+
+    @Autowired
+    private PersonMeetingMapper personMeetingMapper;
+
+    @Autowired
+    private MailMapper mailMapper;
 
     @Override
-    public int addMeeting(OrgMeeting orgMeeting) throws DMException {
-        return orgMeetingDao.insert(orgMeeting);
+    public void addMeeting(OrgMeeting orgMeeting) throws DMException {
+        //数据库新增会议
+        orgMeetingMapper.insert(orgMeeting);
+        //绑定参与人会议的参与关系
+        List<Person> personList = orgMeeting.getInvitePersons();
+        for(Person person :personList){
+            PersonMeeting personMeeting=new PersonMeeting();
+            personMeeting.setPerson(person);
+            personMeeting.setOrgMeeting(orgMeeting);
+            personMeetingMapper.insert(personMeeting);
+            //发站内通知信
+            MailInfo mailInfo=new MailInfo();
+            mailInfo.setPersonId(person.getId());
+            mailInfo.setCreateTime(new Date());
+            mailInfo.setTitle("会议提醒:" + orgMeeting.getTheme());
+            mailInfo.setContent("管理员邀请求参加会议，会议主题:"+orgMeeting.getTheme()+",会议地点："+orgMeeting.getLocation()+",会议开始时间:"+ TimeUtils.convertToTimeString(orgMeeting.getStartTime()));
+            mailMapper.insert(mailInfo);
+        }
+        //
+        //附件信息增加
+        List<Resource> resourceList = orgMeeting.getResourceList();
+        if(resourceList!=null){
+            for(Resource resource:resourceList){
+                resource.setMeetingId(orgMeeting.getId());
+                orgMeetingMapper.insertResource(resource);
+            }
+        }
     }
 
     @Override
     public void delete(OrgMeeting orgMeeting) throws DMException {
-        orgMeetingDao.delete(orgMeeting);
+        //附件信息删除
+        orgMeetingMapper.deleteResource(orgMeeting.getId());
+        //会议删除
+        orgMeetingMapper.delete(orgMeeting);
     }
 
     @Override
     public void update(OrgMeeting orgMeeting) throws DMException {
-        orgMeetingDao.update(orgMeeting);
+        //附件信息删除
+        orgMeetingMapper.deleteResource(orgMeeting.getId());
+        //添加
+        List<Resource> resourceList = orgMeeting.getResourceList();
+        if(resourceList!=null){
+            for(Resource resource:resourceList){
+                resource.setMeetingId(orgMeeting.getId());
+                orgMeetingMapper.insertResource(resource);
+            }
+        }
+        //修改信息
+        orgMeetingMapper.update(orgMeeting);
     }
 
     @Override
     public List<OrgMeeting> getByCondition(OrgMeetingCondition condition, Page page) throws DMException {
-        return orgMeetingDao.getByCondition(condition, page);
+        return orgMeetingMapper.getByCondition(condition,page);
     }
 
     @Override
     public int countByCondition(OrgMeetingCondition condition) throws DMException {
-        return orgMeetingDao.countByCondition(condition);
+        return orgMeetingMapper.countByCondition(condition);
     }
 
     @Override
-    public OrgMeeting getMeeting(int id) throws DMException {
-        return null;
+    public OrgMeeting getById(int id) throws DMException {
+        return orgMeetingMapper.getById(id);
     }
 }

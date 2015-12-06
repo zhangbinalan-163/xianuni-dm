@@ -15,7 +15,44 @@ public class PrepareInfo {
     private Date meetTime;
     private String meetContent;
     private Date createTime;
+    private Date updateTime;
     private String evaluation;//考察和综合评价
+    private String profession;
+    private int degree;
+    private boolean publiced;
+
+    public boolean isYushen() {
+        return yushen;
+    }
+
+    public void setYushen(boolean yushen) {
+        this.yushen = yushen;
+    }
+
+    public boolean isPubliced() {
+        return publiced;
+    }
+
+    public void setPubliced(boolean publiced) {
+        this.publiced = publiced;
+    }
+
+    private boolean yushen;
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public int getDegree() {
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
+    }
 
     public String getEvaluation() {
         return evaluation;
@@ -87,5 +124,13 @@ public class PrepareInfo {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

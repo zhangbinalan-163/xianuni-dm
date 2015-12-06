@@ -12,6 +12,12 @@ public interface ActivitistInfoMapper {
     /**
      *
      * @param activitistInfo
+     */
+    void update(@Param(value = "activitistInfo")ActivitistInfo activitistInfo);
+
+    /**
+     *
+     * @param activitistInfo
      * @throws DMException
      */
     void insert(@Param(value = "activitistInfo")ActivitistInfo activitistInfo);

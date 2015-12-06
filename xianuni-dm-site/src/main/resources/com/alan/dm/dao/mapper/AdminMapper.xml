@@ -34,6 +34,13 @@
         where id=#{admin.id}
     </update>
 
+    <update id="updatePass">
+        update
+        <include refid="TABLE" />
+        set password=#{admin.password},passwordUpdateTime=#{admin.passwordUpdateTime}
+        where id=#{admin.id}
+    </update>
+
     <delete id="delete">
         delete from <include refid="TABLE" />
         where id=#{admin.id}

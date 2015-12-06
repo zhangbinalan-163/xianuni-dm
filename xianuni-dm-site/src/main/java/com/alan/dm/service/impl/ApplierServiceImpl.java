@@ -35,4 +35,10 @@ public class ApplierServiceImpl implements IApplierService {
     public ApplierInfo getById(int applierId) throws DMException {
         return applierInfoMapper.getById(applierId);
     }
+
+    @Override
+    public void updateApplier(ApplierInfo applierInfo) throws DMException {
+        applierInfo.setUpdateTime(new Date());
+        applierInfoMapper.update(applierInfo);
+    }
 }

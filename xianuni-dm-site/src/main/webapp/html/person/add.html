@@ -21,18 +21,35 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">姓名：</label>
-        <div class="col-sm-2">
-            <input id="pName" type="text" class="form-control" name="pName">
+        <label class="col-sm-2 control-label">学工号：</label>
+        <div class="col-sm-3">
+            <input id="pNumber" type="text" class="form-control" name="pNumber">
         </div>
-        <label class="col-sm-1 control-label">类型：</label>
-        <div class="col-sm-1">
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">类型：</label>
+        <div class="col-sm-2">
             <select id="pType" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">学生</option>
                 <option value="1" hassubinfo="true">教工</option>
+                <option value="2" hassubinfo="true">其他</option>
             </select>
         </div>
-        <label class="col-sm-1 control-label">性别：</label>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">姓名：</label>
+        <div class="col-sm-3">
+            <input id="pName" type="text" class="form-control" name="pName">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">身份证：</label>
+        <div class="col-sm-3">
+            <input id="pIdNumber" type="text" class="form-control" name="pIdNumber">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">性别：</label>
         <div class="col-sm-1">
             <select id="pSex" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">男</option>
@@ -41,45 +58,49 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">籍贯：</label>
-        <div id="homeTown" class="col-sm-6">
-            <select class="prov chosen-select"></select>
-            <select class="city chosen-select" disabled="disabled"></select>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">学工号：</label>
+        <label class="col-sm-2 control-label">民族：</label>
         <div class="col-sm-2">
-            <input id="pNumber" type="text" class="form-control" name="pNumber">
-        </div>
-        <label class="col-sm-1 control-label">民族：</label>
-        <div class="col-sm-1">
             <select id="pNation" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">汉族</option>
                 <option value="1" hassubinfo="true">藏族</option>
                 <option value="2" hassubinfo="true">少数民族</option>
             </select>
         </div>
-        <label class="col-sm-1 control-label">学历：</label>
-        <div class="col-sm-1">
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">学历：</label>
+        <div class="col-sm-2">
             <select id="pDegree" class="chosen-select" style="width:100px;" tabindex="2">
-                <option value="0" hassubinfo="true">学士</option>
-                <option value="1" hassubinfo="true">硕士</option>
-                <option value="2" hassubinfo="true">博士</option>
-                <option value="3" hassubinfo="true">高中及以下</option>
+                <option value="0" hassubinfo="true">初中及以下</option>
+                <option value="1" hassubinfo="true">高中</option>
+                <option value="2" hassubinfo="true">专科</option>
+                <option value="3" hassubinfo="true">本科</option>
+                <option value="4" hassubinfo="true">研究生</option>
+                <option value="5" hassubinfo="true">博士</option>
+                <option value="6" hassubinfo="true">其他</option>
             </select>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">身份证：</label>
-        <div class="col-sm-3">
-            <input id="pIdNumber" type="text" class="form-control" name="pIdNumber">
+        <label class="col-sm-2 control-label">籍贯：</label>
+        <div id="homeTown" class="col-sm-6">
+            <select class="prov" id="pProvince"></select>
+            <select class="city" id="pCity" disabled="disabled"></select>
         </div>
-        <label class="col-sm-1 control-label">出生日期：</label>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">出生日期：</label>
         <div class="col-sm-2">
             <input readonly class="form-control layer-date" id="pBirth">
         </div>
         <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#pBirth'});"></label>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">职称：</label>
+        <div class="col-sm-3">
+            <input id="profession" type="text" class="form-control" name="profession">
+        </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">备注：</label>
@@ -142,8 +163,6 @@
             placement: 'right',
             message: '已输入 %charsTyped%/最多输入%charsTotal%'
         });
-
-
     });
 </script>
 </body>

@@ -12,9 +12,10 @@ public class ApplierInfo {
     private Date updateTime;
     private Date applyTime;
     private String talkContent;
-    private Person talker;
-    private int talkerId;
+    private String talkerIds;
     private Date talkTime;
+    private int degree;
+    private String profession;
 
     public Date getUpdateTime() {
         return updateTime;
@@ -56,24 +57,33 @@ public class ApplierInfo {
         this.talkContent = talkContent;
     }
 
-    public Person getTalker() {
-        return talker;
+    public String getTalkerIds() {
+        return talkerIds;
     }
 
-    public void setTalker(Person talker) {
-        this.talker = talker;
-    }
-
-    public int getTalkerId() {
-        return talkerId;
-    }
-
-    public void setTalkerId(int talkerId) {
-        this.talkerId = talkerId;
+    public void setTalkerIds(String talkerIds) {
+        this.talkerIds = talkerIds;
     }
 
     public Date getTalkTime() {
         return talkTime;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
+
+    public int getDegree() {
+
+        return degree;
+    }
+
+    public void setDegree(int degree) {
+        this.degree = degree;
     }
 
     public void setTalkTime(Date talkTime) {

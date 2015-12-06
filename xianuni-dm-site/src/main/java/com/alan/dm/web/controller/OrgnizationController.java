@@ -1,6 +1,7 @@
 package com.alan.dm.web.controller;
 
 import com.alan.dm.common.util.JsonUtils;
+import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.Admin;
 import com.alan.dm.entity.Orgnization;
@@ -36,6 +37,12 @@ public class OrgnizationController extends BaseController{
 		return "orgnization/index";
 	}
 
+	/**
+	 * 删除组织
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/delete.do")
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {
@@ -44,7 +51,7 @@ public class OrgnizationController extends BaseController{
 
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		//级联删除所有节点
-		orgnizationService.deleteOrg(orgnization,true);
+		orgnizationService.deleteOrg(orgnization, true);
 		//设置父节点是否还为空
 		Orgnization parentOrg=orgnizationService.getOrgById(orgnization.getParent());
 		if(parentOrg!=null&&orgnizationService.countSubOrg(parentOrg)==0){
@@ -58,6 +65,27 @@ public class OrgnizationController extends BaseController{
 	}
 
 	/**
+	 * 撤销党组织
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/chexiao.do")
+	@ResponseBody
+	public String chexiao(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId = request.getInt("orgId");
+
+		Orgnization orgnization=orgnizationService.getOrgById(orgId);
+		//级联删除所有节点
+		orgnizationService.removeOrg(orgnization,true);
+		//设置父节点是否还为空
+		JSONObject orgObject=new JSONObject();
+		orgObject.put("success", 200);
+		orgObject.put("msg", "success");
+		return JsonUtils.fromObject(orgObject);
+	}
+	/**
 	 *
 	 * @param httpServletRequest
 	 * @return
@@ -69,6 +97,7 @@ public class OrgnizationController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		Integer orgId = request.getInt("orgId");
 		String orgName=request.getString("orgName");
+
 		Orgnization orgnization = orgnizationService.getOrgById(orgId);
 		JSONObject orgObject=new JSONObject();
 		if(orgnization==null){
@@ -76,6 +105,10 @@ public class OrgnizationController extends BaseController{
 			orgObject.put("msg","部门不存在");
 			return JsonUtils.fromObject(orgObject);
 		}else{
+			String evaTime=request.getString("evaTime",null);
+			if(!StringUtils.isEmpty(evaTime)){
+				orgnization.setElectionTime(request.getDate("evaTime"));
+			}
 			orgnization.setName(orgName);
 			orgnizationService.updateOrg(orgnization);
 			orgObject.put("success", 200);
@@ -95,6 +128,7 @@ public class OrgnizationController extends BaseController{
 		Request request = getRequest(httpServletRequest);
 		Integer orgId = request.getInt("orgId");
 		String orgName=request.getString("orgName");
+
 		Orgnization parentOrg = orgnizationService.getOrgById(orgId);
 		JSONObject orgObject=new JSONObject();
 		if(parentOrg==null){
@@ -132,8 +166,11 @@ public class OrgnizationController extends BaseController{
 		if(orgnization!=null){
 			JSONObject dataObject=new JSONObject();
 			dataObject.put("name",orgnization.getName());
+			dataObject.put("status", orgnization.getStatus()==Orgnization.CANCEL?"已撤销":"正常");
 			dataObject.put("createTime", TimeUtils.convertToTimeString(orgnization.getCreateTime()));
 			dataObject.put("updateTime", TimeUtils.convertToTimeString(orgnization.getUpdateTime()));
+			dataObject.put("evaTime", TimeUtils.convertToTimeString(orgnization.getElectionTime()));
+			dataObject.put("removeTime", TimeUtils.convertToTimeString(orgnization.getCancelTime()));
 			dataObject.put("isParent", orgnization.isHasSon()?"是":"否");
 			dataObject.put("orgId", orgnization.getId());
 			jsonObject.put("data",dataObject);
