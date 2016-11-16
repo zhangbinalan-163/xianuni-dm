@@ -50,6 +50,45 @@ public class PersonServiceImpl implements IPersonService{
     }
 
     @Override
+    public int countBySourceAndTime(Orgnization orgnization, int source, List<Integer> statusList, Date startDate, Date endDate,boolean withAllSub) throws DMException {
+        int totalCount=0;
+        if(orgnization==null){
+            return totalCount;
+        }
+        //
+        if(source==Person.SOURCE_OUT){
+            //外部来源，统计成为党员的时间
+            totalCount=personInfoMapper.countBySource(Arrays.asList(orgnization.getId()),Arrays.asList(Person.SOURCE_OUT),
+                    statusList,startDate,endDate);
+        }else{
+            //内部来源，统计成为预备党员时间
+            totalCount=prepareService.countByOrgWithTime(Arrays.asList(orgnization.getId()),startDate,endDate);
+        }
+        //下属组织的计算
+        if(withAllSub){
+            List<Orgnization> subOrgList=orgnizationService.getOrgByParent(orgnization,true);
+            if(subOrgList!=null&&subOrgList.size()>0){
+                List<Integer> orgIdList=new ArrayList<Integer>();
+                for(Orgnization subOrg:subOrgList){
+                    orgIdList.add(subOrg.getId());
+                }
+                if(source==Person.SOURCE_OUT){
+                    //外部来源，统计成为党员的时间
+                    int subCount=personInfoMapper.countBySource(orgIdList,Arrays.asList(Person.SOURCE_OUT),
+                            statusList,startDate,endDate);
+                    totalCount=totalCount+subCount;
+                }else{
+                    //内部来源，统计成为预备党员时间
+                    int subCount=prepareService.countByOrgWithTime(Arrays.asList(orgnization.getId()),startDate,endDate);
+                    totalCount=totalCount+subCount;
+                }
+            }
+        }
+        return totalCount;
+    }
+
+
+    @Override
     public List<Person> getByCondition(PersonCondition condition, Page page, PersonResult result) throws DMException {
         List<Person> personList = personInfoMapper.getByCondition(condition,page);
         if(personList!=null&&result!=null){
@@ -99,7 +138,8 @@ public class PersonServiceImpl implements IPersonService{
 
 
     @Override
-    public int countByOrgWithStatus(Orgnization orgnization, int status, boolean withAllSub) throws DMException {
+    public int countByOrgWithStatus(Orgnization orgnization,
+                                    List<Integer> statusList,List<Integer> sexList, List<Integer> nationList,List<Integer> degreeList,Date startBirth,Date endBirth,boolean withAllSub) throws DMException {
         int totalCount=0;
         if(orgnization==null){
             return totalCount;
@@ -107,7 +147,12 @@ public class PersonServiceImpl implements IPersonService{
         //组织直接的数量计算
         PersonCondition personCondition=new PersonCondition();
         personCondition.setOrgList(Arrays.asList(orgnization.getId()));
-        personCondition.setStatus(Arrays.asList(status));
+        personCondition.setStatus(statusList);
+        personCondition.setSexList(sexList);
+        personCondition.setNationList(nationList);
+        personCondition.setDegreeList(degreeList);
+        personCondition.setStartBirth(startBirth);
+        personCondition.setEndBirth(endBirth);
         totalCount=personInfoMapper.countByCondition(personCondition);
         //下属组织的计算
         if(withAllSub){
@@ -119,7 +164,12 @@ public class PersonServiceImpl implements IPersonService{
                 }
                 personCondition=new PersonCondition();
                 personCondition.setOrgList(orgIdList);
-                personCondition.setStatus(Arrays.asList(status));
+                personCondition.setStatus(statusList);
+                personCondition.setSexList(sexList);
+                personCondition.setNationList(nationList);
+                personCondition.setDegreeList(degreeList);
+                personCondition.setStartBirth(startBirth);
+                personCondition.setEndBirth(endBirth);
                 totalCount=totalCount+personInfoMapper.countByCondition(personCondition);
             }
         }

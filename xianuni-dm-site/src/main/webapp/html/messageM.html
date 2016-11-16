@@ -175,11 +175,11 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织','内容','是否下属组织可见','创建日期','操作'],
+                            colNames: ['ID','党组织','标题','是否下属组织可见','创建日期','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
-                                {name: 'content', index: 'content',width: 120, align: "left"},
+                                {name: 'title', index: 'content',width: 120, align: "left"},
                                 {name: 'toSub', index: 'toSub',width: 60, align: "left"},
                                 {name: 'create', index: 'create',width: 60, align: "left"},
                                 {name: 'actions', index: 'actions', width: 60, align: "center"}
@@ -197,12 +197,31 @@
                                 var ids = self.$el.jqGrid('getDataIDs');
                                 for (var i = 0; i < ids.length; i++) {
                                     var id = ids[i],
+                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>查看</a>',
                                             b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
                                     self.$el.jqGrid('setRowData', ids[i],
                                             {
-                                                actions: [b].join(' ')
+                                                actions: [a,b].join(' ')
                                             });
                                 }
+                                $('.J_edit').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    $('#idTag').val(id);
+                                    layer.open({
+                                        type: 2,
+                                        content: 'message/update.html',
+                                        area: ['100%', '100%'],
+                                        maxmin: false,
+                                        title: '通知信息',
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5, //0-6的动画形式，-1不开启
+                                        btn: ['取消'],
+                                        no: function (index) {
+                                            layer.close(index);
+                                        }
+                                    });
+                                })
                                 $('.J_delete').on('click', function () {
                                     var id = $(this).data('id');
                                     var index=layer.confirm('确定要删除该信息吗？', {
@@ -218,7 +237,7 @@
                                             type:'post',
                                             dataType:'json',
                                             success:function(data) {
-                                                if(data.success){
+                                                if(data.status){
                                                     layer.alert('删除信息成功', {icon: 1});
                                                     self.fetchData({});
                                                 }else{

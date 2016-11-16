@@ -32,7 +32,7 @@
         <div class="col-sm-9">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>民主评议信息</h5>
+                    <h5>组织特色活动信息</h5>
                 </div>
                 <div class="ibox-content">
                     <form role="form" class="form-inline form-group">
@@ -232,10 +232,11 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '会议主题','开始时间', '应到人数', '实际人数','操作'],
+                            colNames: ['ID','党组织', '会议类型','会议主题','开始时间', '应到人数', '实际人数','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left",hidden:true},
                                 {name: 'title', index: 'title',width: 60, align: "left"},
                                 {name: 'start', index: 'start',width: 60, align: "left"},
                                 {name: 'shouldNumber', index: 'shouldNumber',width: 60, align: "left"},

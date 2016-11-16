@@ -21,13 +21,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学工号：</label>
+        <label class="col-sm-2 control-label"><small>学工号：</small></label>
         <div class="col-sm-4">
             <input type="text" class="form-control" id="pNumber">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">类型：</label>
+        <label class="col-sm-2 control-label"><small>类型：</small></label>
         <div class="col-sm-2">
             <select id="pType" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">学生</option>
@@ -36,7 +36,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">姓名：</label>
+        <label class="col-sm-2 control-label"><small>姓名：</small></label>
         <div class="col-sm-2">
             <input type="text" class="form-control" id="name">
         </div>
@@ -48,9 +48,9 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">原来党组织名称：</label>
+        <label class="col-sm-2 control-label"><small>原来党组织名称：</small></label>
         <div class="col-sm-4">
-            <input type="text" maxlength="50" class="form-control" id="oldOrgName">
+            <input type="text" maxlength="50" class="form-control checkMaxLen" id="oldOrgName">
         </div>
     </div>
 </form>
@@ -75,6 +75,8 @@
 <script src="../../../static/js/plugins/layer/layer.min.js"></script>
 <!-- layerDate plugin javascript -->
 <script src="../../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../../static/js/plugins/chosen/chosen.jquery.js"></script>
 
 <script>
     $(document).ready(function () {
@@ -96,7 +98,7 @@
         for (var selector in config) {
             $(selector).chosen(config[selector]);
         }
-        $('#oldOrgName').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,

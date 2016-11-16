@@ -40,7 +40,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">支部审批：</label>
         <div class="col-sm-5">
-            <textarea id="branchApproval" name="branchApproval" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="branchApproval" name="branchApproval" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -71,19 +71,19 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">党支部大会内容：</label>
         <div class="col-sm-5">
-            <textarea id="meetContent" name="meetContent" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="meetContent" name="meetContent" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">校党委审批：</label>
         <div class="col-sm-5">
-            <textarea id="schoolApproval" name="schoolApproval" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="schoolApproval" name="schoolApproval" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">职称：</label>
         <div class="col-sm-3">
-            <input id="profession" type="text" class="form-control" name="profession">
+            <input id="profession" type="text" class="form-control checkMaxLen" maxlength="20" name="profession">
         </div>
     </div>
     <div class="form-group">
@@ -146,27 +146,7 @@
         for (var selector in config) {
             $(selector).chosen(config[selector]);
         }
-        $('#branchApproval').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
-        $('#schoolApproval').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
-        $('#meetContent').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,

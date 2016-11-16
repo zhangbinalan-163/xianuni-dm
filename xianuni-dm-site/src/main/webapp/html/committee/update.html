@@ -92,6 +92,16 @@
 
 <script>
     $(document).ready(function () {
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
         //获取信息
         var id=getIdTag();
         $.ajax( {
@@ -105,7 +115,7 @@
             success:function(data) {
                 if(data.success){
                     $('#orgName').html(data.orgName);
-                    $('#name').html(data.name);
+                    $('#name').html(data.personName);
                     $('#number').html(data.number);
                     $('#createTime').html(data.createTime);
                     $('#profession').html(data.profession);

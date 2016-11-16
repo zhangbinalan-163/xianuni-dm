@@ -31,7 +31,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">缴纳金额：</label>
         <div class="col-sm-4">
-            <input type="text" class="form-control" id="fee">
+            <input type="text" class="form-control checkMaxLen" maxlength="5" id="fee">
         </div>
     </div>
 
@@ -85,6 +85,16 @@
 
 <script>
     $(document).ready(function () {
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
         var config = {
             '.chosen-select': {},
             '.chosen-select-deselect': {

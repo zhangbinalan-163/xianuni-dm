@@ -67,20 +67,20 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">党支部大会内容：</label>
         <div class="col-sm-5">
-            <textarea id="meetContent" name="meetContent" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="meetContent" name="meetContent" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">政审情况：</label>
         <div class="col-sm-5">
-            <textarea id="politicalCheck" name="politicalCheck" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="politicalCheck" name="politicalCheck" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">入党介绍人：</label>
         <div class="col-sm-4">
             <input type="text" id="directorId" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部正式党员库查询</span>
+            <span class="help-block m-b-none">请从本党支部(正式党员+在编党员)库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -111,7 +111,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">职称：</label>
         <div class="col-sm-3">
-            <input id="profession" type="text" class="form-control" name="profession">
+            <input id="profession" type="text" class="form-control checkMaxLen" maxlength="20" name="profession">
         </div>
     </div>
     <div class="form-group">
@@ -174,27 +174,17 @@
         for (var selector in config) {
             $(selector).chosen(config[selector]);
         }
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
 
-        $('#politicalCheck').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
-        $('#meetContent').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
         var $pNumber = $("#pNumber");
         var $directorId= $("#directorId");
         var $partnerDiv = $("#partnerDiv");
@@ -260,7 +250,7 @@
         });
         $directorId.select2({
             ajax: {
-                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=9&orgId="+getOrgTag(),
+                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=5,9&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

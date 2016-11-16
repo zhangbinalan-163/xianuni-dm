@@ -215,9 +215,10 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '学工号','人员类型','身份证', '性别','民族', '学历','籍贯', '出生日期','职称', '民主测评时间','支部大会','培养人','操作'],
+                            colNames: ['ID','ORGID','党组织', '姓名', '学工号','人员类型','身份证', '性别','民族', '学历','籍贯', '出生日期','职称', '民主测评时间','支部大会','培养人','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
+                                {name: 'orgId', index: 'orgId',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
@@ -259,6 +260,8 @@
                                     var id = $(this).data('id');
                                     var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
                                     $('#idTag').val(id);
+                                    var orgId = data.orgId;
+                                    $('#orgIdTag').val(orgId);
                                     layer.open({
                                         type: 2,
                                         content: 'activitist/update.html',
@@ -270,7 +273,7 @@
                                         btn: ['提交修改', '取消'],
                                         yes: function(index){
                                             var inputs=layer.getChildFrame('body',index).find('input');
-                                            var number,directorNumber,meetTime,meetContent,evaTime,evaContent,profession,degree,quntuan,beian,talked;
+                                            var meetTime,meetContent,evaTime,evaContent,profession,degree,quntuan,beian,talked,talkerNumber;
                                             for(var i=0; i<inputs.length; i++){
                                                 var inputName=inputs[i].id;
                                                 var inputValue=inputs[i].value;
@@ -283,6 +286,9 @@
                                                 }
                                                 if(inputName=='profession'){
                                                     profession=inputValue;
+                                                }
+                                                if(inputName=='pTalker'){
+                                                    talkerNumber=inputValue;
                                                 }
                                             }
                                             var selects=layer.getChildFrame('body',index).find('select');
@@ -318,6 +324,7 @@
                                                 data:{
                                                     personId : id,
                                                     meetTime:meetTime,
+                                                    directorIds:talkerNumber,
                                                     meetContent:meetContent,
                                                     evaTime:evaTime,
                                                     evaContent:evaContent,

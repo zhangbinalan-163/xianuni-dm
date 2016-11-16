@@ -27,7 +27,7 @@ public class Person {
     private Date updateTime;
     private String personDesc;
     private int source;
-    private Date bePartyDate;//入党时间
+    private Date bePatyDate;//入党时间
     private Date rollDate;//入学、参加工作时间
     private String professionalClass;//专业班级
 
@@ -286,12 +286,12 @@ public class Person {
         return profession;
     }
 
-    public Date getBePartyDate() {
-        return bePartyDate;
+    public Date getBePatyDate() {
+        return bePatyDate;
     }
 
-    public void setBePartyDate(Date bePartyDate) {
-        this.bePartyDate = bePartyDate;
+    public void setBePatyDate(Date bePatyDate) {
+        this.bePatyDate = bePatyDate;
     }
 
     public Date getRollDate() {

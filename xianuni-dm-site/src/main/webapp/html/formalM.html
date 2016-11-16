@@ -15,7 +15,6 @@
     <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
     <base target="_blank">
 </head>
-
 <body class="gray-bg">
 <div class="wrapper wrapper-content  animated fadeInRight">
     <div class="row">
@@ -41,9 +40,11 @@
                             <input type="text" placeholder="请输入学工号" id="number" class="form-control">
                         </div>
                         <button id="searchBtn" class="btn btn-primary" type="button">搜索</button>
-                        <button id="addBtn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="testSpan" class="bold">新增</span>
+                        <button id="addBtn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="testSpan2" class="bold">校内新增</span>
                         </button>
-                        <button id="batchUpBtn" class="btn btn-primary " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="batchSpan" class="bold">批量添加</span>
+                        <button id="addOutBtn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="testSpan" class="bold">新增</span>
+                        </button>
+                        <button id="batchUpBtn" class="btn btn-success " type="button"><i class="fa fa-upload"></i>&nbsp;&nbsp;<span id="batchSpan" class="bold">批量导入</span>
                         </button>
                     </form>
                     <div class="jqGrid_wrapper">
@@ -61,14 +62,11 @@
 <!-- 全局js -->
 <script src="../static/js/jquery.min.js?v=2.1.4"></script>
 <script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
-
 <!-- 自定义js -->
 <script src="../static/js/content.js?v=1.0.0"></script>
-
 <!-- jqGrid -->
 <script src="../static/js/plugins/jqgrid/i18n/grid.locale-cn.js?0820"></script>
 <script src="../static/js/plugins/jqgrid/jquery.jqGrid.min.js?0820"></script>
-
 <!-- zTree plugin javascript -->
 <script src="../static/js/plugins/zTree/jquery.ztree.all-3.5.min.js"></script>
 <!-- layer javascript -->
@@ -122,6 +120,142 @@
                         btn: ['关闭'],
                         yes: function(index){
                             layer.close(index);
+                        }
+                    });
+                });
+                $('#addOutBtn').on('click', function () {
+                    // 选中的节点
+                    var node = tree.zTree && tree.zTree.getSelectedNodes()[0];
+                    if(!node||node.id==0){
+                        layer.alert('请选择一个党组织', {icon: 5});
+                        return
+                    }
+                    layer.open({
+                        type: 2,
+                        content: 'formal/addNew.html',
+                        area: ['100%', '100%'],
+                        maxmin: false,
+                        title: '创建<strong>' + node.name +'</strong>的基础人员信息',
+                        shade: 0.6, //遮罩透明度
+                        shift: 5, //0-6的动画形式，-1不开启
+                        btn: ['创建', '取消'],
+                        yes: function(index){
+                            var inputs=layer.getChildFrame('body',index).find('input');
+                            var name,number,idNumber,birth,desc,nation,degree,sex,type,hometown,profession;
+                            for(var i=0; i<inputs.length; i++){
+                                var inputName=inputs[i].id;
+                                var inputValue=inputs[i].value;
+                                if(inputName=='pName'){
+                                    if(!inputValue){
+                                        layer.alert('名字不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    name=inputValue;
+                                }
+                                if(inputName=='pNumber'){
+                                    if(!inputValue){
+                                        layer.alert('学工号不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    number=inputValue;
+                                }
+                                if(inputName=='pIdNumber'){
+                                    if(!inputValue){
+                                        layer.alert('身份证不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    idNumber=inputValue;
+                                }
+                                if(inputName=='pBirth'){
+                                    if(!inputValue){
+                                        layer.alert('出生日期不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    birth=inputValue;
+                                }
+                                if(inputName=='profession'){
+                                    if(!inputValue){
+                                        layer.alert('职称不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    profession=inputValue;
+                                }
+                                if(inputName=='pHometown'){
+                                    hometown=inputValue;
+                                }
+                            }
+                            var selects=layer.getChildFrame('body',index).find('select');
+                            for(var i=0; i<selects.length; i++){
+                                var inputName=selects[i].id;
+                                var inputValue=selects[i].value;
+                                if(inputName=='pNation'){
+                                    if(!inputValue){
+                                        layer.alert('民族不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    nation=inputValue;
+                                }
+                                if(inputName=='pDegree'){
+                                    if(!inputValue){
+                                        layer.alert('学历不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    degree=inputValue;
+                                }
+                                if(inputName=='pSex'){
+                                    if(!inputValue){
+                                        layer.alert('性别不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    sex=inputValue;
+                                }
+                                if(inputName=='pType'){
+                                    if(!inputValue){
+                                        layer.alert('类别不能为空', {icon: 5});
+                                        return;
+                                    }
+                                    type=inputValue;
+                                }
+                            }
+                            var textareas=layer.getChildFrame('body',index).find('textarea');
+                            for(var i=0; i<textareas.length; i++){
+                                var inputName=textareas[i].id;
+                                var inputValue=textareas[i].value;
+                                if(inputName=='pDesc'){
+                                    desc=inputValue;
+                                }
+                            }
+                            $.ajax( {
+                                url:'/xianuni-dm/person/formalAddNew.do',
+                                data:{
+                                    orgId : node.id,
+                                    name:name,
+                                    type:type,
+                                    nation:nation,
+                                    degree:degree,
+                                    sex:sex,
+                                    desc:desc,
+                                    birth:birth,
+                                    number:number,
+                                    idNumber:idNumber,
+                                    hometown:hometown,
+                                    profession:profession
+                                },
+                                type:'post',
+                                dataType:'json',
+                                success:function(data) {
+                                    if(data.success){
+                                        layer.alert('添加信息成功', {icon: 1});
+                                        layer.close(index);
+                                        self.fetchData({});
+                                    }else{
+                                        layer.alert('添加信息失败！'+data.msg, {icon: 5});
+                                    }
+                                },
+                                error : function() {
+                                    layer.alert('添加信息失败', {icon: 5});
+                                }
+                            });
                         }
                     });
                 });
@@ -187,7 +321,7 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '姓名', '学工号','人员类型','身份证', '性别','民族','籍贯', '出生日期','是否外部转入','操作'],
+                            colNames: ['ID','党组织', '姓名', '学工号','人员类型','身份证', '性别','民族','籍贯', '出生日期','是否导入','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
@@ -215,12 +349,62 @@
                                 var ids = self.$el.jqGrid('getDataIDs');
                                 for (var i = 0; i < ids.length; i++) {
                                     var id = ids[i],
-                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>';
+                                            c = '<a class="J_info" data-id="' + id + '"><i class="fa fa-edit"></i>预览</a>',
+                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>编辑</a>',
+                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
                                     self.$el.jqGrid('setRowData', ids[i],
                                             {
-                                                actions: [a].join(' ')
+                                                actions: [c,a,b].join(' ')
                                             });
                                 }
+                                $('.J_info').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    $('#idTag').val(id);
+                                    layer.open({
+                                        type: 2,
+                                        content: 'formal/info.html',
+                                        area: ['100%', '100%'],
+                                        maxmin: false,
+                                        title: '<strong>' + data.number+'<-->'+data.name+'</strong>的党员信息',
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5, //0-6的动画形式，-1不开启
+                                        btn: ['取消'],
+                                        no: function (index) {
+                                            layer.close(index);
+                                        }
+                                    });
+                                })
+                                $('.J_delete').on('click', function () {
+                                    var id = $(this).data('id');
+                                        var index=layer.confirm('确定删除吗？', {
+                                            btn: ['确认','取消'], //按钮
+                                            shade: 0.6, //遮罩透明度
+                                            shift: 5 //0-6的动画形式，-1不开启
+                                        }, function(){
+                                            $.ajax( {
+                                                url:'/xianuni-dm/person/formal/delete.do',
+                                                data:{
+                                                    id :id
+                                                },
+                                                type:'post',
+                                                dataType:'json',
+                                                success:function(data) {
+                                                    if(data.status){
+                                                        layer.alert('删除信息成功', {icon: 1});
+                                                        self.fetchData({});
+                                                    }else{
+                                                        layer.alert('删除信息失败！'+data.msg, {icon: 5});
+                                                    }
+                                                },
+                                                error : function() {
+                                                    layer.alert('删除信息失败', {icon: 5});
+                                                }
+                                            });
+                                        }, function(){
+                                            layer.close(index);
+                                        });
+                                })
                                 $('.J_edit').on('click', function () {
                                     var id = $(this).data('id');
                                     var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
@@ -236,7 +420,7 @@
                                         btn: ['保存修改', '取消'],
                                         yes: function(index){
                                             var inputs=layer.getChildFrame('body',index).find('input');
-                                            var name,idNumber,birth,desc,degree,sex,type,nation,profession;
+                                            var name,idNumber,birth,desc,degree,sex,type,nation,profession,hometown,bePartyTime,rollTime;
                                             for(var i=0; i<inputs.length; i++){
                                                 var inputName=inputs[i].id;
                                                 var inputValue=inputs[i].value;
@@ -254,11 +438,20 @@
                                                     }
                                                     idNumber=inputValue;
                                                 }
+                                                if(inputName=='pBePartyTime'){
+                                                    bePartyTime=inputValue;
+                                                }
                                                 if(inputName=='pBirth'){
                                                     birth=inputValue;
                                                 }
+                                                if(inputName=='pRollTime'){
+                                                    rollTime=inputValue;
+                                                }
                                                 if(inputName=='pProfession'){
                                                     profession=inputValue;
+                                                }
+                                                if(inputName=='pHometown'){
+                                                    hometown=inputValue;
                                                 }
                                             }
                                             var selects=layer.getChildFrame('body',index).find('select');
@@ -299,7 +492,10 @@
                                                     birth:birth,
                                                     idNumber:idNumber,
                                                     nation:nation,
-                                                    profession:profession
+                                                    profession:profession,
+                                                    hometown:hometown,
+                                                    bePartyTime:bePartyTime,
+                                                    rollTime:rollTime
                                                 },
                                                 type:'post',
                                                 dataType:'json',
@@ -371,8 +567,6 @@
             }
 
         }).init();
-
-        // Add responsive to jqGrid
         $(window).bind('resize', function () {
             var width = $('.jqGrid_wrapper').width();
             $('#list').setGridWidth(width);

@@ -25,7 +25,7 @@
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
             <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部在编党员库查询</span>
+            <span class="help-block m-b-none">请从本党支部(正式党员+预备党员+在编党员)库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -70,19 +70,19 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">职称：</label>
         <div class="col-sm-3">
-            <input id="profession" type="text" class="form-control" name="profession">
+            <input id="profession" type="text" class="form-control checkMaxLen" maxlength="20" name="profession">
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">电话：</label>
         <div class="col-sm-3">
-            <input id="tel" type="text" class="form-control" name="profession">
+            <input id="tel" type="text" class="form-control checkMaxLen" maxlength="13" name="profession">
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">备注：</label>
         <div class="col-sm-3">
-            <input id="desc" type="text" class="form-control" name="profession">
+            <input id="desc" type="text" class="form-control checkMaxLen" maxlength="100" name="profession">
         </div>
     </div>
 </form>
@@ -107,11 +107,24 @@
 <script src="../../static/js/plugins/layer/layer.min.js"></script>
 <!-- layerDate plugin javascript -->
 <script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- maxlength -->
+<script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
+
 <script src="../../static/js/plugins/select2/select2.js"></script>
 <script src="../../static/js/plugins/select2/select2_locale_zh-CN.js"></script>
 
 <script>
     $(document).ready(function () {
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
         var config = {
             '.chosen-select': {},
             '.chosen-select-deselect': {

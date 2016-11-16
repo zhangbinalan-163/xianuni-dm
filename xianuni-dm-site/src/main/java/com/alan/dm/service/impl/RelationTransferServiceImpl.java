@@ -16,9 +16,13 @@ import java.util.List;
  */
 @Service(value = "relationTransferService")
 public class RelationTransferServiceImpl implements IRelationTransferService {
-
     @Autowired
     private RelationTransferMapper relationTransferMapper;
+
+    @Override
+    public void updateTransfer(RelationTransferInfo relationTransferInfo) throws DMException {
+        relationTransferMapper.update(relationTransferInfo);
+    }
 
     @Override
     public List<RelationTransferInfo> getByCondition(RelationTransferCondition condition, Page page) throws DMException {

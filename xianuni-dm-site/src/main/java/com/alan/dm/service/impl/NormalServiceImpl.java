@@ -42,6 +42,7 @@ public class NormalServiceImpl implements INormalService {
 
     @Override
     public void updateNormal(NormalInfo normalInfo) throws DMException {
+        normalInfo.setUpdateTime(new Date());
         normalInfoMapper.update(normalInfo);
     }
 }

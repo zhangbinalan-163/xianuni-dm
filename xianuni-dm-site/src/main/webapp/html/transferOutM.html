@@ -111,60 +111,124 @@
                         layer.alert('请选择一个党组织', {icon: 5});
                         return
                     }
-                    layer.open({
-                        type: 2,
-                        content: 'transfer/out/addToOut.html',
-                        area: ['100%', '100%'],
-                        maxmin: false,
-                        title: '创建<strong>' + node.name + '</strong>的校外转出信息',
-                        shade: 0.6, //遮罩透明度
-                        shift: 5, //0-6的动画形式，-1不开启
-                        btn: ['创建', '取消'],
-                        yes: function (index) {
-                            var inputs = layer.getChildFrame('body', index).find('input');
-                            var number, orgName;
-                            for (var i = 0; i < inputs.length; i++) {
-                                var inputName = inputs[i].id;
-                                var inputValue = inputs[i].value;
-                                if (inputName == 'pNumber') {
-                                    if (!inputValue) {
-                                        layer.alert('学工号不能为空', {icon: 5});
-                                        return;
+                    //询问框
+                    var index=layer.confirm('是否是转出到校外', {
+                        btn: ['是','不，是校内转出'], //按钮
+                        shade: false //不显示遮罩
+                    }, function(){
+                        layer.close(index);
+                        layer.open({
+                            type: 2,
+                            content: 'transfer/out/addToOut.html',
+                            area: ['100%', '100%'],
+                            maxmin: false,
+                            title: '创建<strong>' + node.name + '</strong>的校外转出信息',
+                            shade: 0.6, //遮罩透明度
+                            shift: 5, //0-6的动画形式，-1不开启
+                            btn: ['创建', '取消'],
+                            yes: function (index) {
+                                var inputs = layer.getChildFrame('body', index).find('input');
+                                var number, orgName,name,type;
+                                for (var i = 0; i < inputs.length; i++) {
+                                    var inputName = inputs[i].id;
+                                    var inputValue = inputs[i].value;
+                                    if (inputName == 'pNumber') {
+                                        if (!inputValue) {
+                                            layer.alert('学工号不能为空', {icon: 5});
+                                            return;
+                                        }
+                                        number = inputValue;
                                     }
-                                    number = inputValue;
-                                }
-                                if (inputName == 'newOrgName') {
-                                    if (!inputValue) {
-                                        layer.alert('转出组织名称不能为空', {icon: 5});
-                                        return;
+                                    if (inputName == 'newOrgName') {
+                                        if (!inputValue) {
+                                            layer.alert('转出党组织名称不能为空', {icon: 5});
+                                            return;
+                                        }
+                                        orgName = inputValue;
                                     }
-                                    orgName = inputValue;
                                 }
+                                $.ajax({
+                                    url: '/xianuni-dm/relation/transfer/out/add.do',
+                                    data: {
+                                        orgId: node.id,
+                                        number: number,
+                                        orgName: orgName,
+                                        type: 2
+                                    },
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if (data.success) {
+                                            layer.alert('添加信息成功', {icon: 1});
+                                            layer.close(index);
+                                            self.fetchData({});
+                                        } else {
+                                            layer.alert('添加信息失败！' + data.msg, {icon: 5});
+                                        }
+                                    },
+                                    error: function () {
+                                        layer.alert('添加信息失败', {icon: 5});
+                                    }
+                                });
                             }
-                            $.ajax({
-                                url: '/xianuni-dm/relation/transfer/out/add.do',
-                                data: {
-                                    orgId: node.id,
-                                    number: number,
-                                    orgName: orgName,
-                                    type: 2
-                                },
-                                type: 'post',
-                                dataType: 'json',
-                                success: function (data) {
-                                    if (data.success) {
-                                        layer.alert('添加信息成功', {icon: 1});
-                                        layer.close(index);
-                                        self.fetchData({});
-                                    } else {
-                                        layer.alert('添加信息失败！' + data.msg, {icon: 5});
+                        });
+                    }, function(){
+                        layer.close(index);
+                        layer.open({
+                            type: 2,
+                            content: 'transfer/out/addToInner.html',
+                            area: ['100%', '100%'],
+                            maxmin: false,
+                            title: '创建<strong>' + node.name + '</strong>的校内转出信息',
+                            shade: 0.6, //遮罩透明度
+                            shift: 5, //0-6的动画形式，-1不开启
+                            btn: ['创建', '取消'],
+                            yes: function (index) {
+                                var inputs = layer.getChildFrame('body', index).find('input');
+                                var number,toOrgId;
+                                for (var i = 0; i < inputs.length; i++) {
+                                    var inputName = inputs[i].id;
+                                    var inputValue = inputs[i].value;
+                                    if (inputName == 'pNumber') {
+                                        if (!inputValue) {
+                                            layer.alert('学工号不能为空', {icon: 5});
+                                            return;
+                                        }
+                                        number = inputValue;
                                     }
-                                },
-                                error: function () {
-                                    layer.alert('添加信息失败', {icon: 5});
+                                    if (inputName == 'toOrgId') {
+                                        if (!inputValue) {
+                                            layer.alert('转出党组织不能为空', {icon: 5});
+                                            return;
+                                        }
+                                        toOrgId = inputValue;
+                                    }
                                 }
-                            });
-                        }
+                                $.ajax({
+                                    url: '/xianuni-dm/relation/transfer/out/add.do',
+                                    data: {
+                                        orgId: node.id,
+                                        number: number,
+                                        toOrgId:toOrgId,
+                                        type: 0
+                                    },
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        if (data.success) {
+                                            layer.alert('添加信息成功', {icon: 1});
+                                            layer.close(index);
+                                            self.fetchData({});
+                                        } else {
+                                            layer.alert('添加信息失败！' + data.msg, {icon: 5});
+                                        }
+                                    },
+                                    error: function () {
+                                        layer.alert('添加信息失败', {icon: 5});
+                                    }
+                                });
+                            }
+                        });
                     });
                 });
             },
@@ -176,16 +240,17 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID', '姓名', '学工号','原组织','转入组织', '操作时间','操作类型','操作'],
+                            colNames: ['ID', '姓名', '学工号','原组织','转入组织','状态','操作类型', '申请时间','完成时间'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
                                 {name: 'fromOrg', index: 'fromOrg',width: 60, align: "left"},
                                 {name: 'toOrg', index: 'toOrg',width: 60, align: "left"},
-                                {name: 'time', index: 'time',width: 60, align: "left"},
+                                {name: 'status', index: 'status',width: 60, align: "left"},
                                 {name: 'type', index: 'type',width: 60, align: "left"},
-                                {name: 'actions', index: 'actions', width: 120, align: "center"}
+                                {name: 'time', index: 'time',width: 60, align: "left"},
+                                {name: 'done', index: 'done',width: 60, align: "left"},
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
@@ -193,49 +258,7 @@
                             sortname: 'id',
                             mtype: "get",
                             height: 400,
-                            viewrecords: true,
-                            // 自定义事件
-                            gridComplete: function () {
-                                var ids = self.$el.jqGrid('getDataIDs');
-                                for (var i = 0; i < ids.length; i++) {
-                                    var id = ids[i],
-                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
-                                    self.$el.jqGrid('setRowData', ids[i],
-                                            {
-                                                actions: [b].join(' ')
-                                            });
-                                }
-                                $('.J_delete').on('click', function () {
-                                    var id = $(this).data('id');
-                                    var index=layer.confirm('确定要删除该记录吗', {
-                                        btn: ['确认','取消'], //按钮
-                                        shade: 0.6, //遮罩透明度
-                                        shift: 5 //0-6的动画形式，-1不开启
-                                    }, function(){
-                                        $.ajax( {
-                                            url:'/xianuni-dm/relation/transfer/delete.do',
-                                            data:{
-                                                id :id
-                                            },
-                                            type:'post',
-                                            dataType:'json',
-                                            success:function(data) {
-                                                if(data.success){
-                                                    layer.alert('删除信息成功', {icon: 1});
-                                                    self.fetchData({});
-                                                }else{
-                                                    layer.alert('删除信息失败！'+data.msg, {icon: 5});
-                                                }
-                                            },
-                                            error : function() {
-                                                layer.alert('删除信息失败', {icon: 5});
-                                            }
-                                        });
-                                    }, function(){
-                                        layer.close(index);
-                                    });
-                                })
-                            }
+                            viewrecords: true
                         })
                         .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
             }

@@ -40,6 +40,12 @@ public interface IRelationTransferService {
      * @param relationTransferInfo
      * @throws DMException
      */
+    void updateTransfer(RelationTransferInfo relationTransferInfo) throws DMException;
+    /**
+     *
+     * @param relationTransferInfo
+     * @throws DMException
+     */
     void deleteTransfer(RelationTransferInfo relationTransferInfo) throws DMException;
 
     /**

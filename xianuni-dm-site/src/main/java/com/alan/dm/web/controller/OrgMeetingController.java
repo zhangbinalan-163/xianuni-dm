@@ -54,7 +54,7 @@ public class OrgMeetingController extends BaseController {
     public String update(HttpServletRequest httpServletRequest) throws Exception {
         Request request=getRequest(httpServletRequest);
         Integer meetingId=request.getInt("meetingId");
-        Date startTime=request.getDate("startTime", "YYYY-MM-DD hh:mm:ss");
+        Date startTime=request.getDate("startTime", "yyyy-MM-dd hh:mm:ss");
         String location=request.getString("location");
         String theme=request.getString("theme");
         Integer shouldPersonCount=request.getInt("shouldPersonCount", 0);
@@ -161,11 +161,29 @@ public class OrgMeetingController extends BaseController {
         Request request=getRequest(httpServletRequest);
         Integer orgId=request.getInt("orgId");
         Integer type=request.getInt("type");
-        Date startTime=request.getDate("startTime", "YYYY-MM-DD hh:mm:ss");
+        Date startTime=request.getDate("startTime", "yyyy-MM-dd hh:mm:ss");
         String location=request.getString("location");
         String theme=request.getString("theme");
-        Integer shouldPersonCount=request.getInt("shouldPersonCount", 0);
-        Integer realPersonCount=request.getInt("realPersonCount", 0);
+        String shouldPersonCountParam=request.getString("shouldPersonCount");
+        Integer shouldPersonCount;
+        try{
+            shouldPersonCount=Integer.parseInt(shouldPersonCountParam);
+        }catch (Exception e){
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("success", false);
+            jsonObject.put("msg", "应参加人数格式错误");
+            return JsonUtils.fromObject(jsonObject);
+        }
+        String realPersonCountParam=request.getString("realPersonCount");
+        Integer realPersonCount;
+        try{
+            realPersonCount=Integer.parseInt(realPersonCountParam);
+        }catch (Exception e){
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("success", false);
+            jsonObject.put("msg", "实际参加人数格式错误");
+            return JsonUtils.fromObject(jsonObject);
+        }
         String comePerson=request.getString("comePerson", "");
         String noComePerson=request.getString("noComePerson", "");
         String zhuchiren=request.getString("zhuchiren","");
@@ -201,6 +219,9 @@ public class OrgMeetingController extends BaseController {
                 }else if(personId==-6){
                     //发展对象
                     statusList.add(PersonStatus.INTENTION.getId());
+                }else if(personId==-7){
+                    //在编对象
+                    statusList.add(PersonStatus.FORMAL.getId());
                 }else{
                     Person person = personService.getById(personId);
                     if(person!=null&&!containPersonType(statusList,person.getStatus())){
@@ -209,7 +230,9 @@ public class OrgMeetingController extends BaseController {
                 }
             }
             //再去获取全部信息
-            personList.addAll(getAllPerson(orgId, true, statusList));
+            if(statusList.size()>0){
+                personList.addAll(getAllPerson(orgId, true, statusList));
+            }
         }
 
         OrgMeeting orgMeeting=new OrgMeeting();
@@ -310,8 +333,11 @@ public class OrgMeetingController extends BaseController {
         Integer orgId = request.getInt("orgId", 0);
         Integer limit = request.getInt("rows", 10);
         Integer page = request.getInt("page", 1);
-        Integer type = request.getInt("type", 1);
-
+        List<Integer> types=new ArrayList<Integer>();
+        String[] typeStrList=request.getStringArray("type", ",");
+        for(String typeStr:typeStrList){
+            types.add(Integer.parseInt(typeStr));
+        }
         boolean containSubOrg=request.getBoolean("containSub", true);
         //如果没有传入orgId，设置为管理员所管理的ORG
         if(orgId==0){
@@ -345,7 +371,7 @@ public class OrgMeetingController extends BaseController {
         Page pageInfo=new Page();
         pageInfo.setCurrent((page - 1) * limit);
         pageInfo.setSize(limit);
-        condition.setTypeList(Arrays.asList(type));
+        condition.setTypeList(types);
 
         int count = orgMeetingService.countByCondition(condition);
         List<OrgMeeting> meetingList=orgMeetingService.getByCondition(condition,pageInfo);
@@ -364,8 +390,9 @@ public class OrgMeetingController extends BaseController {
                 cellList.add(String.valueOf(orgMeeting.getId()));
                 Orgnization orgInfo = orgMeeting.getOrgnization();
                 cellList.add(orgInfo.getName());
+                cellList.add(MeetingType.getInstance(orgMeeting.getMeetingType()).getName());
                 cellList.add(orgMeeting.getTheme());
-                cellList.add(TimeUtils.convertToTimeString(orgMeeting.getStartTime()));
+                cellList.add(TimeUtils.convertToDateString(orgMeeting.getStartTime()));
                 cellList.add(orgMeeting.getShouldNumberOfPeople()+"人");
                 cellList.add(orgMeeting.getRealNumberOfPeople()+"人");
                 subOrgObject.put("cell", cellList);

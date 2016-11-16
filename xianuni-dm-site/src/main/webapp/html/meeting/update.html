@@ -19,7 +19,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>会议主题</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="theme">
+            <input type="text" class="form-control checkMaxLen" maxlength="50" id="theme">
         </div>
     </div>
     <div class="form-group">
@@ -32,50 +32,50 @@
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>会议地点</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="location"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="30" id="location"></p>
         </div>
     </div>
     <div class="hr-line-dashed"></div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>主持人</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="compere"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="20" id="compere"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>记录人</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="recorder"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="20" id="recorder"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>应到人数</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="shouldNumber"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="5" id="shouldNumber"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>实到人数</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="realNumber"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="5" id="realNumber"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>参加人员</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="attendPerson"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="50" id="attendPerson"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>缺席人员</small></label>
         <div class="col-sm-5">
-            <input type="text" class="form-control" id="absencePerson"></p>
+            <input type="text" class="form-control checkMaxLen" maxlength="50" id="absencePerson"></p>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label"><small>会议纪要</small></label>
         <div class="col-sm-5">
-            <textarea id="content" name="content" class="form-control" maxlength="500" rows="10" required="" aria-required="true"></textarea>
+            <textarea id="content" name="content" class="form-control checkMaxLen" maxlength="500" rows="10" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -123,6 +123,16 @@
 
 <script>
     $(document).ready(function () {
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
 
         var $list = $('#thelist'),
                 $btn = $('#ctlBtn'),

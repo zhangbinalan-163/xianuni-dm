@@ -25,7 +25,7 @@
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
             <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部正式党员和预备党员库查询</span>
+            <span class="help-block m-b-none">请从本党支部(预备党员+正式党员+在编党员)库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -96,7 +96,7 @@
 
         $pNumber.select2({
             ajax: {
-                url: "/xianuni-dm/person/listQuery.do?status=4,5&orgId="+getOrgTag(),
+                url: "/xianuni-dm/person/listQuery.do?status=4,5,9&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

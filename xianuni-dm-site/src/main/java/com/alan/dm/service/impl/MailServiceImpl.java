@@ -21,6 +21,11 @@ public class MailServiceImpl implements MailService {
     private MailMapper mailMapper;
 
     @Override
+    public int countByPerson(Person person) throws DMException {
+        return mailMapper.countByPerson(person);
+    }
+
+    @Override
     public void deleteMail(MailInfo mailInfo) throws DMException {
         mailMapper.delete(mailInfo.getId());
     }

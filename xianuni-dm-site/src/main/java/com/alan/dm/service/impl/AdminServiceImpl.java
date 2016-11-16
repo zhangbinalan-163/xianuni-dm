@@ -51,7 +51,13 @@ public class AdminServiceImpl implements IAdminService{
             personCondition.setOrgList(orgIdsList);
         }
         personCondition.setNumber(number);
-        return personInfoMapper.getAdminCandidateList(personCondition,page);
+        List<Person> personList = personInfoMapper.getAdminCandidateList(personCondition, page);
+        if(personList==null||personList.size()==0){
+            personCondition.setName(number);
+            personCondition.setNumber(null);
+            personList=personInfoMapper.getAdminCandidateList(personCondition,page);
+        }
+        return personList;
     }
 
     @Override

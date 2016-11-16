@@ -86,6 +86,12 @@
         </if>
     </select>
 
+    <select id="countByPerson" resultType="Integer">
+        SELECT count(*)
+        FROM <include refid="MAIL_TABLE" />
+        WHERE personId=#{person.id}
+    </select>
+
     <delete id="delete" parameterType="Integer">
         delete FROM
         <include refid="MAIL_TABLE" />

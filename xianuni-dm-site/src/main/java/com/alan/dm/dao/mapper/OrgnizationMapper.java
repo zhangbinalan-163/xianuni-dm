@@ -3,6 +3,7 @@ package com.alan.dm.dao.mapper;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
+import com.alan.dm.entity.query.OrgnizationCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,6 +13,14 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/11.
  */
 public interface OrgnizationMapper {
+    /**
+     *
+     * @param condition
+     * @param page
+     * @return
+     */
+    List<Orgnization> getByCondition(@Param(value="condition") OrgnizationCondition condition,@Param(value = "page") Page page);
+
     /**
      * 根据父组织查询直属组织
      * @param parentId

@@ -12,21 +12,25 @@
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="person.id">
         INSERT INTO
         <include refid="PERSON_TABLE"/>
-        (orgId,name,status,type,number,idNumber,hometown,sex,nation,degree,password,birth,createTime,personDesc,applierInfoId,activitistInfoId,intentionInfoId,prepareInfoId,normalInfoId,profession)
+        (orgId,name,status,type,number,idNumber,hometown,sex,nation,degree,password,birth,
+        createTime,personDesc,applierInfoId,activitistInfoId,intentionInfoId,prepareInfoId,normalInfoId,profession,bePatyDate,rollDate,professionalClass,source)
         VALUES(#{person.orgnization.id},#{person.name},#{person.status},#{person.type},
-        #{person.number},#{person.idNumber},#{person.hometown},#{person.sex},#{person.nation},#{person.degree},#{person.password},#{person.birth},#{person.createTime},
-        #{person.personDesc},#{person.applierInfoId},#{person.activitistInfoId},#{person.intentionInfoId},#{person.prepareInfoId},#{person.normalInfoId},#{person.profession})
+        #{person.number},#{person.idNumber},#{person.hometown},#{person.sex},#{person.nation},#{person.degree},
+        #{person.password},#{person.birth},#{person.createTime},
+        #{person.personDesc},#{person.applierInfoId},#{person.activitistInfoId},
+        #{person.intentionInfoId},#{person.prepareInfoId},#{person.normalInfoId},#{person.profession}
+        ,#{person.bePatyDate},#{person.rollDate},#{person.professionalClass},#{person.source})
     </insert>
 
     <!-- 更新数据，暂时只有状态修改-->
     <update id="update">
         UPDATE <include refid="PERSON_TABLE"/>
         SET
-        orgId=#{person.orgId},name=#{person.name},status=#{person.status},type=#{person.type},number=#{person.number},
+        orgId=#{person.orgId},name=#{person.name},status=#{person.status},type=#{person.type},number=#{person.number},source=#{person.source},
         idNumber=#{person.idNumber},hometown=#{person.hometown},sex=#{person.sex},nation=#{person.nation},degree=#{person.degree},
         birth=#{person.birth},personDesc=#{person.personDesc},applierInfoId=#{person.applierInfoId},activitistInfoId=#{person.activitistInfoId},
         intentionInfoId=#{person.intentionInfoId},prepareInfoId=#{person.prepareInfoId},normalInfoId=#{person.normalInfoId},profession=#{person.profession},
-        updateTime=#{person.updateTime}
+        updateTime=#{person.updateTime},bePatyDate=#{person.bePatyDate},rollDate=#{person.rollDate},professionalClass=#{person.professionalClass}
         WHERE id=#{person.id}
     </update>
 
@@ -61,6 +65,33 @@
                     #{status}
                 </foreach>
             </if>
+            <if test="condition.sexList != null">
+                AND sex in
+                <foreach collection="condition.sexList" index="index" item="sex" open="("
+                         separator="," close=")">
+                    #{sex}
+                </foreach>
+            </if>
+            <if test="condition.nationList != null">
+                AND nation in
+                <foreach collection="condition.nationList" index="index" item="nation" open="("
+                         separator="," close=")">
+                    #{nation}
+                </foreach>
+            </if>
+            <if test="condition.degreeList != null">
+                AND degree in
+                <foreach collection="condition.degreeList" index="index" item="degree" open="("
+                         separator="," close=")">
+                    #{degree}
+                </foreach>
+            </if>
+            <if test="condition.startBirth != null">
+                AND birth <![CDATA[>=]]> #{condition.startBirth}
+            </if>
+            <if test="condition.endBirth != null">
+                AND birth <![CDATA[<]]> #{condition.endBirth}
+            </if>
             <if test="condition.number != null">
                 <bind name="patternNumber" value="condition.number+ '%'" />
                 AND number LIKE #{patternNumber}
@@ -94,13 +125,72 @@
                     #{status}
                 </foreach>
             </if>
-            <if test="condition.number != null">
-                <bind name="patternNumber" value="condition.number+ '%'" />
-                AND number LIKE #{patternNumber}
+            <if test="condition.sexList != null">
+                AND sex in
+                <foreach collection="condition.sexList" index="index" item="sex" open="("
+                         separator="," close=")">
+                    #{sex}
+                </foreach>
             </if>
+            <if test="condition.nationList != null">
+                AND nation in
+                <foreach collection="condition.nationList" index="index" item="nation" open="("
+                         separator="," close=")">
+                    #{nation}
+                </foreach>
+            </if>
+            <if test="condition.degreeList != null">
+                AND degree in
+                <foreach collection="condition.degreeList" index="index" item="degree" open="("
+                         separator="," close=")">
+                    #{degree}
+                </foreach>
+            </if>
+            <if test="condition.startBirth != null">
+                AND birth <![CDATA[>=]]> #{condition.startBirth}
+            </if>
+            <if test="condition.endBirth != null">
+                AND birth <![CDATA[<]]> #{condition.endBirth}
+            </if>
+
             <if test="condition.name != null">
                 <bind name="patternName" value="condition.name+ '%'" />
                 AND name LIKE #{patternName}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="countBySource" resultType="Integer">
+        select count(*)
+        FROM  <include refid="PERSON_TABLE" />
+        <where>
+            <if test="orgList != null">
+                orgId in
+                <foreach collection="orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="statusList != null">
+                AND status in
+                <foreach collection="statusList" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="sourceList != null">
+                AND source in
+                <foreach collection="sourceList" index="index" item="source" open="("
+                         separator="," close=")">
+                    #{source}
+                </foreach>
+            </if>
+            <if test="startDate != null">
+                AND bePatyDate <![CDATA[>=]]> #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND bePatyDate <![CDATA[<]]> #{endDate}
             </if>
         </where>
     </select>
@@ -128,11 +218,20 @@
                     #{orgList}
                 </foreach>
             </if>
-            and status=5
+            <if test="condition.number != null">
+                <bind name="patternName" value="condition.number+ '%'" />
+                AND number LIKE #{patternName}
+            </if>
+            <if test="condition.name != null">
+                <bind name="patternName" value="condition.name+ '%'" />
+                AND name LIKE #{patternName}
+            </if>
+            and status in (4,5,9)
             and number not in(
               select schoolNumber
               from <include refid="ADMIN_TABLE" />
             )
+
         </where>
         ORDER BY updateTime desc,createTime desc
         <if test="page!=null">
@@ -155,7 +254,7 @@
                 <bind name="patternName" value="condition.number+ '%'" />
                 AND number LIKE #{patternName}
             </if>
-            and status=9
+            and status in (4,5,9)
             and id not in(
             select distinct(personId)
             from <include refid="COMMITTEE_TABLE" />

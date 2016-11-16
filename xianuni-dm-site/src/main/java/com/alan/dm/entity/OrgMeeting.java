@@ -12,10 +12,13 @@ public class OrgMeeting {
     public static int DZLX=1;
     public static int MZPY=2;
     public static int MZSHH=3;
-    public static int SHYK=4;
+    public static int ZBDH=4;
+    public static int DZBWYH=5;
+    public static int DXZH=6;
+    public static int DK=7;
 
     private int id;
-    private int meetingType; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-三会一课
+    private int meetingType; // 组织活动类型 1-党政联席会议 2-民主评议 3-民主生活会 4-支部大会  5-支部委员会 6-当小组会 7-党课
     private int orgId;
     private Orgnization orgnization; // 组织关系
     private Date startTime; // 会议开始时间

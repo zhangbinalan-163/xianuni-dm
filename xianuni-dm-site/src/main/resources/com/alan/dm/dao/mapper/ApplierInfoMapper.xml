@@ -15,7 +15,7 @@
 
     <update id="update">
         update <include refid="A_TABLE"/>
-        SET applyTime=#{applier.applyTime},talkTime=#{applier.talkTime},talkContent=#{applier.talkContent},profession=#{applier.profession},degree=#{applier.degree},updateTime=#{applier.updateTime}
+        SET applyTime=#{applier.applyTime},talkerIds=#{applier.talkerIds},talkTime=#{applier.talkTime},talkContent=#{applier.talkContent},profession=#{applier.profession},degree=#{applier.degree},updateTime=#{applier.updateTime}
         where id=#{applier.id}
     </update>
 

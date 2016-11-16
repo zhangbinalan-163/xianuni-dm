@@ -74,6 +74,7 @@
 <script>
     $(document).ready(function () {
         checkLogin();
+        checkOrg();
 
         $.jgrid.defaults.styleUI = 'Bootstrap';
 
@@ -232,10 +233,11 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '会议主题','开始时间', '应到人数', '实际人数','操作'],
+                            colNames: ['ID','党组织','会议类型', '会议主题','开始时间', '应到人数', '实际人数','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left",hidden:true},
                                 {name: 'title', index: 'title',width: 60, align: "left"},
                                 {name: 'start', index: 'start',width: 60, align: "left"},
                                 {name: 'shouldNumber', index: 'shouldNumber',width: 60, align: "left"},
@@ -493,6 +495,31 @@
                 }
             },
             error:function(){
+            }
+        })
+    }
+    function checkOrg(){
+        $.ajax({
+            url: "/xianuni-dm/login/notZhibuOrg.do",
+            dataType: "json",
+            data: {},
+            success: function (data) {
+                if(data.success){
+
+                }else{
+                    layer.open({
+                        type: 1,
+                        title: false,
+                        shadeClose: false,
+                        shade: 0.9,
+                        closeBtn: 0,
+                        scrollbar: false,
+                        content: '\<\div style="padding:20px;">支部管理员无查看权限\<\/div>'
+                    });
+                }
+            },
+            error:function(){
+
             }
         })
     }

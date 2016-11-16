@@ -54,13 +54,15 @@ public class MessageController extends BaseController{
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int messageId=request.getInt("id");
-		Message message=messageService.getById(messageId);
-		if(message!=null){
-			messageService.deleteMessage(message);
+		String[] ids=request.getStringArray("id", ",");
+		for(String id:ids){
+			Message message=messageService.getById(Integer.parseInt(id));
+			if(message!=null){
+				messageService.deleteMessage(message);
+			}
 		}
 		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("success", true);
+		jsonObject.put("status",true);
 		return JsonUtils.fromObject(jsonObject);
 	}
 
@@ -87,7 +89,7 @@ public class MessageController extends BaseController{
 		message.setOrgnization(orgnization);
 		message.setToSub(toSub);
 		message.setUrlList(urlList);
-
+		message.setTitle(title);
 		JSONObject jsonObject=new JSONObject();
 
 		messageService.createMessage(message);
@@ -112,7 +114,25 @@ public class MessageController extends BaseController{
 	@RequestMapping("/info.do")
 	@ResponseBody
 	public String messageInfo(HttpServletRequest httpServletRequest) throws Exception {
-		return null;
+		Request request = getRequest(httpServletRequest);
+		Integer id = request.getInt("id");
+		Message mailInfo = messageService.getById(id);
+		if(mailInfo!=null){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", true);
+			Orgnization org=orgnizationService.getOrgById(mailInfo.getOrgId());
+			if(org!=null){
+				jsonObject.put("orgName",org.getName());
+			}
+			jsonObject.put("sendTime", TimeUtils.convertToTimeString(mailInfo.getCreateTime()));
+			jsonObject.put("messageTitle", mailInfo.getTitle());
+			jsonObject.put("messageContent", mailInfo.getContent());
+			jsonObject.put("subShow",mailInfo.isToSub() ? "是" : "否");
+			return JsonUtils.fromObject(jsonObject);
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", false);
+		return JsonUtils.fromObject(jsonObject);
 	}
 
 	/**
@@ -128,17 +148,36 @@ public class MessageController extends BaseController{
 		int adminId=getOnlineAdminId(httpServletRequest);
 		Admin adminInfo = adminService.getById(adminId);
 		Person person=personService.getByNumber(adminInfo.getSchoolNumber());
-		Orgnization orgnization = orgnizationService.getOrgById(person.getOrgId());
-		List<Orgnization> parentOrgList=orgnizationService.getParentOrg(orgnization);
+
+		Orgnization orgnization;
+		if(person.getOrgId()==-1){
+			orgnization=new Orgnization();
+			orgnization.setId(-1);
+			orgnization.setParent(-1);
+		}else{
+			orgnization= orgnizationService.getOrgById(person.getOrgId());
+		}
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		if(orgnization!=null){
+			List<Orgnization> parentOrgList=orgnizationService.getParentOrg(orgnization);
+			orgIdList.add(orgnization.getId());
+			if(parentOrgList!=null&&parentOrgList.size()>0){
+				for(Orgnization parentOrg:parentOrgList){
+					orgIdList.add(parentOrg.getId());
+				}
+			}
+
+		}
 
 		MessageCondition condition=new MessageCondition();
-		if(parentOrgList!=null&&parentOrgList.size()>0){
-			List<Integer> orgIdList=new ArrayList<Integer>();
-			for(Orgnization parentOrg:parentOrgList){
-				orgIdList.add(parentOrg.getId());
+		List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+		if(subOrgList!=null){
+			for (Orgnization subOrg:subOrgList){
+				orgIdList.add(subOrg.getId());
 			}
-			condition.setOrgList(orgIdList);
 		}
+		condition.setOrgList(orgIdList);
+
 		condition.setOrgId(orgnization.getId());
 		condition.setPersonQuery(true);
 		Page pageInfo=new Page();
@@ -153,7 +192,7 @@ public class MessageController extends BaseController{
 				JSONObject itemObj=new JSONObject();
 				itemObj.put("id",message.getId());
 				itemObj.put("time",TimeUtils.convertToTimeString(message.getCreateTime()));
-				itemObj.put("content",message.getContent());
+				itemObj.put("title",message.getTitle());
 				itemObj.put("publisher","#管理员#");
 				dataArray.add(itemObj);
 			}
@@ -176,7 +215,6 @@ public class MessageController extends BaseController{
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId", 0);
 		boolean containSubOrg=request.getBoolean("containSub", true);
-		boolean toSub=request.getBoolean("toSub", true);
 
 		//如果没有传入orgId，设置为管理员所管理的ORG
 		if(orgId==0){
@@ -206,7 +244,6 @@ public class MessageController extends BaseController{
 			}
 			condition.setOrgList(orgIdList);
 		}
-		condition.setToSub(toSub);
 
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page - 1) * limit);
@@ -228,7 +265,7 @@ public class MessageController extends BaseController{
 				List<String> cellList=new ArrayList<String>();
 				cellList.add(String.valueOf(message.getId()));
 				cellList.add(message.getOrgnization().getName());
-				cellList.add(message.getContent());
+				cellList.add(message.getTitle());
 				cellList.add(message.isToSub()?"是":"否");
 				cellList.add(TimeUtils.convertToDateString(message.getCreateTime()));
 				subOrgObject.put("cell", cellList);

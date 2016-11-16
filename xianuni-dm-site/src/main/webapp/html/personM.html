@@ -37,7 +37,6 @@
                 <div class="ibox-content">
                     <form role="form" class="form-inline form-group">
                         <div class="form-group">
-                            <input type="text" placeholder="请输入姓名" id="name" class="form-control">
                             <input type="text" placeholder="请输入学工号" id="number" class="form-control">
                         </div>
                         <button id="searchBtn" class="btn btn-primary" type="button">搜索</button>
@@ -100,7 +99,6 @@
                 var self = this;
                 $('#searchBtn').on('click', function(){
                     self.fetchData({
-                        name: $('#name').val().trim(),
                         number: $('#number').val().trim()
                     })
                 });
@@ -122,7 +120,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var name,number,idNumber,birth,desc,nation,degree,sex,type,pHometown='',profession;
+                            var name,number,idNumber,birth,desc,nation,degree,sex,type,hometown,profession;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -161,6 +159,9 @@
                                     }
                                     profession=inputValue;
                                 }
+                                if(inputName=='pHometown'){
+                                    hometown=inputValue;
+                                }
                             }
                             var selects=layer.getChildFrame('body',index).find('select');
                             for(var i=0; i<selects.length; i++){
@@ -194,12 +195,6 @@
                                     }
                                     type=inputValue;
                                 }
-                                if(inputName=='pProvince'){
-                                    pHometown=pHometown+inputValue;
-                                }
-                                if(inputName=='pCity'){
-                                    pHometown=pHometown+"-"+inputValue;
-                                }
                             }
                             var textareas=layer.getChildFrame('body',index).find('textarea');
                             for(var i=0; i<textareas.length; i++){
@@ -222,7 +217,7 @@
                                     birth:birth,
                                     number:number,
                                     idNumber:idNumber,
-                                    homeTown:pHometown,
+                                    hometown:hometown,
                                     profession:profession
                                 },
                                 type:'post',
@@ -305,7 +300,7 @@
                                         btn: ['提交修改', '取消'],
                                         yes: function(index){
                                             var inputs=layer.getChildFrame('body',index).find('input');
-                                            var name,idNumber,birth,desc,degree,sex,type,nation,profession;
+                                            var name,idNumber,birth,desc,degree,sex,type,nation,profession,hometown;
                                             for(var i=0; i<inputs.length; i++){
                                                 var inputName=inputs[i].id;
                                                 var inputValue=inputs[i].value;
@@ -328,6 +323,9 @@
                                                 }
                                                 if(inputName=='pProfession'){
                                                     profession=inputValue;
+                                                }
+                                                if(inputName=='pHometown'){
+                                                    hometown=inputValue;
                                                 }
                                             }
                                             var selects=layer.getChildFrame('body',index).find('select');
@@ -368,7 +366,8 @@
                                                     birth:birth,
                                                     idNumber:idNumber,
                                                     nation:nation,
-                                                    profession:profession
+                                                    profession:profession,
+                                                    hometown:hometown
                                                 },
                                                 type:'post',
                                                 dataType:'json',
@@ -399,7 +398,7 @@
                                         shift: 5 //0-6的动画形式，-1不开启
                                     }, function(){
                                         $.ajax( {
-                                            url:'/xianuni-dm/person/delete.do',
+                                            url:'/xianuni-dm/person/basic/delete.do',
                                             data:{
                                                 id :id
                                             },

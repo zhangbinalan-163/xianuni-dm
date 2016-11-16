@@ -16,89 +16,34 @@
 <form method="get" class="form-horizontal">
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>党组织名称</small></label>
+        <label class="col-sm-2 control-label"><small>党组织名：</small></label>
         <div class="col-sm-5">
             <p id="orgName" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>姓名</small></label>
+        <label class="col-sm-2 control-label"><small>通知标题</small></label>
         <div class="col-sm-5">
-            <p id="pName" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>人员类型</small></label>
-        <div class="col-sm-5">
-            <p id="pType" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>学工号</small></label>
-        <div class="col-sm-5">
-            <p id="pNumber" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>身份证号</small></label>
-        <div class="col-sm-5">
-            <p id="pIdNumber" class="form-control-static"></p>
+            <p id="messageTitle" class="form-control-static"></p>
         </div>
     </div>
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>创建时间</small></label>
+        <label class="col-sm-2 control-label"><small>发送时间</small></label>
         <div class="col-sm-5">
-            <p id="createTime" class="form-control-static"></p>
+            <p id="sendTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>修改时间</small></label>
+        <label class="col-sm-2 control-label"><small>下属部门可见：</small></label>
         <div class="col-sm-5">
-            <p id="updateTime" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="hr-line-dashed"></div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>性别</small></label>
-        <div class="col-sm-5">
-            <p id="pSex" class="form-control-static"></p>
+            <p id="subShow" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>民族</small></label>
+        <label class="col-sm-2 control-label"><small>通知内容</small></label>
         <div class="col-sm-5">
-            <p id="pNation" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>学历</small></label>
-        <div class="col-sm-5">
-            <p id="pDegree" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>籍贯</small></label>
-        <div class="col-sm-5">
-            <p id="pHometown" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>出生日期</small></label>
-        <div class="col-sm-5">
-            <p id="pBirth" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>职务</small></label>
-        <div class="col-sm-5">
-            <p id="pProfession" class="form-control-static"></p>
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label"><small>备注</small></label>
-        <div class="col-sm-5">
-            <p id="pDesc" class="form-control-static"></p>
+            <p id="messageContent" class="form-control-static"></p>
         </div>
     </div>
 </form>
@@ -123,11 +68,11 @@
 <script>
     $(document).ready(function () {
         //获取信息
-        var personId=getOrgTag();
+        var id=getIdTag();
         $.ajax( {
-            url:'/xianuni-dm/person/basicInfo.do',
+            url:'/xianuni-dm/message/info.do',
             data:{
-                personId : personId
+                id : id
             },
             type:'get',
             cache:false,
@@ -135,19 +80,10 @@
             success:function(data) {
                 if(data.success){
                     $('#orgName').html(data.orgName);
-                    $('#createTime').html(data.createTime);
-                    $('#updateTime').html(data.updateTime);
-                    $('#pNumber').html(data.number);
-                    $('#pName').html(data.name);
-                    $('#pType').html(data.type);
-                    $('#pIdNumber').html(data.idNumber);
-                    $('#pSex').html(data.sex);
-                    $('#pNation').html(data.nation);
-                    $('#pDegree').html(data.degree);
-                    $('#pHometown').html(data.hometown);
-                    $('#pBirth').html(data.birth);
-                    $('#pProfession').html(data.profession);
-                    $('#pDesc').html(data.desc);
+                    $('#messageTitle').html(data.messageTitle);
+                    $('#messageContent').html(data.messageContent);
+                    $('#sendTime').html(data.sendTime);
+                    $('#subShow').html(data.subShow);
                 }else{
                     layer.alert('获取信息失败>'+data.msg, {icon: 5});
                 }
@@ -157,8 +93,8 @@
             }
         });
     });
-    function getOrgTag(){
-        return parent.$('#personIdTag').val();
+    function getIdTag(){
+        return parent.$('#idTag').val();
     }
 </script>
 </body>

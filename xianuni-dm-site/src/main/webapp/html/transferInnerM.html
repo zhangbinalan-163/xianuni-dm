@@ -206,7 +206,7 @@
                             btn: ['创建', '取消'],
                             yes: function (index) {
                                 var inputs = layer.getChildFrame('body', index).find('input');
-                                var number;
+                                var number,transferId;
                                 for (var i = 0; i < inputs.length; i++) {
                                     var inputName = inputs[i].id;
                                     var inputValue = inputs[i].value;
@@ -217,13 +217,16 @@
                                         }
                                         number = inputValue;
                                     }
+                                    if (inputName == 'transferId') {
+                                        transferId = inputValue;
+                                    }
                                 }
                                 $.ajax({
                                     url: '/xianuni-dm/relation/transfer/in/add.do',
                                     data: {
                                         orgId: node.id,
                                         number: number,
-                                        type: 0
+                                        transferId:transferId
                                     },
                                     type: 'post',
                                     dataType: 'json',
@@ -253,16 +256,16 @@
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID', '姓名', '学工号','原组织','转入组织', '操作时间','操作类型','操作'],
+                            colNames: ['ID', '姓名', '学工号','原组织','转入组织','操作类型','申请时间','完成时间'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'name', index: 'name',width: 60, align: "left"},
                                 {name: 'number', index: 'number',width: 60, align: "left"},
                                 {name: 'fromOrg', index: 'fromOrg',width: 60, align: "left"},
                                 {name: 'toOrg', index: 'toOrg',width: 60, align: "left"},
-                                {name: 'time', index: 'time',width: 60, align: "left"},
                                 {name: 'type', index: 'type',width: 60, align: "left"},
-                                {name: 'actions', index: 'actions', width: 120, align: "center"}
+                                {name: 'time', index: 'time',width: 60, align: "left"},
+                                {name: 'doneTime', index: 'doneTime',width: 60, align: "left"}
                             ],
                             rowNum: 10,
                             rowList: [10, 20, 30],
@@ -270,49 +273,7 @@
                             sortname: 'id',
                             mtype: "get",
                             height: 400,
-                            viewrecords: true,
-                            // 自定义事件
-                            gridComplete: function () {
-                                var ids = self.$el.jqGrid('getDataIDs');
-                                for (var i = 0; i < ids.length; i++) {
-                                    var id = ids[i],
-                                            b = '<a class="J_delete" data-id="' + id + '"><i class="fa fa-trash"></i>删除</a>';
-                                    self.$el.jqGrid('setRowData', ids[i],
-                                            {
-                                                actions: [b].join(' ')
-                                            });
-                                }
-                                $('.J_delete').on('click', function () {
-                                    var id = $(this).data('id');
-                                    var index=layer.confirm('确定要删除该转入记录吗', {
-                                        btn: ['确认','取消'], //按钮
-                                        shade: 0.6, //遮罩透明度
-                                        shift: 5 //0-6的动画形式，-1不开启
-                                    }, function(){
-                                        $.ajax( {
-                                            url:'/xianuni-dm/relation/transfer/delete.do',
-                                            data:{
-                                                id :id
-                                            },
-                                            type:'post',
-                                            dataType:'json',
-                                            success:function(data) {
-                                                if(data.success){
-                                                    layer.alert('删除信息成功', {icon: 1});
-                                                    self.fetchData({});
-                                                }else{
-                                                    layer.alert('删除信息失败！'+data.msg, {icon: 5});
-                                                }
-                                            },
-                                            error : function() {
-                                                layer.alert('删除信息失败', {icon: 5});
-                                            }
-                                        });
-                                    }, function(){
-                                        layer.close(index);
-                                    });
-                                })
-                            }
+                            viewrecords: true
                         })
                         .jqGrid('navGrid', '#pager', {edit: false, add: false, del: false,search:false});
             }

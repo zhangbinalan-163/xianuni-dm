@@ -1,6 +1,7 @@
 package com.alan.dm.web.controller;
 
 import com.alan.dm.common.util.JsonUtils;
+import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.AdminCondition;
@@ -65,13 +66,14 @@ public class AdminController extends BaseController{
 		Integer adminId = getOnlineAdminId(httpServletRequest);
 		Admin adminInfo=adminService.getById(adminId);
 		if(adminInfo!=null){
-			if(!oldPass.equals(adminInfo.getPassword())){
+			if(!oldPass.equals(adminInfo.getPassword())
+					&&!StringUtils.md5(oldPass).equals(adminInfo.getPassword())){
 				JSONObject itemObj=new JSONObject();
 				itemObj.put("success", false);
 				itemObj.put("msg","旧密码错误");
 				return JsonUtils.fromObject(itemObj);
 			}else{
-				adminInfo.setPassword(newPass);
+				adminInfo.setPassword(StringUtils.md5(newPass));
 				adminService.updatePassword(adminInfo);
 				JSONObject itemObj=new JSONObject();
 				itemObj.put("success", true);
@@ -100,7 +102,7 @@ public class AdminController extends BaseController{
 
 		Admin admin=adminService.getById(adminId);
 		if(admin!=null){
-			admin.setPassword(password);
+			admin.setPassword(StringUtils.md5(password));
 			admin.setPasswordUpdateTime(new Date());
 			adminService.updatePassword(admin);
 		}
@@ -142,15 +144,27 @@ public class AdminController extends BaseController{
 	@RequestMapping("/add.do")
 	@ResponseBody
 	public String add(HttpServletRequest httpServletRequest) throws Exception {
-		Request request = getRequest(httpServletRequest);
-		String number = request.getString("number");
-		int orgId=request.getInt("orgId");
-		String password=request.getString("password");
-
 		JSONObject jsonObject=new JSONObject();
 
+		Request request = getRequest(httpServletRequest);
+		int orgId=request.getInt("orgId");
+
+		//超级管理员可以添加任意管理员。部门管理员只能添加下属部门的管理员
+		Integer adminId = getOnlineAdminId(httpServletRequest);
+		Admin onlineAdmin=adminService.getById(adminId);
+		if(onlineAdmin==null||(onlineAdmin.getType()==Admin.ORG_ADMIN&&onlineAdmin.getOrgId()==orgId)){
+			jsonObject.put("success", false);
+			jsonObject.put("msg", "您没有创建该党组织管理员的权限,请选择下属组织");
+			return JsonUtils.fromObject(jsonObject);
+		}
+
+		String number = request.getString("number");
+		String password=request.getString("password");
+
 		Person person=personService.getByNumber(number);
-		if(person==null||person.getStatus()!=PersonStatus.NORMAL.getId()){
+		if(person==null||(person.getStatus()!=PersonStatus.NORMAL.getId()
+				&&person.getStatus()!=PersonStatus.PERPARE.getId()
+				&&person.getStatus()!=PersonStatus.FORMAL.getId())){
 			jsonObject.put("success", false);
 			jsonObject.put("msg", "该账号不能设置为管理员");
 			return JsonUtils.fromObject(jsonObject);
@@ -160,7 +174,7 @@ public class AdminController extends BaseController{
 		admin.setType(Admin.ORG_ADMIN);
 		admin.setOrgId(orgId);
 		admin.setName(number);
-		admin.setPassword(password);
+		admin.setPassword(StringUtils.md5(password));
 		admin.setCreateTime(new Date());
 		admin.setStatus(Admin.STATUS_NORMAL);
 		admin.setSchoolNumber(number);
@@ -197,8 +211,11 @@ public class AdminController extends BaseController{
 		Admin adminInfo = adminService.getById(adminId);
 		JSONObject jsonObject=new JSONObject();
 		if(adminInfo!=null){
-			jsonObject.put("success",true);
-			jsonObject.put("name",adminInfo.getName());
+			jsonObject.put("success", true);
+			Person person = personService.getByNumber(adminInfo.getSchoolNumber());
+			if(person!=null){
+				jsonObject.put("name",person.getName());
+			}
 			jsonObject.put("number",adminInfo.getSchoolNumber());
 			jsonObject.put("status",adminInfo.getStatus()==Admin.STATUS_NORMAL?"正常":"禁用");
 			jsonObject.put("createTime",TimeUtils.convertToDateString(adminInfo.getCreateTime()));
@@ -295,7 +312,10 @@ public class AdminController extends BaseController{
 				subOrgObject.put("id", admin.getId());
 				List<String> cellList=new ArrayList<String>();
 				cellList.add(String.valueOf(admin.getId()));
-				cellList.add(String.valueOf(admin.getName()));
+				Person person = personService.getByNumber(admin.getSchoolNumber());
+				if(person!=null){
+					cellList.add(String.valueOf(person.getName()));
+				}
 				cellList.add(String.valueOf(admin.getSchoolNumber()));
 				cellList.add(admin.getStatus() == Admin.STATUS_NORMAL ? "正常" : "禁用");
 				cellList.add(TimeUtils.convertToDateString(admin.getCreateTime()));
@@ -328,8 +348,13 @@ public class AdminController extends BaseController{
 		Page page=new Page();
 		page.setSize(20);
 		page.setCurrent(0);
+		List<Orgnization> orgsList=new ArrayList<Orgnization>();
+		orgsList.add(orgnization);
 
-		List<Person> personList=adminService.getCandidatePerson(Arrays.asList(orgnization),number,page);
+		List<Orgnization> subOrgs=orgnizationService.getOrgByParent(orgnization,true);
+		orgsList.addAll(subOrgs);
+
+		List<Person> personList=adminService.getCandidatePerson(orgsList,number,page);
 
 		JSONArray rowsArray=new JSONArray();
 		if(personList!=null){

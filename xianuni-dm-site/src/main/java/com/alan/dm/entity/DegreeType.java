@@ -69,6 +69,6 @@ public enum DegreeType {
         if(QITA.getName().equals(name)){
             return QITA;
         }
-        return null;
+        return QITA;
     }
 }

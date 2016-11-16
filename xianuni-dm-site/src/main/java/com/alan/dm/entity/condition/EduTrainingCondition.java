@@ -9,5 +9,13 @@ import com.alan.dm.entity.query.PersonCondition;
  * @author: fan
  */
 public class EduTrainingCondition extends PersonCondition{
+    private Integer type;//培训类别
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
 }

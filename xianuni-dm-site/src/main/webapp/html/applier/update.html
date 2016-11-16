@@ -9,6 +9,7 @@
     <link href="../../static/css/animate.css" rel="stylesheet">
     <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
     <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../static/js/plugins/select2/select2.css" rel="stylesheet">
     <base target="_blank">
 </head>
 
@@ -16,35 +17,35 @@
 <form method="get" class="form-horizontal">
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>党组织名称</small></label>
+        <label class="col-sm-2 control-label">党组织名称</label>
         <div class="col-sm-5">
             <p id="orgName" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>姓名</small></label>
+        <label class="col-sm-2 control-label">姓名</label>
         <div class="col-sm-5">
             <p id="pName" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>学工号</small></label>
+        <label class="col-sm-2 control-label">学工号</label>
         <div class="col-sm-5">
             <p id="pNumber" class="form-control-static"></p>
         </div>
     </div>
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>提交申请书时间</small></label>
+        <label class="col-sm-2 control-label">提交申请书时间</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="applyTime">
             <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#applyTime'});"></label>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>职称</small></label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-5">
-            <input id="profession" type="text" class="form-control" name="profession">
+            <input id="profession" type="text" class="form-control checkMaxLen" maxlength="20" name="profession">
         </div>
     </div>
     <div class="form-group">
@@ -62,33 +63,42 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>谈话时间</small></label>
+        <label class="col-sm-2 control-label">谈话时间</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="talkTime">
             <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#talkTime'});"></label>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>谈话内容</small></label>
+        <label class="col-sm-2 control-label">谈话内容</label>
         <div class="col-sm-5">
-            <textarea id="talkContent" name="talkContent" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="talkContent" name="talkContent" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>谈话人</small></label>
-        <div class="col-sm-5">
-            <p id="talker" class="form-control-static"></p>
+        <label class="col-sm-2 control-label">谈话人：</label>
+        <div class="col-sm-4">
+            <input type="text" id="pTalker" class="js-example-data-ajax" style="width: 100%"/>
+            <span class="help-block m-b-none">请从本党支部(正式党员+在编党员)库查询</span>
         </div>
     </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-4">
+            <div id="talkerDiv"></div>
+        </div>
+        <input id="numberList" hidden="hidden">
+    </div>
+
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>创建时间</small></label>
+        <label class="col-sm-2 control-label">创建时间</label>
         <div class="col-sm-5">
             <p id="createTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>修改时间</small></label>
+        <label class="col-sm-2 control-label">修改时间</label>
         <div class="col-sm-5">
             <p id="updateTime" class="form-control-static"></p>
         </div>
@@ -112,8 +122,79 @@
 <!-- maxlength -->
 <script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
 
+<script src="../../static/js/plugins/select2/select2.js"></script>
+<script src="../../static/js/plugins/select2/select2_locale_zh-CN.js"></script>
+
 <script>
     $(document).ready(function () {
+        //
+        var $pTalker = $("#pTalker");
+        var $partnerDiv = $("#talkerDiv");
+        var formatResult2 = function(result, container, query, escapeMarkup) {
+            return "<div>"+result.title+"</div>";
+        };
+        var formatSelection2 = function (data, container, escapeMarkup) {
+            //最多两个
+            if($('.data_delete').length>1){
+                layer.alert('最多选择两个', {icon: 5});
+                return '选择人员到下面的列表中';
+            }
+            //判断是否已经添加
+            var selectedDiv=$('#J_delete'+data.id);
+            if(selectedDiv.length>0){
+                layer.alert('请勿重复选择', {icon: 5});
+                return '选择人员到下面的列表中';
+            }
+            $partnerDiv.append('<div id="div_'+data.id+'">'+data.title+'&nbsp;&nbsp;<a id="J_delete'+data.id+'" class="data_delete" data-id="' + data.id + '"><i class="fa fa-trash"></i>删除</a></div>');
+            $pTalker.val(getSelectedPersonId());
+            //增加删除操作
+            $('#J_delete'+data.id).on('click', function () {
+                var id = $(this).data('id');
+                $('#div_'+data.id).remove();
+                $pTalker.val(getSelectedPersonId());
+            })
+            //获取所有的已选择内容
+            return '选择人员到下面的列表中';
+        };
+        $pTalker.select2({
+            ajax: {
+                url:  "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=5,9&orgId="+getOrgTag(),
+                type:'get',
+                cache:false,
+                dataType:'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        number: params, // search term
+                        code: 'utf-8',
+                        extras: 1
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.value
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) { return markup; },
+            id: function(){ return true},
+            formatResult: formatResult2, // 下拉列表生成模板
+            formatSelection: formatSelection2 // 选中结果生成模板
+        });
+
+        //
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
+
         //获取信息
         var applierId=getIdTag();
         $.ajax( {
@@ -127,11 +208,23 @@
             success:function(data) {
                 if(data.success){
                     $('#orgName').html(data.orgName);
+                    $('#pNumber').html(data.number);
                     $('#createTime').html(data.createTime);
                     $('#updateTime').html(data.updateTime);
                     $('#pName').html(data.name);
-                    $('#talker').html(data.talker);
-                    $('#pNumber').html(data.number);
+                    for(var i=0;i<data.talkers.length;i++){
+                        var talker=data.talkers[i];
+                        //谈话人
+                        $partnerDiv.append('<div id="div_'+talker.id+'">'+talker.title+'&nbsp;&nbsp;<a id="J_delete'+talker.id+'" class="data_delete" data-id="' + talker.id + '"><i class="fa fa-trash"></i>删除</a></div>');
+                        $pTalker.val(getSelectedPersonId());
+                        //增加删除操作
+                        (function(id){
+                            $('#J_delete'+id).on('click', function () {
+                                $('#div_'+id).remove();
+                                $pTalker.val(getSelectedPersonId());
+                            })
+                        })(talker.id)
+                    }
 
                     $('#profession').val(data.profession);
                     $('#applyTime').val(data.applyTime);
@@ -147,8 +240,18 @@
             }
         });
     });
+    function getOrgTag(){
+        return parent.$('#orgIdTag').val();
+    }
     function getIdTag(){
         return parent.$('#idTag').val();
+    }
+    function getSelectedPersonId(){
+        var str='';
+        $(".data_delete").each(function(){
+            str=str+','+$(this).data('id');
+        });
+        return str;
     }
 </script>
 </body>

@@ -150,7 +150,12 @@ public class Request {
     public Date getDate(String key) throws DMException {
         return getDate(key, "yyyy-MM-dd");
     }
-
+    public Date getDate(String key,boolean defaultNull) throws DMException {
+        if(getString(key,null)==null){
+            return null;
+        }
+        return getDate(key, "yyyy-MM-dd");
+    }
     public boolean getBoolean(String key) {
         return "true".equals(httpServletRequest.getParameter(key));
     }

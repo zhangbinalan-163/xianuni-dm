@@ -24,7 +24,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">标题：</label>
         <div class="col-sm-6">
-            <input id="title" type="text" maxlength="60" class="form-control" name="title">
+            <input id="title" type="text" maxlength="60" class="form-control checkMaxLen" name="title">
         </div>
     </div>
     <div class="form-group">
@@ -50,7 +50,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">内容：</label>
         <div class="col-sm-5">
-            <textarea id="content" name="content" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="content" name="content" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
 </form>
@@ -95,36 +95,32 @@
         for (var selector in config) {
             $(selector).chosen(config[selector]);
         }
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
 
-        $('#content').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
-        $('#title').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
         $('#pOrg').html(getOrgNameTag());
 
         var $pNumber = $("#pNumber");
+        var $numberList = $("#numberList");
         var $partnerDiv = $("#partnerDiv");
 
         var formatResult = function(result, container, query, escapeMarkup) {
             return "<div>"+result.title+"</div>";
         };
         var formatSelection = function (data, container, escapeMarkup) {
+            //最多两个
+            if($('.data_delete').length>49){
+                layer.alert('最多选择50个', {icon: 5});
+                return '选择人员到下面的列表中';
+            }
             //判断是否已经添加
             var selectedDiv=$('#J_delete'+data.id);
             if(selectedDiv.length>0){
@@ -132,12 +128,12 @@
                 return '选择人员到下面的列表中';
             }
             $partnerDiv.append('<div id="div_'+data.id+'">'+data.title+'&nbsp;&nbsp;<a id="J_delete'+data.id+'" class="data_delete" data-id="' + data.id + '"><i class="fa fa-trash"></i>删除</a></div>');
-            $pNumber.val(getSelectedPersonId());
+            $numberList.val(getSelectedPersonId());
             //增加删除操作
             $('#J_delete'+data.id).on('click', function () {
                 var id = $(this).data('id');
                 $('#div_'+data.id).remove();
-                $pNumber.val(getSelectedPersonId());
+                $numberList.val(getSelectedPersonId());
             })
             //获取所有的已选择内容
             return '选择人员到下面的列表中';
@@ -145,7 +141,7 @@
         $pNumber.select2({
             maximumSelectionLength: 10,
             ajax: {
-                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=0,1,2,3,4,5&orgId="+getOrgTag(),
+                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=0,1,2,3,4,5,9&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

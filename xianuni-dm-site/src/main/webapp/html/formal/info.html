@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body>
+<form method="get" class="form-horizontal">
+    <div id="printDiv">
+    <div class="hr-line-dashed"></div>
+        <table>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党组织名称:</strong></td>
+                <td>&nbsp;<p id="orgName"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>姓名:</strong></td>
+                <td>&nbsp;<p id="pName"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>类型:</strong></td>
+                <td>&nbsp;<p id="pType"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学工号:</strong></td>
+                <td>&nbsp;<p id="pNumber"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>身份证号:</strong></td>
+                <td>&nbsp;<p id="pIdNumber" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>性别:</strong></td>
+                <td>&nbsp;<p id="pSex" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>民族:</strong></td>
+                <td>&nbsp;<p id="pNation" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学历:</strong></td>
+                <td>&nbsp;<p id="pDegree" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>籍贯:</strong></td>
+                <td>&nbsp;<p id="pHometown" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>出生日期:</strong></td>
+                <td>&nbsp;<p id="pBirth" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>入党日期:</strong></td>
+                <td>&nbsp;<p id="pBePartyTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>(参加工作/入学)日期:</strong></td>
+                <td>&nbsp;<p id="pRollTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>职称:</strong></td>
+                <td>&nbsp;<p id="pProfession" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>创建时间:</strong></td>
+                <td>&nbsp;<p id="createTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>修改时间:</strong></td>
+                <td>&nbsp;<p id="updateTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>备注:</strong></td>
+                <td>&nbsp;<p id="pDesc" ></p></td>
+            </tr>
+        </table>
+
+    <div class="hr-line-dashed"></div>
+    申请人阶段相关信息
+        <table>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>提交申请书时间:</strong></td>
+                <td>&nbsp;<p id="applier_applyTime"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>职称:</strong></td>
+                <td>&nbsp;<p id="applier_profession"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学历:</strong></td>
+                <td>&nbsp;<p id="applier_degree"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>谈话时间:</strong></td>
+                <td>&nbsp;<p id="applier_talkTime"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>谈话内容:</strong></td>
+                <td>&nbsp;<p id="applier_talkContent" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>谈话人:</strong></td>
+                <td>&nbsp;<p id="applier_talker" ></p></td>
+            </tr>
+        </table>
+    <div class="hr-line-dashed"></div>
+    积极分子阶段相关信息
+        <table>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否群团推优:</strong></td>
+                <td>&nbsp;<p id="activitist_quntuan"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>职称:</strong></td>
+                <td>&nbsp;<p id="activitist_profession"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学历:</strong></td>
+                <td>&nbsp;<p id="activitist_degree"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否上级备案:</strong></td>
+                <td>&nbsp;<p id="activitist_beian"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>民主评议时间:</strong></td>
+                <td>&nbsp;<p id="activitist_evaTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>民主测评总结:</strong></td>
+                <td>&nbsp;<p id="activitist_evaContent" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会时间:</strong></td>
+                <td>&nbsp;<p id="activitist_meetTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会内容:</strong></td>
+                <td>&nbsp;<p id="activitist_meetContent" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>培养人:</strong></td>
+                <td>&nbsp;<p id="activitist_director" ></p></td>
+            </tr>
+        </table>
+    <div class="hr-line-dashed"></div>
+    发展对象阶段相关信息
+        <table>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>职称:</strong></td>
+                <td>&nbsp;<p id="intention_profession"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学历:</strong></td>
+                <td>&nbsp;<p id="intention_degree"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>积极分子确定时间:</strong></td>
+                <td>&nbsp;<p id="intention_beAcTime"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>培训课时:</strong></td>
+                <td>&nbsp;<p id="intention_trainHour"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否公示:</strong></td>
+                <td>&nbsp;<p id="intention_publiced" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会时间:</strong></td>
+                <td>&nbsp;<p id="intention_meetTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会内容:</strong></td>
+                <td>&nbsp;<p id="intention_meetContent" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>政审情况:</strong></td>
+                <td>&nbsp;<p id="intention_politicalCheck" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否上级备案:</strong></td>
+                <td>&nbsp;<p id="intention_beian" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否校党委预审:</strong></td>
+                <td>&nbsp;<p id="intention_yushen" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>入党介绍人:</strong></td>
+                <td>&nbsp;<p id="intention_introducer" ></p></td>
+            </tr>
+        </table>
+    <div class="hr-line-dashed"></div>
+    预备党员阶段相关信息
+        <table>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否通过公示:</strong></td>
+                <td>&nbsp;<p id="prepare_public"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>支部审批:</strong></td>
+                <td>&nbsp;<p id="prepare_branchApproval"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>上级党委预审:</strong></td>
+                <td>&nbsp;<p id="prepare_yushen"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>是否填写入党申请书:</strong></td>
+                <td>&nbsp;<p id="prepare_shenqing"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会时间:</strong></td>
+                <td>&nbsp;<p id="prepare_meetTime" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会内容:</strong></td>
+                <td>&nbsp;<p id="prepare_meetContent" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>校党委审批:</strong></td>
+                <td>&nbsp;<p id="prepare_schoolApproval" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>职称:</strong></td>
+                <td>&nbsp;<p id="prepare_profession" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学历:</strong></td>
+                <td>&nbsp;<p id="prepare_degree" ></p></td>
+            </tr>
+        </table>
+
+    <div class="hr-line-dashed"></div>
+    正式党员相关信息
+        <table>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>申请转正时间:</strong></td>
+                <td>&nbsp;<p id="normal_applyTime"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会时间:</strong></td>
+                <td>&nbsp;<p id="normal_meetTime"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党支部大会内容:</strong></td>
+                <td>&nbsp;<p id="normal_meetContent"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>党总支审批:</strong></td>
+                <td>&nbsp;<p id="normal_branchApproval"></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>校党委审批:</strong></td>
+                <td>&nbsp;<p id="normal_schoolApproval" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>职称:</strong></td>
+                <td>&nbsp;<p id="normal_profession" ></p></td>
+            </tr>
+            <tr>
+                <td>&nbsp;&nbsp;<strong>学历:</strong></td>
+                <td>&nbsp;<p id="normal_degree" ></p></td>
+            </tr>
+        </table>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"></label>
+        <div class="col-sm-4">
+            <button id="printButton" class="btn btn-primary" type="button">打印</button>
+        </div>
+    </div>
+</form>
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+<script src="../../static/js/jquery.jqprint-0.3.js"></script>
+<script src="../../static/js/jquery-migrate-1.1.0.js"></script>
+
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- maxlength -->
+<script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $("#printButton").on('click', function() {
+            $("#printDiv").jqprint();
+        });
+
+        //获取信息
+        var personId=getIdTag();
+        $.ajax( {
+            url:'/xianuni-dm/person/formal/infoV2.do',
+            data:{
+                personId : personId
+            },
+            type:'get',
+            cache:false,
+            dataType:'json',
+            success:function(data) {
+                if(data.success) {
+                    $('#orgName').html(data.orgName);
+                    $('#createTime').html(data.createTime);
+                    $('#updateTime').html(data.updateTime);
+                    $('#pBePartyTime').html(data.bePartyTime);
+                    $('#pRollTime').html(data.rollTime);
+                    $('#pNumber').html(data.number);
+                    $('#pName').html(data.name);
+                    $('#pType').html(data.type);
+                    $('#pSex').html(data.sex);
+                    $('#pNation').html(data.nation);
+                    $('#pDegree').html(data.degree);
+                    $('#pIdNumber').html(data.idNumber);
+                    $('#pHometown').html(data.hometown);
+                    $('#pBirth').html(data.birth);
+                    $('#pProfession').html(data.profession);
+                    $('#pDesc').html(data.desc);
+                    //申请人阶段
+                    $('#applier_talker').html(data.applier_talker);
+                    $('#applier_profession').html(data.applier_profession);
+                    $('#applier_applyTime').html(data.applier_applyTime);
+                    $('#applier_talkTime').html(data.applier_talkTime);
+                    $('#applier_talkContent').html(data.applier_talkContent);
+                    $('#applier_degree').html(data.applier_degree);
+                    //积极分子阶段
+                    $('#activitist_director').html(data.activitist_director);
+                    $('#activitist_profession').html(data.activitist_profession);
+                    $('#activitist_evaTime').html(data.activitist_evaTime);
+                    $('#activitist_evaContent').html(data.activitist_evaContent);
+                    $('#activitist_meetTime').html(data.activitist_meetTime);
+                    $('#activitist_meetContent').html(data.activitist_meetContent);
+                    $('#activitist_degree').html(data.activitist_degree);
+                    $('#activitist_quntuan').html(data.activitist_quntuan);
+                    $('#activitist_beian').html(data.activitist_beian);
+                    $('#activitist_talked').html(data.activitist_talked);
+                    //发展对象阶段
+                    $('#intention_meetTime').html(data.intention_meetTime);
+                    $('#intention_meetContent').html(data.intention_meetContent);
+                    $('#intention_politicalCheck').html(data.intention_politicalCheck);
+                    $('#intention_introducer').html(data.intention_introducer);
+                    $('#intention_schoolApproval').html(data.intention_schoolApproval);
+                    $('#intention_profession').html(data.intention_profession);
+                    $('#intention_beAcTime').html(data.intention_beAcTime);
+                    $('#intention_trainHour').html(data.intention_trainHour);
+                    $('#intention_yushen').html(data.intention_yushen);
+                    $('#intention_beian').html(data.intention_beian);
+                    $('#intention_degree').html(data.intention_degree);
+                    $('#intention_publiced').html(data.intention_publiced);
+                    //预备党员阶段
+                    $('#prepare_schoolApproval').html(data.prepare_schoolApproval);
+                    $('#prepare_branchApproval').html(data.prepare_branchApproval);
+                    $('#prepare_meetTime').html(data.prepare_meetTime);
+                    $('#prepare_meetContent').html(data.prepare_meetContent);
+                    $('#prepare_profession').html(data.prepare_profession);
+                    $('#prepare_public').html(data.prepare_publiced);
+                    $('#prepare_yushen').html(data.prepare_yushen);
+                    $('#prepare_shenqing').html(data.prepare_application);
+                    $('#prepare_degree').html(data.prepare_degree);
+                    //正式党员阶段
+                    $('#normal_schoolApproval').html(data.normal_schoolApproval);
+                    $('#normal_branchApproval').html(data.normal_branchApproval);
+                    $('#normal_degree').html(data.normal_degree);
+                    $('#normal_profession').html(data.normal_profession);
+                    $('#normal_applyTime').html(data.normal_applyTime);
+                    $('#normal_meetTime').html(data.normal_meetTime);
+                    $('#normal_meetContent').html(data.normal_meetContent);
+                } else{
+                        layer.alert('获取信息失败>'+data.msg, {icon: 5});
+                    }
+            },
+            error : function() {
+                alert("异常");
+            }
+        });
+    });
+    function getIdTag(){
+        return parent.$('#idTag').val();
+    }
+</script>
+</body>
+</html>

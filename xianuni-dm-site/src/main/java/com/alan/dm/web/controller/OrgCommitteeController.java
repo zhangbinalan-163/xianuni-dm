@@ -61,7 +61,8 @@ public class OrgCommitteeController extends BaseController{
 			Orgnization orgnization = orgnizationService.getOrgById(person.getOrgId());
 			jsonObject.put("orgName",orgnization.getName());
 			jsonObject.put("personName",person.getName());
-			jsonObject.put("job",committeeInfo.getJob());
+			jsonObject.put("number",person.getNumber());
+			jsonObject.put("job",CommitteeJobType.getInstance(committeeInfo.getJob()).getName());
 			jsonObject.put("desc",committeeInfo.getCdesc());
 			jsonObject.put("tel", committeeInfo.getTel());
 			jsonObject.put("level","第"+committeeInfo.getLevel()+"届");
@@ -94,7 +95,7 @@ public class OrgCommitteeController extends BaseController{
 
 		Person person = personService.getByNumber(number);
 		JSONObject jsonObject=new JSONObject();
-		if(person==null||person.getStatus()!=PersonStatus.NORMAL.getId()){
+		if(person==null||(person.getStatus()!=PersonStatus.PERPARE.getId()&&person.getStatus()!=PersonStatus.NORMAL.getId()&&person.getStatus()!=PersonStatus.FORMAL.getId())){
 			throw new DMException("该学工号不存在或者不是正式党员");
 		}
 		//todo 对权限的检查，当前管理员只能管理有权限的组织和下属组织
@@ -242,7 +243,13 @@ public class OrgCommitteeController extends BaseController{
 		page.setSize(20);//最多获取20个
 		page.setCurrent(0);
 
-		List<Person> personList=committeeService.getCandidatePerson(Arrays.asList(orgnization),number,page);
+		List<Orgnization> orgsList=new ArrayList<Orgnization>();
+		orgsList.add(orgnization);
+
+		List<Orgnization> subOrgs=orgnizationService.getOrgByParent(orgnization,true);
+		orgsList.addAll(subOrgs);
+
+		List<Person> personList=committeeService.getCandidatePerson(orgsList,number,page);
 
 		JSONArray rowsArray=new JSONArray();
 		if(personList!=null){

@@ -32,11 +32,51 @@
         <div class="col-sm-9">
             <div class="ibox">
                 <div class="ibox-title">
-                    <h5>党员数量统计</h5>
+                    <h5>党员总数统计</h5>
                 </div>
                 <div class="ibox-content">
                     <div id="helpInfo">请选择一个组织查看具体信息</div>
                     <div class="echarts" id="chart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>党员性别统计</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="echarts" id="sexChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>党员民族统计</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="echarts" id="nationChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>党员学历统计</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="echarts" id="degreeChart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>党员年龄统计</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="echarts" id="ageChart"></div>
                 </div>
             </div>
         </div>
@@ -59,7 +99,6 @@
 
 <!-- ECharts -->
 <script src="../static/js/plugins/echarts/echarts-all.js"></script>
-
 <!-- layer javascript -->
 <script src="../static/js/plugins/layer/layer.min.js"></script>
 
@@ -101,6 +140,10 @@
             },
             updateChart: function (event, treeId, treeNode) {
                 barChart.update(treeNode.id);
+                sexChart.update(treeNode.id);
+                nationChart.update(treeNode.id);
+                degreeChart.update(treeNode.id);
+                ageChart.update(treeNode.id);
             },
             filter: function (treeId, parentNode, childNodes) {
                 return childNodes;
@@ -126,9 +169,6 @@
             getOptions: function(data){
                 data = this.formatData(data);
                 return {
-                    title : {
-                        text: '党员统计信息'
-                    },
                     tooltip : {
                         trigger: 'axis'
                     },
@@ -208,7 +248,292 @@
                 });
             }
         }).init();
-        window.chart = barChart;
+        //window.chart = barChart;
+
+        var sexChart = ({
+            init: function(){
+                this.orgId = '';
+                this.$el = document.getElementById("sexChart");
+                this.chart = echarts.init(this.$el);
+                return this;
+            },
+            initChart: function(data){
+                var chart = this.chart;
+                if (chart && chart.dispose) {
+                    chart.dispose();
+                }
+                this.chart = echarts.init(this.$el);
+                this.chart.setOption(this.getOptions(data));
+            },
+            getOptions: function(data){
+                data = this.formatData(data);
+                return {
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    series : [
+                        {
+                            name: '党员性别统计',
+                            type: 'pie',
+                            data:data.series
+                        }
+                    ]
+                };
+            },
+            // 格式化输出数据
+            formatData: function(data){
+                data = data || {};
+                if(!data.series){
+                    data.series = [];
+                }
+                return data;
+            },
+            bindEvents: function(){
+                window.onresize = this.chart.resize;
+            },
+            // 更新图表
+            update: function(orgId){
+                var self = this;
+                $('#helpInfo').hide();
+                self.chart.showLoading();
+                $.ajax({
+                    url: '/xianuni-dm/person/statis.do?type=bysex', // 接口地址
+                    type: 'get',
+                    data: {
+                        orgId: orgId
+                    },
+                    dataType: 'json',
+                    complete: function(){
+                        self.chart.hideLoading();
+                    },
+                    success: function(res){
+                        if(res.success){
+                            self.initChart(res.data);
+                        }else{
+                            layer.alert(res.msg || '数据获取失败', {icon: 5});
+                        }
+                    },
+                    error: function(){
+                        layer.alert('数据获取失败', {icon: 5});
+                    }
+                });
+            }
+        }).init();
+
+        var nationChart = ({
+            init: function(){
+                this.orgId = '';
+                this.$el = document.getElementById("nationChart");
+                this.chart = echarts.init(this.$el);
+                return this;
+            },
+            initChart: function(data){
+                var chart = this.chart;
+                if (chart && chart.dispose) {
+                    chart.dispose();
+                }
+                this.chart = echarts.init(this.$el);
+                this.chart.setOption(this.getOptions(data));
+            },
+            getOptions: function(data){
+                data = this.formatData(data);
+                return {
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    series : [
+                        {
+                            name: '党员民族统计',
+                            type: 'pie',
+                            data:data.series
+                        }
+                    ]
+                };
+            },
+            // 格式化输出数据
+            formatData: function(data){
+                data = data || {};
+                if(!data.series){
+                    data.series = [];
+                }
+                return data;
+            },
+            bindEvents: function(){
+                window.onresize = this.chart.resize;
+            },
+            // 更新图表
+            update: function(orgId){
+                var self = this;
+                $('#helpInfo').hide();
+                self.chart.showLoading();
+                $.ajax({
+                    url: '/xianuni-dm/person/statis.do?type=bynation', // 接口地址
+                    type: 'get',
+                    data: {
+                        orgId: orgId
+                    },
+                    dataType: 'json',
+                    complete: function(){
+                        self.chart.hideLoading();
+                    },
+                    success: function(res){
+                        if(res.success){
+                            self.initChart(res.data);
+                        }else{
+                            layer.alert(res.msg || '数据获取失败', {icon: 5});
+                        }
+                    },
+                    error: function(){
+                        layer.alert('数据获取失败', {icon: 5});
+                    }
+                });
+            }
+        }).init();
+
+        var degreeChart = ({
+            init: function(){
+                this.orgId = '';
+                this.$el = document.getElementById("degreeChart");
+                this.chart = echarts.init(this.$el);
+                return this;
+            },
+            initChart: function(data){
+                var chart = this.chart;
+                if (chart && chart.dispose) {
+                    chart.dispose();
+                }
+                this.chart = echarts.init(this.$el);
+                this.chart.setOption(this.getOptions(data));
+            },
+            getOptions: function(data){
+                data = this.formatData(data);
+                return {
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    series : [
+                        {
+                            name: '党员学历统计',
+                            type: 'pie',
+                            data:data.series
+                        }
+                    ]
+                };
+            },
+            // 格式化输出数据
+            formatData: function(data){
+                data = data || {};
+                if(!data.series){
+                    data.series = [];
+                }
+                return data;
+            },
+            bindEvents: function(){
+                window.onresize = this.chart.resize;
+            },
+            // 更新图表
+            update: function(orgId){
+                var self = this;
+                $('#helpInfo').hide();
+                self.chart.showLoading();
+                $.ajax({
+                    url: '/xianuni-dm/person/statis.do?type=bydegree', // 接口地址
+                    type: 'get',
+                    data: {
+                        orgId: orgId
+                    },
+                    dataType: 'json',
+                    complete: function(){
+                        self.chart.hideLoading();
+                    },
+                    success: function(res){
+                        if(res.success){
+                            self.initChart(res.data);
+                        }else{
+                            layer.alert(res.msg || '数据获取失败', {icon: 5});
+                        }
+                    },
+                    error: function(){
+                        layer.alert('数据获取失败', {icon: 5});
+                    }
+                });
+            }
+        }).init();
+
+        var ageChart = ({
+            init: function(){
+                this.orgId = '';
+                this.$el = document.getElementById("ageChart");
+                this.chart = echarts.init(this.$el);
+                return this;
+            },
+            initChart: function(data){
+                var chart = this.chart;
+                if (chart && chart.dispose) {
+                    chart.dispose();
+                }
+                this.chart = echarts.init(this.$el);
+                this.chart.setOption(this.getOptions(data));
+            },
+            getOptions: function(data){
+                data = this.formatData(data);
+                return {
+                    tooltip : {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    series : [
+                        {
+                            name: '党员年龄统计',
+                            type: 'pie',
+                            data:data.series
+                        }
+                    ]
+                };
+            },
+            // 格式化输出数据
+            formatData: function(data){
+                data = data || {};
+                if(!data.series){
+                    data.series = [];
+                }
+                return data;
+            },
+            bindEvents: function(){
+                window.onresize = this.chart.resize;
+            },
+            // 更新图表
+            update: function(orgId){
+                var self = this;
+                $('#helpInfo').hide();
+                self.chart.showLoading();
+                $.ajax({
+                    url: '/xianuni-dm/person/statis.do?type=byage', // 接口地址
+                    type: 'get',
+                    data: {
+                        orgId: orgId
+                    },
+                    dataType: 'json',
+                    complete: function(){
+                        self.chart.hideLoading();
+                    },
+                    success: function(res){
+                        if(res.success){
+                            self.initChart(res.data);
+                        }else{
+                            layer.alert(res.msg || '数据获取失败', {icon: 5});
+                        }
+                    },
+                    error: function(){
+                        layer.alert('数据获取失败', {icon: 5});
+                    }
+                });
+            }
+        }).init();
+
     });
     function checkLogin(){
         $.ajax({

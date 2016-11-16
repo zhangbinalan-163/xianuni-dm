@@ -5,7 +5,8 @@ package com.alan.dm.entity;
  * Created by zhangbinalan on 15/11/16.
  */
 public enum MeetingType {
-    DZLX(1,"党政联席会议"),MZPY(2,"民主评议"),MZSHH(3,"民主生活会"),SHYK(4,"三会一课");
+    DZLX(1,"党政联席会议"),MZPY(2,"组织特色活动"),MZSHH(3,"民主生活会"),
+    ZBDH(4,"支部大会"),DZBWYH(5,"党支部委员会"),DXZH(6,"组织生活会"),DK(7,"党课");
 
     private int id;
     private String name;
@@ -35,7 +36,16 @@ public enum MeetingType {
             return MZSHH;
         }
         if(id==4){
-            return SHYK;
+            return ZBDH;
+        }
+        if(id==5){
+            return DZBWYH;
+        }
+        if(id==6){
+            return DXZH;
+        }
+        if(id==7){
+            return DK;
         }
         return null;
     }

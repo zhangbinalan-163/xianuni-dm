@@ -37,7 +37,7 @@ public class HtmlLoginFilter implements Filter {
             if(!StringUtils.isEmpty(cookie)){
                 CookieInfo cookieInfo = SessionUtils.parseCookie(cookie);
                 if(cookie!=null){
-                    if(SessionUtils.validateCookie(cookieInfo,null,null,20*60*1000L)==0){
+                    if(SessionUtils.validateCookie(cookieInfo,null,null,null)==0){
                         //验证通过
                         session.setAttribute(Constants.SESSION_ADMINID_NAME, String.valueOf(cookieInfo.getUserId()));
                         chain.doFilter(request,response);

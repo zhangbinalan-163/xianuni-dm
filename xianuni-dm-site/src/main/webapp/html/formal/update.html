@@ -16,19 +16,19 @@
 <form method="get" class="form-horizontal">
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>党组织名称：</small></label>
+        <label class="col-sm-2 control-label">党组织名称</label>
         <div class="col-sm-5">
             <p id="orgName" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>姓名：</small></label>
+        <label class="col-sm-2 control-label">姓名</label>
         <div class="col-sm-5">
-            <input id="pName"  type="text" class="form-control"/>
+            <input id="pName"  type="text" class="form-control checkMaxLen" maxlength="20"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">类型：</label>
+        <label class="col-sm-2 control-label">类型</label>
         <div class="col-sm-2">
             <select id="pType" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">学生</option>
@@ -38,20 +38,20 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>学工号：</small></label>
+        <label class="col-sm-2 control-label">学工号</label>
         <div class="col-sm-5">
             <p id="pNumber" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>身份证号：</small></label>
+        <label class="col-sm-2 control-label">身份证号</label>
         <div class="col-sm-5">
-            <input type="text" id="pIdNumber" class="form-control"/>
+            <input type="text" id="pIdNumber" class="form-control checkMaxLen" maxlength="18" />
         </div>
     </div>
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">性别：</label>
+        <label class="col-sm-2 control-label">性别</label>
         <div class="col-sm-1">
             <select id="pSex"  class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">男</option>
@@ -60,17 +60,29 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">民族：</label>
+        <label class="col-sm-2 control-label">民族</label>
         <div class="col-sm-2">
             <select id="pNation" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">汉族</option>
-                <option value="1" hassubinfo="true">藏族</option>
-                <option value="2" hassubinfo="true">少数民族</option>
+                <option value="1" hassubinfo="true">蒙古族</option>
+                <option value="2" hassubinfo="true">回族</option>
+                <option value="3" hassubinfo="true">藏族</option>
+                <option value="4" hassubinfo="true">维吾尔族</option>
+                <option value="5" hassubinfo="true">苗族</option>
+                <option value="6" hassubinfo="true">彝族</option>
+                <option value="7" hassubinfo="true">壮族</option>
+                <option value="8" hassubinfo="true">布依族</option>
+                <option value="9" hassubinfo="true">朝鲜族</option>
+                <option value="10" hassubinfo="true">满族</option>
+                <option value="11" hassubinfo="true">土家族</option>
+                <option value="12" hassubinfo="true">哈萨克族</option>
+                <option value="13" hassubinfo="true">傣族</option>
+                <option value="14" hassubinfo="true">其他</option>
             </select>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-2">
             <select id="pDegree" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">初中及以下</option>
@@ -84,77 +96,93 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>籍贯：</small></label>
+        <label class="col-sm-2 control-label">籍贯</label>
         <div class="col-sm-5">
-            <p id="pHometown" class="form-control-static"></p>
+            <input type="text"  id="pHometown" class="form-control checkMaxLen" maxlength="20"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>出生日期：</small></label>
+        <label class="col-sm-2 control-label">出生日期</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="pBirth"/>
-            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#pBirth',istime: true, format: 'YYYY-MM-DD hh:mm:ss'});"></label>
+            <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#pBirth'});"></label>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>职称：</small></label>
+        <label class="col-sm-2 control-label">入党日期</label>
+        <div class="col-sm-2">
+            <input readonly class="form-control layer-date" id="pBePartyTime">
+        </div>
+        <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#pBePartyTime'});"></label>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">(参加工作/入学)日期</label>
+        <div class="col-sm-2">
+            <input readonly class="form-control layer-date" id="pRollTime">
+        </div>
+        <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#pRollTime'});"></label>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-5">
-            <input type="text"  id="pProfession" class="form-control"/>
+            <input type="text"  id="pProfession" class="form-control checkMaxLen" maxlength="20"/>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>创建时间：</small></label>
+        <label class="col-sm-2 control-label">创建时间</label>
         <div class="col-sm-5">
             <p id="createTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>修改时间：</small></label>
+        <label class="col-sm-2 control-label">修改时间</label>
         <div class="col-sm-5">
             <p id="updateTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>备注：</small></label>
+        <label class="col-sm-2 control-label">备注</label>
         <div class="col-sm-5">
-            <textarea id="pDesc" name="pDesc" class="form-control" maxlength="100" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="pDesc" name="pDesc" class="form-control checkMaxLen" maxlength="100" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="hr-line-dashed"></div>
     申请人阶段相关信息
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>提交申请书时间：</small></label>
+        <label class="col-sm-2 control-label">提交申请书时间</label>
         <div class="col-sm-4">
             <p id="applier_applyTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>职称：</small></label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-5">
             <p id="applier_profession" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-2">
             <p id="applier_degree" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>谈话时间：</small></label>
+        <label class="col-sm-2 control-label">谈话时间</label>
         <div class="col-sm-4">
             <p id="applier_talkTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>谈话内容：</small></label>
+        <label class="col-sm-2 control-label">谈话内容</label>
         <div class="col-sm-5">
             <p id="applier_talkContent" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>谈话人：</small></label>
+        <label class="col-sm-2 control-label">谈话人</label>
         <div class="col-sm-5">
             <p id="applier_talker" class="form-control-static"></p>
         </div>
@@ -163,61 +191,61 @@
     积极分子阶段相关信息
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>职称：</small></label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-5">
             <p id="activitist_profession" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-2">
             <p id="activitist_degree" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否群团推优：</label>
+        <label class="col-sm-2 control-label">是否群团推优</label>
         <div class="col-sm-1">
             <p id="activitist_quntuan" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否上级备案：</label>
+        <label class="col-sm-2 control-label">是否上级备案</label>
         <div class="col-sm-1">
             <p id="activitist_beian" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否谈话：</label>
+        <label class="col-sm-2 control-label">是否谈话</label>
         <div class="col-sm-1">
             <p id="activitist_talked" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">民主评议时间：</label>
+        <label class="col-sm-2 control-label">民主评议时间</label>
         <div class="col-sm-4">
             <p id="activitist_evaTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">民主测评总结：</label>
+        <label class="col-sm-2 control-label">民主测评总结</label>
         <div class="col-sm-5">
             <p id="activitist_evaContent" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会时间：</label>
+        <label class="col-sm-2 control-label">党支部大会时间</label>
         <div class="col-sm-4">
             <p id="activitist_meetTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会内容：</label>
+        <label class="col-sm-2 control-label">党支部大会内容</label>
         <div class="col-sm-5">
             <p id="activitist_meetContent" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>培养人：</small></label>
+        <label class="col-sm-2 control-label">培养人</label>
         <div class="col-sm-5">
             <p id="activitist_director" class="form-control-static"></p>
         </div>
@@ -226,67 +254,67 @@
     发展对象阶段相关信息
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">职称：</label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-3">
             <p id="intention_profession" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-1">
             <p id="intention_degree" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">积极分子确定时间：</label>
+        <label class="col-sm-2 control-label">积极分子确定时间</label>
         <div class="col-sm-4">
             <p id="intention_beAcTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">培训课时：</label>
+        <label class="col-sm-2 control-label">培训课时</label>
         <div class="col-sm-1">
             <p id="intention_trainHour" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否公示：</label>
+        <label class="col-sm-2 control-label">是否公示</label>
         <div class="col-sm-1">
             <p id="intention_publiced" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会时间：</label>
+        <label class="col-sm-2 control-label">党支部大会时间</label>
         <div class="col-sm-4">
             <p id="intention_meetTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会内容：</label>
+        <label class="col-sm-2 control-label">党支部大会内容</label>
         <div class="col-sm-5">
             <p id="intention_meetContent" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">政审情况：</label>
+        <label class="col-sm-2 control-label">政审情况</label>
         <div class="col-sm-5">
             <p id="intention_politicalCheck" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否上级备案：</label>
+        <label class="col-sm-2 control-label">是否上级备案</label>
         <div class="col-sm-1">
             <p id="intention_beian" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否校党委预审：</label>
+        <label class="col-sm-2 control-label">是否校党委预审</label>
         <div class="col-sm-1">
             <p id="intention_yushen" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>入党介绍人：</small></label>
+        <label class="col-sm-2 control-label">入党介绍人</label>
         <div class="col-sm-5">
             <p id="intention_introducer" class="form-control-static"></p>
         </div>
@@ -296,55 +324,55 @@
     预备党员阶段相关信息
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否通过公示：</label>
+        <label class="col-sm-2 control-label">是否通过公示</label>
         <div class="col-sm-1">
             <p id="prepare_public" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">支部审批：</label>
+        <label class="col-sm-2 control-label">支部审批</label>
         <div class="col-sm-5">
             <p id="prepare_branchApproval" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">上级党委预审：</label>
+        <label class="col-sm-2 control-label">上级党委预审</label>
         <div class="col-sm-1">
             <p id="prepare_yushen" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否填写入党申请书：</label>
+        <label class="col-sm-2 control-label">是否填写入党申请书</label>
         <div class="col-sm-1">
             <p id="prepare_shenqing" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会时间：</label>
+        <label class="col-sm-2 control-label">党支部大会时间</label>
         <div class="col-sm-4">
             <p id="prepare_meetTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会内容：</label>
+        <label class="col-sm-2 control-label">党支部大会内容</label>
         <div class="col-sm-5">
             <p id="prepare_meetContent" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">校党委审批：</label>
+        <label class="col-sm-2 control-label">校党委审批</label>
         <div class="col-sm-5">
             <p id="prepare_schoolApproval" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">职称：</label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-3">
             <p id="prepare_profession" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-1">
             <p id="prepare_degree" class="form-control-static"></p>
         </div>
@@ -354,43 +382,43 @@
     正式党员相关信息
     <div class="hr-line-dashed"></div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">申请转正时间：</label>
+        <label class="col-sm-2 control-label">申请转正时间</label>
         <div class="col-sm-4">
             <p id="normal_applyTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会时间：</label>
+        <label class="col-sm-2 control-label">党支部大会时间</label>
         <div class="col-sm-4">
             <p id="normal_meetTime" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会内容：</label>
+        <label class="col-sm-2 control-label">党支部大会内容</label>
         <div class="col-sm-5">
             <p id="normal_meetContent" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党总支审批：</label>
+        <label class="col-sm-2 control-label">党总支审批</label>
         <div class="col-sm-5">
             <p id="normal_branchApproval" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">校党委审批：</label>
+        <label class="col-sm-2 control-label">校党委审批</label>
         <div class="col-sm-5">
             <p id="normal_schoolApproval" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">职称：</label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-3">
             <p id="normal_profession" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-1">
             <p id="normal_degree" class="form-control-static"></p>
         </div>
@@ -400,6 +428,7 @@
 <!-- 全局js -->
 <script src="../../static/js/jquery.min.js?v=2.1.4"></script>
 <script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+<script src="../../statis/js/jQuery.print.js"></script>
 
 <!-- 自定义js -->
 <script src="../../static/js/content.js?v=1.0.0"></script>
@@ -416,6 +445,16 @@
 
 <script>
     $(document).ready(function () {
+        $('.checkMaxLen').maxlength({
+            alwaysShow: true,
+            validate: false,
+            allowOverMax: true,
+            customMaxAttribute: "90",
+            warningClass: "label label-info",
+            limitReachedClass: "label label-warning",
+            placement: 'right',
+            message: '已输入 %charsTyped%/最多输入%charsTotal%'
+        });
         //获取信息
         var personId=getIdTag();
         $.ajax( {
@@ -431,6 +470,8 @@
                     $('#orgName').html(data.orgName);
                     $('#createTime').html(data.createTime);
                     $('#updateTime').html(data.updateTime);
+                    $('#pBePartyTime').val(data.bePartyTime);
+                    $('#pRollTime').val(data.rollTime);
                     $('#pNumber').html(data.number);
                     $('#pName').val(data.name);
                     $('#pType').find('option[value="'+data.type+'"]').attr("selected","selected");
@@ -438,12 +479,12 @@
                     $('#pNation').find('option[value="'+data.nation+'"]').attr("selected","selected");
                     $('#pDegree').find('option[value="'+data.degree+'"]').attr("selected","selected");
                     $('#pIdNumber').val(data.idNumber);
-                    $('#pHometown').html(data.hometown);
+                    $('#pHometown').val(data.hometown);
                     $('#pBirth').val(data.birth);
                     $('#pProfession').val(data.profession);
                     $('#pDesc').val(data.desc);
                     //申请人阶段
-                    $('#applier_talker').html(data.talker);
+                    $('#applier_talker').html(data.applier_talker);
                     $('#applier_profession').html(data.applier_profession);
                     $('#applier_applyTime').html(data.applier_applyTime);
                     $('#applier_talkTime').html(data.applier_talkTime);

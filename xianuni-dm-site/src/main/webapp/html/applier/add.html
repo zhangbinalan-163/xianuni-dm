@@ -25,7 +25,7 @@
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
             <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部基础人员库查询</span>
+            <span class="help-block m-b-none">请从本党支部(基础人员)库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -46,7 +46,7 @@
         <label class="col-sm-2 control-label">谈话人：</label>
         <div class="col-sm-4">
             <input type="text" id="pTalker" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部正式党员库查询</span>
+            <span class="help-block m-b-none">请从本党支部(正式党员+在编党员)库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -59,13 +59,13 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">谈话记录：</label>
         <div class="col-sm-5">
-            <textarea id="talkContent" name="talkContent" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="talkContent" name="talkContent" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">职称：</label>
         <div class="col-sm-3">
-            <input id="profession" type="text" class="form-control" name="profession">
+            <input id="profession" type="text" class="form-control checkMaxLen" maxlength="20" name="profession">
         </div>
     </div>
     <div class="form-group">
@@ -129,7 +129,7 @@
             $(selector).chosen(config[selector]);
         }
 
-        $('#talkContent').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,
@@ -205,7 +205,7 @@
         });
         $pTalker.select2({
             ajax: {
-                url:   "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=9&orgId="+getOrgTag(),
+                url:  "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=5,9&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

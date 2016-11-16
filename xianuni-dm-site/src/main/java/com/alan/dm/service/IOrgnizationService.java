@@ -3,6 +3,7 @@ package com.alan.dm.service;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Page;
+import com.alan.dm.entity.query.OrgnizationCondition;
 
 import java.util.List;
 
@@ -11,6 +12,14 @@ import java.util.List;
  * Created by zhangbinalan on 15/11/11.
  */
 public interface IOrgnizationService {
+    /**
+     * 
+     * @param condition
+     * @param page
+     * @return
+     * @throws DMException
+     */
+    List<Orgnization> getByCondition(OrgnizationCondition condition,Page page) throws DMException;
     /**
      * 撤销党组织，可以撤销子部门
      * @param orgnization

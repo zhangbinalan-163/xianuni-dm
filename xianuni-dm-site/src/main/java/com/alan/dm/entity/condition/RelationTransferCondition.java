@@ -12,6 +12,15 @@ public class RelationTransferCondition {
     private List<Integer> types;
     private List<Integer> fromOrgId;
     private List<Integer> toOrgId;
+    private Integer status;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 
     public String getNumber() {
         return number;

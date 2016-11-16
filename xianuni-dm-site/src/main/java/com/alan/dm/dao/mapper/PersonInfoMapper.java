@@ -5,6 +5,7 @@ import com.alan.dm.entity.Person;
 import com.alan.dm.entity.query.PersonCondition;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,7 +29,20 @@ public interface PersonInfoMapper {
      */
     int countByCondition(@Param(value="condition")PersonCondition condition);
 
-
+    /**
+     *
+     * @param orgIdList
+     * @param sourceList
+     * @param statusList
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    int countBySource(@Param(value="orgList")List<Integer> orgIdList,
+                      @Param(value="sourceList")List<Integer> sourceList,
+                      @Param(value="statusList")List<Integer> statusList,
+                      @Param(value="startDate")Date startDate,
+                      @Param(value="endDate") Date endDate);
     /**
      *
      * @param condition

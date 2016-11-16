@@ -3,6 +3,8 @@ package com.alan.dm.service.impl;
 import com.alan.dm.common.exception.DMException;
 import com.alan.dm.dao.mapper.OrgnizationMapper;
 import com.alan.dm.entity.Orgnization;
+import com.alan.dm.entity.Page;
+import com.alan.dm.entity.query.OrgnizationCondition;
 import com.alan.dm.service.IOrgnizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -42,6 +45,11 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
             }
         }
         return subOrgList;
+    }
+
+    @Override
+    public List<Orgnization> getByCondition(OrgnizationCondition condition, Page page) throws DMException {
+        return orgnizationMapper.getByCondition(condition,page);
     }
 
     @Override
@@ -105,12 +113,12 @@ public class OrgnizationServiceImpl implements IOrgnizationService {
 
     @Override
     public List<Orgnization> getParentOrg(Orgnization orgnization) throws DMException {
-        List<Orgnization> orgnizationList=new ArrayList<Orgnization>();
+        List<Orgnization> orgnizationList=new LinkedList<Orgnization>();
         int parent=orgnization.getParent();
         while(parent!=-1){
             Orgnization parentOrg = orgnizationMapper.getById(parent);
-            parent=parentOrg.getParent();
             orgnizationList.add(parentOrg);
+            parent=parentOrg.getParent();
         }
         return orgnizationList;
     }

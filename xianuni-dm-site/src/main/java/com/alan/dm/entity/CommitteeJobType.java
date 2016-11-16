@@ -6,7 +6,7 @@ package com.alan.dm.entity;
  */
 public enum CommitteeJobType {
 
-    NORMAL(0,"委员"),ZUZHI(1,"宣传委员"),XUANCHUAN(2,"宣传委员"),OTHER(3,"其他职务"),LEAD(4,"书记");
+    NORMAL(0,"委员"),ZUZHI(1,"宣传委员"),XUANCHUAN(2,"组织委员"),OTHER(3,"其他职务"),LEAD(4,"书记");
 
     private int id;
     private String name;

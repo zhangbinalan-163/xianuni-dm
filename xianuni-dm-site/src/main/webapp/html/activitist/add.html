@@ -9,7 +9,6 @@
     <link href="../../static/css/animate.css" rel="stylesheet">
     <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
     <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
-
     <link href="../../static/js/plugins/select2/select2.css" rel="stylesheet">
     <base target="_blank">
 </head>
@@ -23,14 +22,14 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学工号：</label>
+        <label class="col-sm-2 control-label">学工号</label>
         <div class="col-sm-4">
             <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
             <span class="help-block m-b-none">请从本党支部申请人库查询</span>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否谈话：</label>
+        <label class="col-sm-2 control-label">是否谈话</label>
         <div class="col-sm-1">
             <select id="talked" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">未谈话</option>
@@ -39,7 +38,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否群团推优：</label>
+        <label class="col-sm-2 control-label">是否群团推优</label>
         <div class="col-sm-1">
             <select id="quntuan" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">否</option>
@@ -48,36 +47,36 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">民主评议时间：</label>
+        <label class="col-sm-2 control-label">民主评议时间</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="talkTime">
             <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#talkTime'});"></label>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">民主测评总结：</label>
+        <label class="col-sm-2 control-label">民主测评总结</label>
         <div class="col-sm-5">
-            <textarea id="talkContent" name="talkContent" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="talkContent" name="talkContent" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会时间：</label>
+        <label class="col-sm-2 control-label">党支部大会时间</label>
         <div class="col-sm-4">
             <input readonly class="form-control layer-date" id="meetTime">
             <label class="laydate-icon inline demoicon" onclick="laydate({elem: '#meetTime'});"></label>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">党支部大会内容：</label>
+        <label class="col-sm-2 control-label">党支部大会内容</label>
         <div class="col-sm-5">
-            <textarea id="meetContent" name="meetContent" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="meetContent" name="meetContent" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">培养人：</label>
+        <label class="col-sm-2 control-label">培养人</label>
         <div class="col-sm-4">
             <input type="text" id="directorId" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部正式党员库查询</span>
+            <span class="help-block m-b-none">请从本党支部(正式党员+在编党员)库查询</span>
         </div>
     </div>
     <div class="form-group">
@@ -88,7 +87,7 @@
         <input id="numberList" hidden="hidden">
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">是否上级备案：</label>
+        <label class="col-sm-2 control-label">是否上级备案</label>
         <div class="col-sm-1">
             <select id="beian" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">否</option>
@@ -97,13 +96,13 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">职称：</label>
+        <label class="col-sm-2 control-label">职称</label>
         <div class="col-sm-3">
-            <input id="profession" type="text" class="form-control" name="profession">
+            <input id="profession" type="text" class="form-control checkMaxLen" maxlength="20" name="profession">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学历：</label>
+        <label class="col-sm-2 control-label">学历</label>
         <div class="col-sm-1">
             <select id="degree" class="chosen-select" style="width:100px;" tabindex="2">
                 <option value="0" hassubinfo="true">初中及以下</option>
@@ -163,7 +162,7 @@
             $(selector).chosen(config[selector]);
         }
 
-        $('#talkContent').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,
@@ -248,7 +247,7 @@
         });
         $directorId.select2({
             ajax: {
-                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=9&orgId="+getOrgTag(),
+                url: "/xianuni-dm/person/list/withType.do?withAllPersonByType=false&status=5,9&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

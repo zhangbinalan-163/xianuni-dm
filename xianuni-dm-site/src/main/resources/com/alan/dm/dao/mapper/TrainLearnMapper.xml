@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.alan.dm.dao.mapper.TrainLearnMapper">
+
+    <sql id="LEARN_TABLE">tb_train_learn</sql>
+    <sql id="PERSON_TABLE">tb_person</sql>
+    <sql id="TRAIN_TABLE">party_training</sql>
+    <sql id="ORG_TABLE">tb_orgnization</sql>
+
+    <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
+        <id property="id" column="orgId"/>
+        <result property="name" column="orgName"/>
+    </resultMap>
+
+    <resultMap id="PERSON_INFO" type="com.alan.dm.entity.Person">
+        <id property="id" column="personId"/>
+        <result property="name" column="personName"/>
+        <result property="number" column="personNumber"/>
+    </resultMap>
+
+    <resultMap id="TRAIN_LEARN_INFO" type="com.alan.dm.entity.TrainLearn">
+        <id property="id" column="learnId" />
+        <result property="personId" column="personId"/>
+        <result property="trainId" column="trainId"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="learn" column="learn"/>
+        <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
+        <association property="training" column="trainId" javaType="com.alan.dm.entity.EduTraining" resultMap="TRAIN_INFO"/>
+        <association property="orgnization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
+    </resultMap>
+
+    <resultMap id="TRAIN_INFO" type="com.alan.dm.entity.EduTraining">
+        <id property="id" column="trainId" />
+        <result property="title" column="trainTitle"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="trainLearn.id">
+        INSERT INTO
+        <include refid="LEARN_TABLE"/>
+        (trainId,personId,learn,createTime)
+        VALUES(#{trainLearn.training.id},#{trainLearn.person.id},#{trainLearn.learn},#{trainLearn.createTime})
+    </insert>
+
+    <insert id="update">
+        update
+        <include refid="LEARN_TABLE"/>
+        set learn=#{trainLearn.learn},updateTime=#{trainLearn.updateTime}
+        where id=#{trainLearn.id}
+    </insert>
+
+    <delete id="delete">
+        DELETE  FROM <include refid="LEARN_TABLE"/>
+        WHERE id=#{trainLearn.id}
+    </delete>
+
+    <select id="getByCondition" resultMap="TRAIN_LEARN_INFO">
+        SELECT
+        TL.id AS learnId,
+        TL.personId AS personId,
+        TL.trainId AS trainId,
+        TL.createTime AS createTime,
+        TL.updateTime AS updateTime,
+        TL.learn AS learn,
+        O.name AS orgName,
+        P.id AS personId,
+        P.name AS personName,
+        P.number AS personNumber,
+        P.orgId AS orgId,
+        T.id AS trainId,
+        T.title AS trainTitle
+        FROM  <include refid="LEARN_TABLE" /> TL
+        JOIN <include refid="TRAIN_TABLE"/> T ON TL.trainId=T.id
+        JOIN <include refid="PERSON_TABLE"/> P ON TL.personId=P.id
+        JOIN <include refid="ORG_TABLE"/> O ON O.id=P.orgId
+        <where>
+            <if test="condition.orgList != null">
+                P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
+            </if>
+        </where>
+        ORDER BY TL.createTime desc
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
+    <select id="countByCondition" resultType="Integer">
+        select count(*)
+        FROM  <include refid="LEARN_TABLE" /> TL
+        JOIN <include refid="TRAIN_TABLE"/> T ON TL.trainId=T.id
+        JOIN <include refid="PERSON_TABLE"/> P ON TL.personId=P.id
+        JOIN <include refid="ORG_TABLE"/> O ON O.id=P.orgId
+        <where>
+            <if test="condition.orgList != null">
+                P.orgId in
+                <foreach collection="condition.orgList" index="index" item="orgList" open="("
+                         separator="," close=")">
+                    #{orgList}
+                </foreach>
+            </if>
+            <if test="condition.number != null">
+                <bind name="patternNumber" value="condition.number+ '%'" />
+                AND P.number LIKE #{patternNumber}
+            </if>
+        </where>
+    </select>
+
+    <select id="getById" resultType="com.alan.dm.entity.TrainLearn">
+        SELECT *
+        FROM  <include refid="LEARN_TABLE" />
+        WHERE id=#{id}
+    </select>
+
+    <select id="getByPersonAndTrain" resultType="com.alan.dm.entity.TrainLearn">
+        SELECT *
+        FROM  <include refid="LEARN_TABLE" />
+        WHERE trainId=#{trainId} and personId=#{personId}
+    </select>
+</mapper>

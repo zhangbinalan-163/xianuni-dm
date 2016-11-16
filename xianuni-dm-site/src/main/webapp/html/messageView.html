@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../static/css/animate.css" rel="stylesheet">
+    <link href="../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link href="../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body>
+<div class="wrapper wrapper-content  animated fadeInRight article">
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="pull-right">
+                        <small>发布时间</small><i class="fa fa-clock-o"></i>&nbsp;<small id="time"></small>
+                    </div>
+                    <div class="text-center article-title">
+                        <h3 id="title"></h3>
+                    </div>
+                    <p id="content"></p>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</form>
+
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../static/js/content.js?v=1.0.0"></script>
+
+<script>
+    $(document).ready(function () {
+        //获取信息
+        var resourceId=getIdTag();
+        $.ajax({
+            url: "/xianuni-dm/message/info.do?id="+resourceId,
+            dataType: 'json',
+            success: function(data){
+                $('#time').html(data.sendTime);
+                $('#title').html(data.messageTitle);
+                $('#content').html(data.messageContent);
+            },
+            error: function(){
+
+            }
+        });
+    });
+    function getIdTag(){
+        return parent.$('#messageIdTag').val();
+    }
+</script>
+</body>
+</html>

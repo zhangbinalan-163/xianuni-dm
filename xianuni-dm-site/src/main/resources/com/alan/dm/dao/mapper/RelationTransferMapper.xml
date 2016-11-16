@@ -21,15 +21,24 @@
         <result property="fromOrgName" column="fromOrgName"/>
         <result property="toOrgName" column="toOrgName"/>
         <result property="toOrgId" column="toOrgId"/>
+        <result property="status" column="status"/>
+        <result property="transferDoneTime" column="transferDoneTime"/>
         <association property="person" column="personId" javaType="com.alan.dm.entity.Person" resultMap="PERSON_INFO"/>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="relationTransferInfo.id">
         INSERT INTO
         <include refid="A_TABLE"/>
-        (transferType,personId,toOrgId,fromOrgId,fromOrgName,toOrgName,transferTime)
-        VALUES(#{relationTransferInfo.transferType},#{relationTransferInfo.person.id},#{relationTransferInfo.toOrgId},#{relationTransferInfo.fromOrgId},#{relationTransferInfo.fromOrgName},#{relationTransferInfo.toOrgName},#{relationTransferInfo.transferTime})
+        (transferType,personId,toOrgId,fromOrgId,fromOrgName,toOrgName,transferTime,status)
+        VALUES(#{relationTransferInfo.transferType},#{relationTransferInfo.person.id},#{relationTransferInfo.toOrgId},#{relationTransferInfo.fromOrgId},
+        #{relationTransferInfo.fromOrgName},#{relationTransferInfo.toOrgName},#{relationTransferInfo.transferTime},#{relationTransferInfo.status})
     </insert>
+
+    <update id="update">
+        update <include refid="A_TABLE"/>
+        set status=#{relationTransferInfo.status},transferDoneTime=#{relationTransferInfo.transferDoneTime}
+        where id=#{relationTransferInfo.id}
+    </update>
 
     <select id="getById" resultType="com.alan.dm.entity.RelationTransferInfo">
         SELECT *
@@ -52,6 +61,8 @@
           A.toOrgId as toOrgId,
           A.toOrgName as toOrgName,
           A.transferTime as transferTime,
+          A.status as status,
+          A.transferDoneTime as transferDoneTime,
           P.name as personName,
           P.number as personNumber
 
@@ -78,6 +89,9 @@
                          open="(" close=")" separator=",">
                     #{types}
                 </foreach>
+            </if>
+            <if test="condition.status != null">
+                AND A.status = #{condition.status}
             </if>
             <if test="condition.number != null">
                 <bind name="pattern" value="condition.number+ '%'" />
@@ -121,7 +135,9 @@
                 <bind name="pattern" value="condition.number+ '%'" />
                 AND P.number LIKE #{pattern}
             </if>
-
+            <if test="condition.status != null">
+                AND A.status = #{condition.status}
+            </if>
         </where>
     </select>
 

@@ -25,7 +25,7 @@
         <label class="col-sm-2 control-label">学工号：</label>
         <div class="col-sm-4">
             <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从您管理的党支部人员中查询</span>
+            <span class="help-block m-b-none">请选择相关转入人员</span>
         </div>
     </div>
     <div class="form-group">
@@ -47,6 +47,7 @@
         </div>
     </div>
 </form>
+<input type="text" hidden="hidden" id="transferId">
 
 <!-- 全局js -->
 <script src="../../../static/js/jquery.min.js?v=2.1.4"></script>
@@ -109,17 +110,18 @@
         var $pNumber = $("#pNumber");
 
         var formatResult = function(result, container, query, escapeMarkup) {
-            return "<div>"+result.personStatus+" 学工号:" + result.personNumber+ " 姓名:" + result.personName+"</div>";
+            return "<div>学工号:" + result.personNumber+ " 姓名:" + result.personName+"</div>";
         };
         var formatSelection = function (data, container, escapeMarkup) {
             $pNumber.val(data.personNumber);
             $('#pOutOrg').html(data.orgName);
             $('#pName').html(data.personName);
+            $('#transferId').val(data.transferId);
             return data.personNumber;
         };
         $pNumber.select2({
             ajax: {
-                url: "/xianuni-dm/person/listQuery.do?status=0,1,2,3,4,5&withAllSubOrg=true&orgId="+getOrgTag(),
+                url: "/xianuni-dm/relation/transfer/in/listInchecking.do?orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

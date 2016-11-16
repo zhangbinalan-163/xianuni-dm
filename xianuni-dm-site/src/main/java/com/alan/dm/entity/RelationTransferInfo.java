@@ -8,8 +8,12 @@ import java.util.Date;
  * @author: fan
  */
 public class RelationTransferInfo {
+    public static final int CHECKING=1;//正在审核
+    public static final int DONE=0;//已经完成
+
     private int id;
     private Person person;
+    private int status;
     private int transferType;
     private int fromOrgId;
     private int toOrgId;
@@ -17,6 +21,32 @@ public class RelationTransferInfo {
     private String toOrgName;
     private String tel;
     private Date transferTime;
+    private int personId;
+    private Date transferDoneTime;
+
+    public Date getTransferDoneTime() {
+        return transferDoneTime;
+    }
+
+    public void setTransferDoneTime(Date transferDoneTime) {
+        this.transferDoneTime = transferDoneTime;
+    }
+
+    public int getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(int personId) {
+        this.personId = personId;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public int getId() {
         return id;

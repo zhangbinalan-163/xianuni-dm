@@ -22,28 +22,28 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">学工号：</label>
+        <label class="col-sm-2 control-label"><small>学工号：</small></label>
         <div class="col-sm-4">
             <input type="text" id="pNumber" class="js-example-data-ajax" style="width: 100%"/>
-            <span class="help-block m-b-none">请从本党支部预备党员和正式党员库查询</span>
+            <span class="help-block m-b-none">请从本党支部在编党员、预备党员、正式党员库查询</span>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">姓名：</label>
+        <label class="col-sm-2 control-label"><small>姓名：</small></label>
         <div class="col-sm-4">
             <p id="pName" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>原党组织</small></label>
+        <label class="col-sm-2 control-label"><small>原党组织：</small></label>
         <div class="col-sm-5">
             <p id="pOldOrg" class="form-control-static"></p>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>转出党组织</small></label>
+        <label class="col-sm-2 control-label"><small>转出党组织：</small></label>
         <div class="col-sm-5">
-            <input type="text" maxlength="50" class="form-control" id="newOrgName">
+            <input type="text" maxlength="50" class="form-control checkMaxLen" id="newOrgName">
         </div>
     </div>
 </form>
@@ -93,7 +93,7 @@
         for (var selector in config) {
             $(selector).chosen(config[selector]);
         }
-        $('#oldOrgName').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,
@@ -103,7 +103,6 @@
             placement: 'right',
             message: '已输入 %charsTyped%/最多输入%charsTotal%'
         });
-
         $('#pOrg').html(getOrgNameTag());
 
         var $pNumber = $("#pNumber");
@@ -118,7 +117,7 @@
         };
         $pNumber.select2({
             ajax: {
-                url: "/xianuni-dm/person/listQuery.do?status=4,5&withAllSubOrg=true&orgId="+getOrgTag(),
+                url: "/xianuni-dm/person/listQuery.do?status=4,5,9&withAllSubOrg=true&orgId="+getOrgTag(),
                 type:'get',
                 cache:false,
                 dataType:'json',

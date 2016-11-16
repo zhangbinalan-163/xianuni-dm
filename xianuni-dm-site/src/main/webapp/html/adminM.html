@@ -205,7 +205,7 @@
                                         title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的管理员信息',
                                         shade: 0.6, //遮罩透明度
                                         shift: 5, //0-6的动画形式，-1不开启
-                                        btn: ['Sorry，暂时不支持修改', '取消'],
+                                        btn: ['保存修改', '取消'],
                                         yes: function(index){
                                             var inputs=layer.getChildFrame('body',index).find('input');
                                             var password;
@@ -238,6 +238,8 @@
                                                         layer.alert('修改管理员信息失败', {icon: 5});
                                                     }
                                                 });
+                                            }else{
+                                                layer.close(index);
                                             }
                                         },
                                         no: function (index) {

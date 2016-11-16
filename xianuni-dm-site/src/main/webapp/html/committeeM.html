@@ -137,7 +137,7 @@
                                     tel=inputValue;
                                 }
                                 if(inputName=='profession'){
-                                    profession=profession;
+                                    profession=inputValue;
                                 }
                             }
                             var selects=layer.getChildFrame('body',index).find('select');
@@ -229,7 +229,7 @@
                                         content: 'committee/update.html',
                                         area: ['100%', '100%'],
                                         maxmin: false,
-                                        title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的积极分子信息',
+                                        title: '修改<strong>' + data.number+'<-->'+data.name+'</strong>的委员会信息',
                                         shade: 0.6, //遮罩透明度
                                         shift: 5, //0-6的动画形式，-1不开启
                                         btn: ['Sorry，暂时不支持修改', '取消'],

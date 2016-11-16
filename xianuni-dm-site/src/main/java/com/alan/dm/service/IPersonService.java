@@ -7,12 +7,24 @@ import com.alan.dm.entity.Person;
 import com.alan.dm.entity.query.PersonCondition;
 import com.alan.dm.entity.query.PersonResult;
 
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by zhangbinalan on 15/11/16.
  */
 public interface IPersonService {
+    /**
+     * 统计指定时间内成为党员的数量
+     * @param orgnization
+     * @param source
+     * @param statusList
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws DMException
+     */
+    int countBySourceAndTime(Orgnization orgnization,int source,List<Integer> statusList,Date startDate,Date endDate,boolean withAllSub) throws DMException;
     /**
      *
      * @param person
@@ -22,11 +34,14 @@ public interface IPersonService {
     /**
      * 统计某个党组织特定状态的党员的数量,包含下属组织
      * @param orgnization
-     * @param status
+     * @param statusList
      * @return
      * @throws DMException
      */
-    int countByOrgWithStatus(Orgnization orgnization,int status,boolean withAllSub) throws DMException;
+    int countByOrgWithStatus(Orgnization orgnization,
+                             List<Integer> statusList,List<Integer> sexList,List<Integer> nationList,
+                             List<Integer> degreeList,Date startBirth,Date endBirth,
+                             boolean withAllSub) throws DMException;
 
     /**
      * 根据条件分页查询人员信息，会带回响应的信息

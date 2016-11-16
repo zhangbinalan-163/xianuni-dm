@@ -2,9 +2,12 @@ package com.alan.dm.web.controller;
 
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.SessionUtils;
+import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.entity.Admin;
+import com.alan.dm.entity.Orgnization;
 import com.alan.dm.entity.Person;
 import com.alan.dm.service.IAdminService;
+import com.alan.dm.service.IOrgnizationService;
 import com.alan.dm.service.IPersonService;
 import com.alan.dm.web.Constants;
 import com.alan.dm.web.util.IPUtils;
@@ -36,6 +39,45 @@ public class LoginController extends BaseController{
 
     @Resource(name = "personService")
     private IPersonService personService;
+
+    @Resource(name = "orgnizationService")
+    private IOrgnizationService orgnizationService;
+
+    /**
+     * 是不是党支部
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/notZhibuOrg.do")
+    @ResponseBody
+    public String notZhibuOrg(HttpServletRequest httpServletRequest) throws Exception {
+        Integer adminId = getOnlineAdminId(httpServletRequest);
+        Admin adminInfo = adminService.getById(adminId);
+        if(adminInfo!=null){
+            if(adminInfo.getType()==Admin.SYSTEM_ADMIN) {
+                JSONObject jsonObject=new JSONObject();
+                jsonObject.put("success",true);
+                return JsonUtils.fromObject(jsonObject);
+            }else{
+                Orgnization org = orgnizationService.getOrgById(adminInfo.getOrgId());
+                if(org!=null){
+                    if(orgnizationService.countSubOrg(org)==0){
+                        JSONObject jsonObject=new JSONObject();
+                        jsonObject.put("success",false);
+                        return JsonUtils.fromObject(jsonObject);
+                    }else{
+                        JSONObject jsonObject=new JSONObject();
+                        jsonObject.put("success",true);
+                        return JsonUtils.fromObject(jsonObject);
+                    }
+                }
+            }
+        }
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("success",false);
+        return JsonUtils.fromObject(jsonObject);
+    }
 
     /**
      * 获取当前用户信息
@@ -84,7 +126,7 @@ public class LoginController extends BaseController{
                 jsonObject.put("msg","用户不存在:"+number);
                 return JsonUtils.fromObject(jsonObject);
             }else{
-                if(!password.equals(admin.getPassword())){
+                if(!password.equals(admin.getPassword())&& !StringUtils.md5(password).equals(admin.getPassword())){
                     JSONObject jsonObject=new JSONObject();
                     jsonObject.put("success",false);
                     jsonObject.put("msg","用户名或密码错误");
@@ -92,7 +134,7 @@ public class LoginController extends BaseController{
                 }
             }
             //设置COOKIE和session
-            String cookie=SessionUtils.generateCookie(admin.getId(), IPUtils.getRequestIp(httpServletRequest),System.currentTimeMillis(),2*60*60*1000L);
+            String cookie=SessionUtils.generateCookie(admin.getId(), IPUtils.getRequestIp(httpServletRequest),System.currentTimeMillis(),10*60*60*1000L);
             Cookie cookieInfo = new Cookie(Constants.COOKIE_NAME,cookie);
             cookieInfo.setPath("/");
             httpServletResponse.addCookie(cookieInfo);
@@ -113,7 +155,7 @@ public class LoginController extends BaseController{
                 jsonObject.put("msg","用户不存在:"+number);
                 return JsonUtils.fromObject(jsonObject);
             }else{
-                if(!password.equals(person.getPassword())){
+                if(!password.equals(person.getPassword())&& !StringUtils.md5(password).equals(person.getPassword())){
                     JSONObject jsonObject=new JSONObject();
                     jsonObject.put("success",false);
                     jsonObject.put("msg","用户名或密码错误");
@@ -121,7 +163,7 @@ public class LoginController extends BaseController{
                 }
             }
             //设置COOKIE和session
-            String cookie=SessionUtils.generateCookie(person.getId(), IPUtils.getRequestIp(httpServletRequest),System.currentTimeMillis(),2*60*60*1000L);
+            String cookie=SessionUtils.generateCookie(person.getId(), IPUtils.getRequestIp(httpServletRequest),System.currentTimeMillis(),10*60*60*1000L);
             Cookie cookieInfo = new Cookie(Constants.COOKIE_NAME_PERSON,cookie);
             cookieInfo.setPath("/");
             httpServletResponse.addCookie(cookieInfo);

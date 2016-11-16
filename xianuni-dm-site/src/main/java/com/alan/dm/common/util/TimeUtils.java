@@ -88,4 +88,22 @@ public class TimeUtils {
         }
         return date;
     }
+    /**
+     * 将字符串转换成日期
+     * @param source
+     * @return
+     */
+    public static Date convertStringToDate(String source,String pattern) {
+        if(StringUtils.isEmpty(source)) {
+            return null;
+        }
+        DateFormat format = new SimpleDateFormat(pattern);
+        Date date = null;
+        try {
+            date = format.parse(source);
+        } catch (ParseException e) {
+            LOGGER.error("convert string to date fail.");
+        }
+        return date;
+    }
 }

@@ -8,6 +8,29 @@
 
     <resultMap id="INFO" type="com.alan.dm.entity.Orgnization"></resultMap>
 
+    <!-- 根据条件，分页获取人员信息-->
+    <select id="getByCondition" resultType="com.alan.dm.entity.Orgnization">
+        SELECT *
+        FROM  <include refid="TABLE" />
+        <where>
+            <if test="condition.name != null">
+                <bind name="patternName" value="condition.name+ '%'" />
+                name LIKE #{patternName}
+            </if>
+            <if test="condition.status != null">
+                AND status in
+                <foreach collection="condition.status" index="index" item="status" open="("
+                         separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY updateTime desc,createTime desc
+        <if test="page!=null">
+            LIMIT #{page.current}, #{page.size}
+        </if>
+    </select>
+
     <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="orgnization.id">
         INSERT INTO
         <include refid="TABLE"/>

@@ -166,4 +166,8 @@
 		<property name="mapperInterface" value="com.alan.dm.dao.mapper.PersonMeetingMapper" />
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
+	<bean id="trainLearnMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.alan.dm.dao.mapper.TrainLearnMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
 </beans>

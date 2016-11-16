@@ -112,7 +112,7 @@
                         btn: ['创建', '取消'],
                         yes: function(index){
                             var inputs=layer.getChildFrame('body',index).find('input');
-                            var comePerson,fileUrlList,fileNameList,personIds,sendMail,theme,location,startTime,shouldPersonCount,realPersonCount,comePerson,noComePerson,zhuchiren,meetContent,jiluren;
+                            var comePerson,fileUrlList,fileNameList,personIds,sendMail,theme,location,startTime,shouldPersonCount,realPersonCount,comePerson,noComePerson,zhuchiren,meetContent,jiluren,mType;
                             for(var i=0; i<inputs.length; i++){
                                 var inputName=inputs[i].id;
                                 var inputValue=inputs[i].value;
@@ -176,6 +176,9 @@
                                 if(inputName=='sendMail'){
                                     sendMail=inputValue;
                                 }
+                                if(inputName=='mType'){
+                                    mType=inputValue;
+                                }
                             }
                             var textareas=layer.getChildFrame('body',index).find('textarea');
                             for(var i=0; i<textareas.length; i++){
@@ -189,7 +192,7 @@
                                 url:'/xianuni-dm/meeting/add.do',
                                 data:{
                                     orgId : node.id,
-                                    type : 4,
+                                    type : mType,
                                     theme:theme,
                                     location:location,
                                     startTime:startTime,
@@ -228,14 +231,15 @@
                 var self = this;
                 this.$el.jqGrid(
                         {
-                            url: '/xianuni-dm/meeting/list.do?type=4',
+                            url: '/xianuni-dm/meeting/list.do?type=4,5,6,7',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,
-                            colNames: ['ID','党组织', '会议主题','开始时间', '应到人数', '实际人数','操作'],
+                            colNames: ['ID','党组织', '会议类型','会议主题','开始时间', '应到人数', '实际人数','操作'],
                             colModel: [
                                 {name: 'id', index: 'id',hidden:true},
                                 {name: 'org', index: 'org',width: 80, align: "left"},
+                                {name: 'type', index: 'type',width: 60, align: "left"},
                                 {name: 'title', index: 'title',width: 60, align: "left"},
                                 {name: 'start', index: 'start',width: 60, align: "left"},
                                 {name: 'shouldNumber', index: 'shouldNumber',width: 60, align: "left"},

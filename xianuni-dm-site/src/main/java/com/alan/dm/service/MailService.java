@@ -38,6 +38,13 @@ public interface MailService {
 
     /**
      *
+     * @param person
+     * @return
+     * @throws DMException
+     */
+    int countByPerson(Person person) throws DMException;
+    /**
+     *
      * @param id
      * @return
      * @throws DMException

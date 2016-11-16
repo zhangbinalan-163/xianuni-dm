@@ -60,13 +60,15 @@ public class MailController extends BaseController{
 	@ResponseBody
 	public String delete(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
-		int mailId=request.getInt("id");
-		MailInfo mailInfo=mailService.getById(mailId);
-		if(mailInfo!=null){
-			mailService.deleteMail(mailInfo);
+		String[] ids=request.getStringArray("id", ",");
+		for(String id:ids){
+			MailInfo mailInfo=mailService.getById(Integer.parseInt(id));
+			if(mailInfo!=null){
+				mailService.deleteMail(mailInfo);
+			}
 		}
 		JSONObject jsonObject=new JSONObject();
-		jsonObject.put("success", true);
+		jsonObject.put("status",true);
 		return JsonUtils.fromObject(jsonObject);
 	}
 
@@ -129,7 +131,25 @@ public class MailController extends BaseController{
 	@RequestMapping("/info.do")
 	@ResponseBody
 	public String messageInfo(HttpServletRequest httpServletRequest) throws Exception {
-		return null;
+		Request request = getRequest(httpServletRequest);
+		Integer id = request.getInt("id");
+		MailInfo mailInfo = mailService.getById(id);
+		if(mailInfo!=null){
+			JSONObject jsonObject=new JSONObject();
+			jsonObject.put("success", true);
+			Person person=personService.getById(mailInfo.getPersonId());
+			if(person!=null){
+				jsonObject.put("personName",person.getName());
+				jsonObject.put("personNumber",person.getNumber());
+			}
+			jsonObject.put("sendTime", TimeUtils.convertToTimeString(mailInfo.getCreateTime()));
+			jsonObject.put("mailName", mailInfo.getTitle());
+			jsonObject.put("mailContent", mailInfo.getContent());
+			return JsonUtils.fromObject(jsonObject);
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("success", false);
+		return JsonUtils.fromObject(jsonObject);
 	}
 
 	/**
@@ -141,7 +161,30 @@ public class MailController extends BaseController{
 	@RequestMapping("/person/list.do")
 	@ResponseBody
 	public String personListMessage(HttpServletRequest httpServletRequest) throws Exception {
-		return null;
+		//获取当前登录账号、或者管理员的ID
+		int adminId=getOnlineAdminId(httpServletRequest);
+		Admin adminInfo = adminService.getById(adminId);
+		Person person=personService.getByNumber(adminInfo.getSchoolNumber());
+
+		Page page=new Page();
+		page.setCurrent(0);
+		page.setSize(15);
+
+		List<MailInfo> mailList = mailService.getByPerson(person, page);
+		JSONObject jsonObject=new JSONObject();
+		JSONArray dataArray=new JSONArray();
+		if(mailList!=null){
+			for(MailInfo mailInfo:mailList){
+				JSONObject itemObj=new JSONObject();
+				itemObj.put("id",mailInfo.getId());
+				itemObj.put("time", TimeUtils.convertToTimeString(mailInfo.getCreateTime()));
+				itemObj.put("title",mailInfo.getTitle());
+				itemObj.put("readed",mailInfo.isReaded()?"已读":"未读");
+				dataArray.add(itemObj);
+			}
+		}
+		jsonObject.put("list",dataArray);
+		return JsonUtils.fromObject(jsonObject);
 	}
 	/**
 	 * 列表

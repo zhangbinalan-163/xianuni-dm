@@ -14,7 +14,7 @@
 <body class="gray-bg">
     <div class="wrapper wrapper-content">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h5>消息通知</h5>
@@ -27,18 +27,20 @@
                             </a>
                         </div>
                     </div>
-                    <div class="ibox-content no-padding">
-                        <ul id="messageDiv" class="list-group">
+                    <div class="ibox-content">
+                        <table class="table table-hover no-margins">
+                            <tbody id="messageDiv">
 
-                        </ul>
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-5">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>媒体资源</h5>
+                        <h5>站内信</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -60,6 +62,7 @@
         </div>
     </div>
     <input type="text" hidden="hidden" id="resourceIdTag"/>
+    <input type="text" hidden="hidden" id="messageIdTag"/>
     <!-- 全局js -->
     <script src="../../static/js/jquery.min.js?v=2.1.4"></script>
     <script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
@@ -79,28 +82,37 @@
                 success: function(data){
                     var list = data.list, buf = [];
                     var itemTpl = function(item){
-                        return '<li class="list-group-item"><p><a class="text-info" href="index.html#">'
-                                + item.publisher
-                                + '</a>' + item.content +'</p>'
-                                + ' <small class="block text-muted"><i class="fa fa-clock-o"></i>'
-                                + item.time+'</small></li>';
+                        return '<tr><td><a class="J_view_2  text-info" data-id="' + item.id + '"<small>'+item.title+'</small></a></td><td><i class="fa fa-clock-o"></i>'+item.time+'</td></tr>';
                     }
                     $.each(list, function(index, item){
                         buf.push(itemTpl(item));
                     })
                     $('#messageDiv').html(buf.join(''));
+                    $('.J_view_2').on('click', function () {
+                        var id = $(this).data('id');
+                        $('#messageIdTag').val(id);
+                        layer.open({
+                            type: 2,
+                            content: 'messageView.html',
+                            area: ['100%', '100%'],
+                            maxmin: false,
+                            title: '通知查看',
+                            shade: 0.6, //遮罩透明度
+                            shift: 5//0-6的动画形式，-1不开启
+                        });
+                    });
                 },
                 error: function(){
 
                 }
             });
             $.ajax({
-                url: "/xianuni-dm/user/message/list.do",
+                url: "/xianuni-dm/user/mail/list.do",
                 dataType: 'json',
                 success: function(data){
                     var list = data.list, buf = [];
                     var itemTpl = function(item){
-                        return '<tr><td><a class="J_view  text-info" data-id="' + item.id + '"<small>'+item.content+'</small></a></td><td><i class="fa fa-clock-o"></i>'+item.time+'</td></tr>';
+                        return '<tr><td><a class="J_view  text-info" data-id="' + item.id + '"<small>'+item.title+'</small></a></td><td><i class="fa fa-clock-o"></i>'+item.time+'</td></tr>';
                     }
                     $.each(list, function(index, item){
                         buf.push(itemTpl(item));
@@ -111,10 +123,10 @@
                         $('#resourceIdTag').val(id);
                         layer.open({
                             type: 2,
-                            content: 'resource/view.html',
+                            content: 'mailView.html',
                             area: ['100%', '100%'],
                             maxmin: false,
-                            title: '媒体资源查看',
+                            title: '站内信查看',
                             shade: 0.6, //遮罩透明度
                             shift: 5//0-6的动画形式，-1不开启
                         });

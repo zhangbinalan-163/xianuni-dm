@@ -166,6 +166,7 @@
                                 url:'/xianuni-dm/train/add.do',
                                 data:{
                                     orgId : node.id,
+                                    type:0,
                                     theme:theme,
                                     startTime:startTime,
                                     endTime:endTime,
@@ -196,7 +197,7 @@
                 var self = this;
                 this.$el.jqGrid(
                         {
-                            url: '/xianuni-dm/train/list.do',
+                            url: '/xianuni-dm/train/list.do?type=0',
                             datatype: "json",
                             autowidth: true,
                             shrinkToFit: true,

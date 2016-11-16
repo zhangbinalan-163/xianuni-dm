@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <!-- jqgrid-->
+    <link href="../../static/css/plugins/jqgrid/ui.jqgrid.css?0820" rel="stylesheet">
+    <!-- zTree -->
+    <link href="../../static/css/plugins/zTree/metroStyle/metroStyle.css" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-13">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>通知信息</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="jqGrid_wrapper">
+                        <table id="list"></table>
+                        <div id="pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" hidden="hidden" id="messageIdTag"/>
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- jqGrid -->
+<script src="../../static/js/plugins/jqgrid/i18n/grid.locale-cn.js?0820"></script>
+<script src="../../static/js/plugins/jqgrid/jquery.jqGrid.min.js?0820"></script>
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.jgrid.defaults.styleUI = 'Bootstrap';
+
+        var table = ({
+            init: function () {
+                this.$el = $("#list");
+                this.orgId = '0';
+                this.render();
+                this.bindEvents();
+                return this
+            },
+            fetchData: function (data) {
+                this.orgId = data.orgId || this.orgId;
+                this.$el.jqGrid("setGridParam", {
+                    postData: data,
+                    page: 1
+                }).trigger("reloadGrid");
+            },
+            bindEvents: function(){
+
+            },
+            render: function () {
+                var self = this;
+                this.$el.jqGrid(
+                        {
+                            url: '/xianuni-dm/user/message/all.do',
+                            datatype: "json",
+                            autowidth: true,
+                            shrinkToFit: true,
+                            colNames: ['ID','党组织', '标题','时间','操作'],
+                            colModel: [
+                                {name: 'id', index: 'id',hidden:true},
+                                {name: 'org', index: 'org',width: 100, align: "left"},
+                                {name: 'title', index: 'title',width: 100, align: "left"},
+                                {name: 'start', index: 'start',width: 100, align: "left"},
+                                {name: 'actions', index: 'actions', width: 120, align: "center"}
+                            ],
+                            rowNum: 10,
+                            rowList: [10, 20, 30],
+                            pager: '#pager',
+                            sortname: 'id',
+                            mtype: "get",
+                            height: 400,
+                            viewrecords: true,
+                            // 自定义事件
+                            gridComplete: function () {
+                                var ids = self.$el.jqGrid('getDataIDs');
+                                for (var i = 0; i < ids.length; i++) {
+                                    var id = ids[i],
+                                            a = '<a class="J_edit" data-id="' + id + '"><i class="fa fa-edit"></i>查看</a>';
+                                    self.$el.jqGrid('setRowData', ids[i],
+                                            {
+                                                actions: [a].join(' ')
+                                            });
+                                }
+                                $('.J_edit').on('click', function () {
+                                    var id = $(this).data('id');
+                                    var data = self.$el.jqGrid('getRowData', id); // 需要编辑的数据
+                                    $('#messageIdTag').val(id);
+                                    layer.open({
+                                        type: 2,
+                                        content: 'messageView.html',
+                                        area: ['100%', '100%'],
+                                        maxmin: false,
+                                        title: '通知详情',
+                                        shade: 0.6, //遮罩透明度
+                                        shift: 5, //0-6的动画形式，-1不开启
+                                        btn: ['关闭'],
+                                        yes: function(index){
+                                            layer.close(index);
+                                        }
+                                    });
+                                })
+                            }
+                        })
+                        .jqGrid('navGrid', '#pager', { edit: false, add: false, del:false,search:false});
+            }
+        }).init();
+
+        $(window).bind('resize', function () {
+            var width = $('.jqGrid_wrapper').width();
+            $('#list').setGridWidth(width);
+        });
+    });
+</script>
+</body>
+</html>

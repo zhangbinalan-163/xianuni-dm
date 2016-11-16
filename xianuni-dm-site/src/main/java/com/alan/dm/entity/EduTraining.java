@@ -9,6 +9,9 @@ import java.util.List;
  * @author: fan
  */
 public class EduTraining {
+    public static final int FORMAL_TYPE=0;
+    public static final int OBJ_TYPE=1;
+
     private int id;
     private String title; // 培训标题
     private Orgnization organization; // 组织机构
@@ -17,7 +20,16 @@ public class EduTraining {
     private Date endTime; // 结束时间
     private String content; // 培训内容
     private Date createTime; //
+    private int trainType;//培训类型
     private List<Resource> resourceList;//
+
+    public int getTrainType() {
+        return trainType;
+    }
+
+    public void setTrainType(int trainType) {
+        this.trainType = trainType;
+    }
 
     public int getId() {
         return id;

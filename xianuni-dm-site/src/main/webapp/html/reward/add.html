@@ -62,7 +62,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">描述：</label>
         <div class="col-sm-4">
-            <textarea id="rewardDesc" name="rewardDesc" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="rewardDesc" name="rewardDesc" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
 </form>
@@ -105,7 +105,7 @@
             $(selector).chosen(config[selector]);
         }
 
-        $('#rewardDesc').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,

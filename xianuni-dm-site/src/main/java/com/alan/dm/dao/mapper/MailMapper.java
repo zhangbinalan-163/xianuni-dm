@@ -31,6 +31,12 @@ public interface MailMapper {
 
     /**
      *
+     * @param person
+     * @return
+     */
+    int countByPerson(@Param(value = "person") Person person);
+    /**
+     *
      * @param id
      * @return
      */

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -88,8 +89,8 @@ public class RelationController extends BaseController{
 	public String inAdd(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId=request.getInt("orgId");
-		String number=request.getString("number");
 		Integer type=request.getInt("type", 0);
+		String number=request.getString("number");
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
 		if(type==1){
 			String orgName=request.getString("orgName");
@@ -102,16 +103,7 @@ public class RelationController extends BaseController{
 				jsonObject.put("msg","该学号已经存在");
 				return JsonUtils.fromObject(jsonObject);
 			}
-			//先创建党员信息
-			person=new Person();
-			person.setNumber(number);
-			person.setSource(type == 1 ? 1 : 0);
-			person.setOrgnization(orgnization);
-			person.setPersonDesc("校外转入");
-			person.setName(name);
-			person.setStatus(PersonStatus.NORMAL.getId());
-			personService.createPerson(person);
-
+			//创建空的相关新
 			ApplierInfo applierInfo=new ApplierInfo();
 			applierService.createApplier(applierInfo);
 			ActivitistInfo activitistInfo=new ActivitistInfo();
@@ -122,15 +114,21 @@ public class RelationController extends BaseController{
 			prepareService.createPrepare(prepareInfo);
 			NormalInfo normalInfo=new NormalInfo();
 			normalService.createNormal(normalInfo);
-
-			//修改基础人员状态
-			person.setStatus(PersonStatus.NORMAL.getId());
+			//创建党员信息
+			person=new Person();
+			person.setNumber(number);
+			person.setSource(type == 1 ? 1 : 0);
+			person.setOrgnization(orgnization);
+			person.setPersonDesc("校外转入");
+			person.setName(name);
+			person.setStatus(PersonStatus.FORMAL.getId());
 			person.setNormalInfoId(normalInfo.getId());
 			person.setApplierInfoId(applierInfo.getId());
 			person.setActivitistInfoId(activitistInfo.getId());
 			person.setIntentionInfoId(intentionInfo.getId());
 			person.setPrepareInfoId(prepareInfo.getId());
-			personService.updatePerson(person);
+
+			personService.createPerson(person);
 
 			//创建转入记录
 			RelationTransferInfo transferInfo=new RelationTransferInfo();
@@ -140,6 +138,7 @@ public class RelationController extends BaseController{
 			transferInfo.setTransferTime(new Date());
 			transferInfo.setToOrgId(orgnization.getId());
 			transferInfo.setToOrgName(orgnization.getName());
+			transferInfo.setTransferDoneTime(new Date());
 			relationTransferService.createTransfer(transferInfo);
 
 		}else{
@@ -151,22 +150,19 @@ public class RelationController extends BaseController{
 				jsonObject.put("msg","该学号不存在");
 				return JsonUtils.fromObject(jsonObject);
 			}
-			//创建转入记录
-			RelationTransferInfo transferInfo=new RelationTransferInfo();
-			transferInfo.setTransferType(RelationTransferType.INNER.getId());
-			transferInfo.setPerson(person);
-			//获取原来的部门信息
-			Orgnization oldOrg = orgnizationService.getOrgById(person.getOrgId());
-			transferInfo.setFromOrgId(oldOrg.getId());
-			transferInfo.setFromOrgName(oldOrg.getName());
-			transferInfo.setToOrgId(orgnization.getId());
-			transferInfo.setToOrgName(orgnization.getName());
-			transferInfo.setTransferTime(new Date());
-
-			relationTransferService.createTransfer(transferInfo);
-
+			Integer transferId=request.getInt("transferId");
+			RelationTransferInfo transferInfo = relationTransferService.getById(transferId);
+			if(transferInfo==null||transferInfo.getPersonId()!=person.getId()){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success",false);
+				jsonObject.put("msg","记录不存在");
+				return JsonUtils.fromObject(jsonObject);
+			}
+			transferInfo.setStatus(RelationTransferInfo.DONE);
+			transferInfo.setTransferDoneTime(new Date());
+			relationTransferService.updateTransfer(transferInfo);
 			//设置新部门
-			person.setOrgnization(orgnization);
+			person.setOrgId(transferInfo.getToOrgId());
 			person.setUpdateTime(new Date());
 			personService.updatePerson(person);
 		}
@@ -206,6 +202,7 @@ public class RelationController extends BaseController{
 			transferInfo.setFromOrgName(oldOrg.getName());
 			transferInfo.setToOrgName(toOrgName);
 			transferInfo.setTransferTime(new Date());
+			transferInfo.setTransferDoneTime(new Date());
 			relationTransferService.createTransfer(transferInfo);
 			//设置为历史党员
 			person.setStatus(PersonStatus.HISTORY_OUT.getId());
@@ -217,10 +214,37 @@ public class RelationController extends BaseController{
 			jsonObject.put("msg","success");
 			return JsonUtils.fromObject(jsonObject);
 		}else{
-			//校内转出,需要调用out/add.do即可
+			//校内转出
+			int toOrgId=request.getInt("toOrgId");
+			String number=request.getString("number");
+
+			Person person = personService.getByNumber(number);
+			if(person==null){
+				JSONObject jsonObject=new JSONObject();
+				jsonObject.put("success",false);
+				jsonObject.put("msg","该学号不存在");
+				return JsonUtils.fromObject(jsonObject);
+			}
+			//创建转入记录
+			RelationTransferInfo transferInfo=new RelationTransferInfo();
+			transferInfo.setTransferType(RelationTransferType.INNER.getId());
+			transferInfo.setStatus(RelationTransferInfo.CHECKING);
+			transferInfo.setPerson(person);
+
+			Orgnization toOrg = orgnizationService.getOrgById(toOrgId);
+			transferInfo.setToOrgId(toOrg.getId());
+			transferInfo.setToOrgName(toOrg.getName());
+
+			Orgnization oldOrg=orgnizationService.getOrgById(person.getOrgId());
+			transferInfo.setFromOrgId(oldOrg.getId());
+			transferInfo.setFromOrgName(oldOrg.getName());
+			transferInfo.setTransferTime(new Date());
+
+			relationTransferService.createTransfer(transferInfo);
+
 			JSONObject jsonObject=new JSONObject();
-			jsonObject.put("success",false);
-			jsonObject.put("msg","不支持该操作");
+			jsonObject.put("success",true);
+			jsonObject.put("msg","success");
 			return JsonUtils.fromObject(jsonObject);
 		}
 	}
@@ -295,8 +319,10 @@ public class RelationController extends BaseController{
 				cellList.add(person.getNumber());
 				cellList.add(relationTransferInfo.getFromOrgName());
 				cellList.add(relationTransferInfo.getToOrgName());
-				cellList.add(TimeUtils.convertToDateString(relationTransferInfo.getTransferTime()));
+				cellList.add(relationTransferInfo.getStatus()==RelationTransferInfo.CHECKING?"审核中":"完成");
 				cellList.add(RelationTransferType.getInstance(relationTransferInfo.getTransferType()).getName());
+				cellList.add(TimeUtils.convertToDateString(relationTransferInfo.getTransferTime()));
+				cellList.add(TimeUtils.convertToDateString(relationTransferInfo.getTransferDoneTime()));
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}
@@ -311,6 +337,53 @@ public class RelationController extends BaseController{
 	 * @return
 	 * @throws Exception
 	 */
+	@RequestMapping("transfer/in/listInchecking.do")
+	@ResponseBody
+	public String listInChecking(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		Integer orgId=request.getInt("orgId");
+		String number=request.getString("number", null);
+
+		RelationTransferCondition condition=new RelationTransferCondition();
+		List<Integer> orgIdList=new ArrayList<Integer>();
+		orgIdList.add(orgId);
+		condition.setToOrgId(orgIdList);
+
+		condition.setTypes(Arrays.asList(0));
+		condition.setNumber(number);
+		condition.setStatus(RelationTransferInfo.CHECKING);
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(0);
+		pageInfo.setSize(10);
+
+		List<RelationTransferInfo> relationTransferInfoList=relationTransferService.getByCondition(condition,pageInfo);
+		JSONArray rowsArray=new JSONArray();
+		if(relationTransferInfoList!=null){
+			for(RelationTransferInfo transferInfo:relationTransferInfoList){
+				JSONObject keyObject=new JSONObject();
+				Person person = transferInfo.getPerson();
+				keyObject.put("transferId",transferInfo.getId());
+				keyObject.put("personName",person.getName());
+				keyObject.put("personNumber", person.getNumber());
+				Orgnization oldOrg = orgnizationService.getOrgById(transferInfo.getFromOrgId());
+				keyObject.put("orgName", oldOrg.getName());
+				rowsArray.add(keyObject);
+			}
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("code", 200);
+		jsonObject.put("message", "success");
+		jsonObject.put("value",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+
+	}
+	/**
+	 *
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping("/transfer/inList.do")
 	@ResponseBody
 	public String inList(HttpServletRequest httpServletRequest) throws Exception {
@@ -318,7 +391,7 @@ public class RelationController extends BaseController{
 		Integer limit = request.getInt("rows", 10);
 		Integer page = request.getInt("page", 1);
 		Integer orgId=request.getInt("orgId",0);
-		String name=request.getString("number", null);
+		String number=request.getString("number", null);
 		boolean containSubOrg=request.getBoolean("containSub", true);
 		//如果没有传入orgId，设置为管理员所管理的ORG
 		if(orgId==0){
@@ -349,6 +422,9 @@ public class RelationController extends BaseController{
 		}
 		condition.setToOrgId(orgIdList);
 		condition.setTypes(Arrays.asList(1, 0));
+		condition.setStatus(RelationTransferInfo.DONE);
+		condition.setNumber(number);
+
 		Page pageInfo=new Page();
 		pageInfo.setCurrent((page - 1) * limit);
 		pageInfo.setSize(limit);
@@ -373,8 +449,9 @@ public class RelationController extends BaseController{
 				cellList.add(person.getNumber());
 				cellList.add(relationTransferInfo.getFromOrgName());
 				cellList.add(relationTransferInfo.getToOrgName());
-				cellList.add(TimeUtils.convertToDateString(relationTransferInfo.getTransferTime()));
 				cellList.add(RelationTransferType.getInstance(relationTransferInfo.getTransferType()).getName());
+				cellList.add(TimeUtils.convertToDateString(relationTransferInfo.getTransferTime()));
+				cellList.add(TimeUtils.convertToTimeString(relationTransferInfo.getTransferDoneTime()));
 				subOrgObject.put("cell", cellList);
 				rowsArray.add(subOrgObject);
 			}

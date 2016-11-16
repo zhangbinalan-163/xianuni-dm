@@ -167,7 +167,7 @@ public class PartyDuesController extends BaseController{
 		if(!StringUtils.isEmpty(number)){
 			condition.setNumber(number);
 		}
-		condition.setStatus(Arrays.asList(PersonStatus.PERPARE.getId(), PersonStatus.NORMAL.getId()));
+		condition.setStatus(Arrays.asList(PersonStatus.PERPARE.getId(), PersonStatus.NORMAL.getId(),PersonStatus.FORMAL.getId()));
 		int subCount = partyDuesService.countByCondition(condition);
 
 		List<PartyDuesPay> duesPayList = partyDuesService.getByCondition(condition, pageInfo);

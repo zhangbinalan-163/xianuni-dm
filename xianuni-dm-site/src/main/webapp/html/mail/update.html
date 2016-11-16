@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../../static/css/bootstrap.min.css?v=3.3.5" rel="stylesheet">
+    <link href="../../static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="../../static/css/animate.css" rel="stylesheet">
+    <link href="../../static/css/style.css?v=4.0.0" rel="stylesheet">
+    <link href="../../static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <base target="_blank">
+</head>
+
+<body>
+<form method="get" class="form-horizontal">
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>收件人学号</small></label>
+        <div class="col-sm-5">
+            <p id="personNumber" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>收件人姓名</small></label>
+        <div class="col-sm-5">
+            <p id="personName" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>发送时间</small></label>
+        <div class="col-sm-5">
+            <p id="sendTime" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>站内信标题</small></label>
+        <div class="col-sm-5">
+            <p id="mailName" class="form-control-static"></p>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label"><small>站内信内容</small></label>
+        <div class="col-sm-5">
+            <p id="mailContent" class="form-control-static"></p>
+        </div>
+    </div>
+</form>
+
+<!-- 全局js -->
+<script src="../../static/js/jquery.min.js?v=2.1.4"></script>
+<script src="../../static/js/bootstrap.min.js?v=3.3.5"></script>
+
+<!-- 自定义js -->
+<script src="../../static/js/content.js?v=1.0.0"></script>
+
+<!-- layer javascript -->
+<script src="../../static/js/plugins/layer/layer.min.js"></script>
+
+<!-- layerDate plugin javascript -->
+<script src="../../static/js/plugins/layer/laydate/laydate.js"></script>
+<!-- Chosen -->
+<script src="../../static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- maxlength -->
+<script src="../../static/js/plugins/maxlength/bootstrap-maxlength.js"></script>
+
+<script>
+    $(document).ready(function () {
+        //获取信息
+        var id=getIdTag();
+        $.ajax( {
+            url:'/xianuni-dm/mail/info.do',
+            data:{
+                id : id
+            },
+            type:'get',
+            cache:false,
+            dataType:'json',
+            success:function(data) {
+                if(data.success){
+                    $('#personNumber').html(data.personNumber);
+                    $('#personName').html(data.personName);
+                    $('#rewardDesc').html(data.rewardDesc);
+                    $('#sendTime').html(data.sendTime);
+                    $('#mailName').html(data.mailName);
+                    $('#mailContent').html(data.mailContent);
+                }else{
+                    layer.alert('获取信息失败>'+data.msg, {icon: 5});
+                }
+            },
+            error : function() {
+                alert("异常");
+            }
+        });
+    });
+    function getIdTag(){
+        return parent.$('#idTag').val();
+    }
+</script>
+</body>
+</html>

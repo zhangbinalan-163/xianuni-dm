@@ -3,10 +3,13 @@ package com.alan.dm.web.controller;
 import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
-import com.alan.dm.entity.Admin;
-import com.alan.dm.entity.Orgnization;
+import com.alan.dm.entity.*;
+import com.alan.dm.entity.query.OrgnizationCondition;
+import com.alan.dm.entity.query.PersonCondition;
+import com.alan.dm.entity.query.PersonResult;
 import com.alan.dm.service.IAdminService;
 import com.alan.dm.service.IOrgnizationService;
+import com.alan.dm.service.IPersonService;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -18,8 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RequestMapping("/orgnization")
@@ -32,9 +34,90 @@ public class OrgnizationController extends BaseController{
 	@Resource(name = "adminService")
 	private IAdminService adminService;
 
-	@RequestMapping("/index.do")
-	public String index(){
-		return "orgnization/index";
+	@Resource(name = "personService")
+	private IPersonService personService;
+
+	@RequestMapping("/allWithParent.do")
+	@ResponseBody
+	public String listWithParent(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		String name=request.getString("name", null);
+
+		OrgnizationCondition condition=new OrgnizationCondition();
+		condition.setStatus(Arrays.asList(Orgnization.NORMAL));
+		if(!StringUtils.isEmpty(name)){
+			condition.setName(name);
+		}
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(0);
+		pageInfo.setSize(20);
+
+		List<Orgnization> orgnizationList = orgnizationService.getByCondition(condition, pageInfo);
+		JSONArray rowsArray=new JSONArray();
+		if(orgnizationList!=null){
+			for(Orgnization orgnization:orgnizationList){
+				JSONObject keyObject=new JSONObject();
+				keyObject.put("orgId",orgnization.getId());
+				List<Orgnization> parentList = orgnizationService.getParentOrg(orgnization);
+				StringBuffer sb=new StringBuffer();
+				if(parentList!=null&&parentList.size()>0){
+					List<Orgnization> seqParentList=new LinkedList<Orgnization>();
+					for(int i=(parentList.size()-1);i>=0;i--){
+						seqParentList.add(parentList.get(i));
+					}
+					for(Orgnization parentOrg:seqParentList){
+						sb.append(parentOrg.getName()).append("-->");
+					}
+				}
+				keyObject.put("orgName",sb.append(orgnization.getName()));
+				keyObject.put("orginOrgName",orgnization.getName());
+				rowsArray.add(keyObject);
+			}
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("code", 200);
+		jsonObject.put("message", "success");
+		jsonObject.put("value",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
+	}
+	/**
+	 * 党组织
+	 * @param httpServletRequest
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("/listQuery.do")
+	@ResponseBody
+	public String listQuery(HttpServletRequest httpServletRequest) throws Exception {
+		Request request = getRequest(httpServletRequest);
+		String name=request.getString("name", null);
+
+		OrgnizationCondition condition=new OrgnizationCondition();
+		condition.setStatus(Arrays.asList(Orgnization.NORMAL));
+		if(!StringUtils.isEmpty(name)){
+			condition.setName(name);
+		}
+
+		Page pageInfo=new Page();
+		pageInfo.setCurrent(0);
+		pageInfo.setSize(10);
+
+		List<Orgnization> orgnizationList = orgnizationService.getByCondition(condition, pageInfo);
+		JSONArray rowsArray=new JSONArray();
+		if(orgnizationList!=null){
+			for(Orgnization orgnization:orgnizationList){
+				JSONObject keyObject=new JSONObject();
+				keyObject.put("orgId",orgnization.getId());
+				keyObject.put("orgName",orgnization.getName());
+				rowsArray.add(keyObject);
+			}
+		}
+		JSONObject jsonObject=new JSONObject();
+		jsonObject.put("code", 200);
+		jsonObject.put("message", "success");
+		jsonObject.put("value",rowsArray);
+		return JsonUtils.fromObject(jsonObject);
 	}
 
 	/**
@@ -50,6 +133,23 @@ public class OrgnizationController extends BaseController{
 		Integer orgId = request.getInt("orgId");
 
 		Orgnization orgnization=orgnizationService.getOrgById(orgId);
+		//如果有子节点，不可以删除
+		if(orgnizationService.countSubOrg(orgnization)>0){
+			JSONObject orgObject=new JSONObject();
+			orgObject.put("success", false);
+			orgObject.put("msg", "有下属组织，不可删除");
+			return JsonUtils.fromObject(orgObject);
+		}
+		//
+		PersonCondition condition=new PersonCondition();
+		condition.setOrgList(Arrays.asList(orgId));
+		if(personService.countByCondition(condition)>0){
+			JSONObject orgObject=new JSONObject();
+			orgObject.put("success", false);
+			orgObject.put("msg", "党组织下有党员信息，不可删除");
+			return JsonUtils.fromObject(orgObject);
+		}
+
 		//级联删除所有节点
 		orgnizationService.deleteOrg(orgnization, true);
 		//设置父节点是否还为空
@@ -156,7 +256,7 @@ public class OrgnizationController extends BaseController{
 
 	@RequestMapping("/info.do")
 	@ResponseBody
-	public String orglist(HttpServletRequest httpServletRequest) throws Exception {
+	public String info(HttpServletRequest httpServletRequest) throws Exception {
 		Request request = getRequest(httpServletRequest);
 		Integer orgId = request.getInt("orgId", 0);
 
@@ -167,9 +267,9 @@ public class OrgnizationController extends BaseController{
 			JSONObject dataObject=new JSONObject();
 			dataObject.put("name",orgnization.getName());
 			dataObject.put("status", orgnization.getStatus()==Orgnization.CANCEL?"已撤销":"正常");
-			dataObject.put("createTime", TimeUtils.convertToTimeString(orgnization.getCreateTime()));
-			dataObject.put("updateTime", TimeUtils.convertToTimeString(orgnization.getUpdateTime()));
-			dataObject.put("evaTime", TimeUtils.convertToTimeString(orgnization.getElectionTime()));
+			dataObject.put("createTime", TimeUtils.convertToDateString(orgnization.getCreateTime()));
+			dataObject.put("updateTime", TimeUtils.convertToDateString(orgnization.getUpdateTime()));
+			dataObject.put("evaTime", TimeUtils.convertToDateString(orgnization.getElectionTime()));
 			dataObject.put("removeTime", TimeUtils.convertToTimeString(orgnization.getCancelTime()));
 			dataObject.put("isParent", orgnization.isHasSon()?"是":"否");
 			dataObject.put("orgId", orgnization.getId());

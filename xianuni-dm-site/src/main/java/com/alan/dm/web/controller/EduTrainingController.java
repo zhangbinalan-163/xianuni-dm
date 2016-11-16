@@ -5,12 +5,14 @@ import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
 import com.alan.dm.entity.condition.EduTrainingCondition;
+import com.alan.dm.entity.query.TrainLearnCondition;
 import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,9 +45,11 @@ public class EduTrainingController extends BaseController {
     @javax.annotation.Resource(name = "adminService")
     private IAdminService adminService;
 
-    @javax.annotation.Resource(name = "orgnizationService")
+    @Autowired
     private IOrgnizationService orgnizationService;
 
+    @Autowired
+    private EduTrainingLearnService eduTrainingLearnService;
     /**
      *
      */
@@ -55,9 +59,10 @@ public class EduTrainingController extends BaseController {
         Request request=getRequest(httpServletRequest);
 
         Integer orgId=request.getInt("orgId");
-        Date startTime=request.getDate("startTime", "YYYY-MM-DD hh:mm:ss");
-        Date endTime=request.getDate("endTime", "YYYY-MM-DD hh:mm:ss");
+        Date startTime=request.getDate("startTime", "yyyy-MM-dd hh:mm:ss");
+        Date endTime=request.getDate("endTime", "yyyy-MM-dd hh:mm:ss");
         String theme=request.getString("theme");
+        int type=request.getInt("type",0);
         String content=request.getString("content", "");
         String filUrlList=request.getString("fileUrlList",null);
         String filNameList=request.getString("fileNameList",null);
@@ -70,6 +75,7 @@ public class EduTrainingController extends BaseController {
         Orgnization orgnization=orgnizationService.getOrgById(orgId);
         eduTraining.setOrganization(orgnization);
         eduTraining.setTitle(theme);
+        eduTraining.setTrainType(type);
 
         if(!StringUtils.isEmpty(filUrlList)&&!StringUtils.isEmpty(filNameList)){
             String[] fileArray=filUrlList.split(",");
@@ -137,6 +143,7 @@ public class EduTrainingController extends BaseController {
             }
             condition.setOrgList(orgIdList);
         }
+        condition.setType(type);
 
         Page pageInfo=new Page();
         pageInfo.setCurrent((page - 1) * limit);
@@ -168,7 +175,129 @@ public class EduTrainingController extends BaseController {
         jsonObject.put("rows",rowsArray);
         return JsonUtils.fromObject(jsonObject);
     }
+    /**
+     * 列表
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/learn/list.do")
+    @ResponseBody
+    public String learnList(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        Integer orgId = request.getInt("orgId", 0);
+        Integer limit = request.getInt("rows", 10);
+        Integer page = request.getInt("page", 1);
+        String number=request.getString("number", null);
 
+        boolean containSubOrg=request.getBoolean("containSub", true);
+        //如果没有传入orgId，设置为管理员所管理的ORG
+        if(orgId==0){
+            Integer adminId = getOnlineAdminId(httpServletRequest);
+            Admin adminInfo = adminService.getById(adminId);
+            if(adminInfo.getType()==Admin.ORG_ADMIN){
+                orgId=adminInfo.getOrgId();
+            }
+        }
+        TrainLearnCondition condition=new TrainLearnCondition();
+        List<Integer> orgIdList=new ArrayList<Integer>();
+        orgIdList.add(orgId);
+
+        if(containSubOrg){
+            Orgnization orgnization=null;
+            if(orgId == 0) {
+                orgnization =new Orgnization();
+                orgnization.setId(-1);
+            }else{
+                orgnization= orgnizationService.getOrgById(orgId);
+            }
+            List<Orgnization> subOrgList = orgnizationService.getOrgByParent(orgnization, true);
+            if(subOrgList!=null){
+                for (Orgnization subOrg:subOrgList){
+                    orgIdList.add(subOrg.getId());
+                }
+            }
+            condition.setOrgList(orgIdList);
+        }
+
+        if(!StringUtils.isEmpty(number)){
+            condition.setNumber(number);
+        }
+
+        Page pageInfo=new Page();
+        pageInfo.setCurrent((page - 1) * limit);
+        pageInfo.setSize(limit);
+
+        int count = eduTrainingLearnService.countLearnByCondtion(condition);
+        List<TrainLearn> learnList=eduTrainingLearnService.getLearnByCondtion(condition, pageInfo);
+
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("page", page);
+        jsonObject.put("total", count == 0 ? 0 : count / limit + 1);
+        jsonObject.put("records", count);
+
+        JSONArray rowsArray = new JSONArray();
+        if (learnList!=null){
+            for (TrainLearn trainLearn : learnList) {
+                JSONObject subOrgObject = new JSONObject();
+                subOrgObject.put("id", trainLearn.getId());
+                List<String> cellList=new ArrayList<String>();
+                cellList.add(String.valueOf(trainLearn.getId()));
+                cellList.add(trainLearn.getOrgnization().getName());
+                cellList.add(trainLearn.getTraining().getTitle());
+                cellList.add(trainLearn.getPerson().getNumber());
+                cellList.add(trainLearn.getPerson().getName());
+                cellList.add(TimeUtils.convertToTimeString(trainLearn.getCreateTime()));
+                subOrgObject.put("cell", cellList);
+                rowsArray.add(subOrgObject);
+            }
+        }
+        jsonObject.put("rows",rowsArray);
+        return JsonUtils.fromObject(jsonObject);
+    }
+
+    /**
+     *
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/learn/info.do")
+    @ResponseBody
+    public String learnInfo(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        int trainId=request.getInt("id");
+        TrainLearn learnInfo = eduTrainingLearnService.getById(trainId);
+        JSONObject jsonObject=new JSONObject();
+        if(learnInfo!=null){
+            jsonObject.put("success",true);
+            EduTraining trainInfo = eduTrainingService.getById(learnInfo.getTrainId());
+            jsonObject.put("title", trainInfo.getTitle());
+            Orgnization orgnization = orgnizationService.getOrgById(trainInfo.getOrgId());
+            jsonObject.put("orgName", orgnization.getName());
+            jsonObject.put("content", trainInfo.getContent());
+            jsonObject.put("createTime", TimeUtils.convertToTimeString(learnInfo.getCreateTime()));
+            jsonObject.put("startTime", TimeUtils.convertToTimeString(trainInfo.getStartTime()));
+            JSONArray jsonArray=new JSONArray();
+            List<Resource> resourceList = trainInfo.getResourceList();
+            if(resourceList!=null){
+                for(Resource resource:resourceList){
+                    JSONObject fileObj=new JSONObject();
+                    fileObj.put("name",resource.getRealName());
+                    fileObj.put("url",request.getHttpServletRequest().getContextPath()+resource.getResourcePath());
+                    jsonArray.add(fileObj);
+                }
+            }
+            jsonObject.put("fileUrlList", jsonArray);
+            jsonObject.put("myLearn", learnInfo.getLearn());
+            Person person = personService.getById(learnInfo.getPersonId());
+            jsonObject.put("personName", person.getName());
+            jsonObject.put("personNumber", person.getNumber());
+            return JsonUtils.fromObject(jsonObject);
+        }
+        jsonObject.put("success",true);
+        return JsonUtils.fromObject(jsonObject);
+    }
     /**
      *
      * @param httpServletRequest
@@ -206,7 +335,7 @@ public class EduTrainingController extends BaseController {
         if(trainInfo!=null){
             jsonObject.put("success",true);
             jsonObject.put("title",trainInfo.getTitle());
-            Orgnization orgnization = orgnizationService.getOrgById(trainInfo.getId());
+            Orgnization orgnization = orgnizationService.getOrgById(trainInfo.getOrgId());
             jsonObject.put("orgName",orgnization.getName());
             jsonObject.put("content",trainInfo.getContent());
             jsonObject.put("createTime", TimeUtils.convertToTimeString(trainInfo.getCreateTime()));

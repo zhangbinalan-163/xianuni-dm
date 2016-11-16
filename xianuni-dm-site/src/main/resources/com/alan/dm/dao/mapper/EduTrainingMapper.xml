@@ -6,7 +6,7 @@
 
     <sql id="T_TABLE">party_training</sql>
     <sql id="ORG_TABLE">tb_orgnization</sql>
-    <sql id="RESOURE_TABLE">tb_train_resource</sql>
+    <sql id="RESOURE_TABLE">tb_resource</sql>
 
     <resultMap id="ORG_INFO" type="com.alan.dm.entity.Orgnization">
         <id property="id" column="orgId"/>
@@ -19,6 +19,7 @@
         <result property="startTime" column="startTime"/>
         <result property="endTime" column="endTime"/>
         <result property="createTime" column="createTime"/>
+        <result property="trainType" column="trainType"/>
         <association property="organization" column="orgId" javaType="com.alan.dm.entity.Orgnization" resultMap="ORG_INFO"/>
     </resultMap>
 
@@ -29,6 +30,8 @@
         <result property="startTime" column="startTime"/>
         <result property="endTime" column="endTime"/>
         <result property="createTime" column="createTime"/>
+        <result property="trainType" column="trainType"/>
+        <result property="orgId" column="orgId"/>
         <collection property="resourceList" ofType="com.alan.dm.entity.Resource">
             <id property="id" column="resourceId"/>
             <result property="name" column="name"/>
@@ -46,6 +49,7 @@
         A.orgId,
         A.content,
         A.createTime,
+        A.trainType,
         R.id as resourceId,
         R.resourcePath as resourcePath,
         R.name as resourceName
@@ -58,8 +62,8 @@
     <insert id="insert" parameterType="com.alan.dm.entity.EduTraining" useGeneratedKeys="true"
             keyColumn="id" keyProperty="training.id">
         INSERT INTO <include refid="T_TABLE"/>
-        (title,orgId,startTime,endTime,content,createTime)
-        VALUES(#{training.title},#{training.organization.id},#{training.startTime},#{training.endTime},#{training.content},#{training.createTime})
+        (title,orgId,startTime,endTime,content,createTime,trainType)
+        VALUES(#{training.title},#{training.organization.id},#{training.startTime},#{training.endTime},#{training.content},#{training.createTime},#{training.trainType})
     </insert>
 
     <insert id="insertResource"  useGeneratedKeys="true"
@@ -78,6 +82,7 @@
         A.orgId,
         A.content,
         A.createTime,
+        A.trainType,
         O.id as orgId,
         O.name as orgName
         FROM  <include refid="T_TABLE" /> A
@@ -89,6 +94,9 @@
                          separator="," close=")">
                     #{orgList}
                 </foreach>
+            </if>
+            <if test="condition.type != null">
+                AND trainType=#{condition.type}
             </if>
         </where>
         ORDER BY id DESC
@@ -108,6 +116,9 @@
                          separator="," close=")">
                     #{orgList}
                 </foreach>
+            </if>
+            <if test="condition.type != null">
+                AND trainType=#{condition.type}
             </if>
         </where>
     </select>

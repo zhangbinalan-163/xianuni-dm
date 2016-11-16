@@ -23,11 +23,11 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">标题：</label>
         <div class="col-sm-6">
-            <input id="title" type="text" maxlength="60" class="form-control" name="title">
+            <input id="title" type="text" maxlength="60" class="form-control checkMaxLen" name="title">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label"><small>部门</small></label>
+        <label class="col-sm-2 control-label"><small>部门：</small></label>
         <div class="col-sm-2">
             <p id="pOrg" class="form-control-static"></p>
         </div>
@@ -42,7 +42,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">内容：</label>
         <div class="col-sm-5">
-            <textarea id="content" name="pDesc" class="form-control" maxlength="200" rows="6" required="" aria-required="true"></textarea>
+            <textarea id="content" name="pDesc" class="form-control checkMaxLen" maxlength="200" rows="6" required="" aria-required="true"></textarea>
         </div>
     </div>
 </form>
@@ -84,18 +84,7 @@
         for (var selector in config) {
             $(selector).chosen(config[selector]);
         }
-
-        $('#content').maxlength({
-            alwaysShow: true,
-            validate: false,
-            allowOverMax: true,
-            customMaxAttribute: "90",
-            warningClass: "label label-info",
-            limitReachedClass: "label label-warning",
-            placement: 'right',
-            message: '已输入 %charsTyped%/最多输入%charsTotal%'
-        });
-        $('#title').maxlength({
+        $('.checkMaxLen').maxlength({
             alwaysShow: true,
             validate: false,
             allowOverMax: true,

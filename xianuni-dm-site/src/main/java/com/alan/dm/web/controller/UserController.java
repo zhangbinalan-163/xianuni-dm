@@ -4,20 +4,26 @@ import com.alan.dm.common.util.JsonUtils;
 import com.alan.dm.common.util.StringUtils;
 import com.alan.dm.common.util.TimeUtils;
 import com.alan.dm.entity.*;
+import com.alan.dm.entity.Resource;
 import com.alan.dm.entity.condition.EduTrainingCondition;
 import com.alan.dm.entity.condition.MessageCondition;
+import com.alan.dm.entity.condition.OrgMeetingCondition;
 import com.alan.dm.service.*;
 import com.alan.dm.web.vo.Request;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +40,12 @@ public class UserController extends BaseController{
 
     @javax.annotation.Resource(name = "mailService")
     private MailService mailService;
+
+    @Autowired
+    private EduTrainingLearnService eduTrainingLearnService;
+
+    @Autowired
+    private IOrgMeetingService orgMeetingService;
 
     @javax.annotation.Resource(name = "eduTrainingService")
     private IEduTrainingService eduTrainingService;
@@ -59,6 +71,8 @@ public class UserController extends BaseController{
     @javax.annotation.Resource(name = "messageService")
     private IMessageService messageService;
 
+    @javax.annotation.Resource(name = "adminService")
+    private IAdminService adminService;
 
     /**
      * 获取当前用户信息
@@ -97,6 +111,52 @@ public class UserController extends BaseController{
     }
 
     /**
+     *
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/meeting/info.do")
+    @ResponseBody
+    public String meetingInfo(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        int meetingId = request.getInt("id");
+
+        OrgMeeting orgMeeting=orgMeetingService.getById(meetingId);
+        JSONObject jsonObject=new JSONObject();
+        if(orgMeeting==null){
+            jsonObject.put("success", false);
+            jsonObject.put("msg","不存在该记录");
+            return JsonUtils.fromObject(jsonObject);
+        }
+
+        jsonObject.put("success", true);
+        Orgnization orgnization=orgnizationService.getOrgById(orgMeeting.getOrgId());
+        jsonObject.put("orgName",orgnization.getName());
+        jsonObject.put("location",orgMeeting.getLocation());
+        jsonObject.put("theme",orgMeeting.getTheme());
+        jsonObject.put("compere", orgMeeting.getCompere());
+        jsonObject.put("recorder", orgMeeting.getRecorder());
+        jsonObject.put("content",orgMeeting.getContent());
+        jsonObject.put("meetType",MeetingType.getInstance(orgMeeting.getMeetingType()).getName());
+        jsonObject.put("absencePerson",orgMeeting.getAbsencePeople());
+        jsonObject.put("attendPerson",orgMeeting.getAttendancePeople());
+        jsonObject.put("starttime",TimeUtils.convertToTimeString(orgMeeting.getStartTime()));
+
+        List<com.alan.dm.entity.Resource> resourceList = orgMeeting.getResourceList();
+        JSONArray jsonArray=new JSONArray();
+        if(resourceList!=null){
+            for(com.alan.dm.entity.Resource resource:resourceList){
+                JSONObject fileObj=new JSONObject();
+                fileObj.put("name",resource.getRealName());
+                fileObj.put("url",request.getHttpServletRequest().getContextPath()+resource.getResourcePath());
+                jsonArray.add(fileObj);
+            }
+        }
+        jsonObject.put("fileUrlList",jsonArray);
+        return JsonUtils.fromObject(jsonObject);
+    }
+    /**
      * 获得培训信息
      * @param httpServletRequest
      * @return
@@ -112,12 +172,12 @@ public class UserController extends BaseController{
         if(trainInfo!=null){
             jsonObject.put("success",true);
             jsonObject.put("title",trainInfo.getTitle());
-            Orgnization orgnization = orgnizationService.getOrgById(trainInfo.getId());
+            Orgnization orgnization = orgnizationService.getOrgById(trainInfo.getOrgId());
             jsonObject.put("orgName",orgnization.getName());
             jsonObject.put("content",trainInfo.getContent());
             jsonObject.put("createTime", TimeUtils.convertToTimeString(trainInfo.getCreateTime()));
             jsonObject.put("endTime",TimeUtils.convertToTimeString(trainInfo.getEndTime()));
-            jsonObject.put("startTime",TimeUtils.convertToTimeString(trainInfo.getStartTime()));
+            jsonObject.put("startTime", TimeUtils.convertToTimeString(trainInfo.getStartTime()));
             JSONArray jsonArray=new JSONArray();
             List<Resource> resourceList = trainInfo.getResourceList();
             if(resourceList!=null){
@@ -128,7 +188,13 @@ public class UserController extends BaseController{
                     jsonArray.add(fileObj);
                 }
             }
-            jsonObject.put("fileUrlList",jsonArray);
+            jsonObject.put("fileUrlList", jsonArray);
+            Person person=new Person();
+            person.setId(getOnlinePersonId(httpServletRequest));
+            TrainLearn trainLearn = eduTrainingLearnService.getByPersonWithTrain(person, trainInfo);
+            if(trainLearn!=null){
+                jsonObject.put("myLearn", trainLearn.getLearn());
+            }
             return JsonUtils.fromObject(jsonObject);
         }
         jsonObject.put("success",true);
@@ -146,6 +212,26 @@ public class UserController extends BaseController{
         Request request = getRequest(httpServletRequest);
         Integer trainId = request.getInt("trainId");
         String learnByTrain=request.getString("learnByTrain");
+        Integer personId = getOnlinePersonId(httpServletRequest);
+
+        Person person = personService.getById(personId);
+        EduTraining trainInfo = eduTrainingService.getById(trainId);
+        TrainLearn trainLearnInfo = eduTrainingLearnService.getByPersonWithTrain(person, trainInfo);
+        if(trainLearnInfo!=null){
+            trainLearnInfo.setLearn(learnByTrain);
+            trainLearnInfo.setUpdateTime(new Date());
+            eduTrainingLearnService.updateLearn(trainLearnInfo);
+
+        }else{
+            TrainLearn trainLearn=new TrainLearn();
+            trainLearn.setPerson(person);
+            trainLearn.setTraining(trainInfo);
+            trainLearn.setLearn(learnByTrain);
+            trainLearn.setCreateTime(new Date());
+
+            eduTrainingLearnService.createLearn(trainLearn);
+        }
+        //
         JSONObject jsonObject=new JSONObject();
         jsonObject.put("success",true);
         return JsonUtils.fromObject(jsonObject);
@@ -210,6 +296,66 @@ public class UserController extends BaseController{
         return JsonUtils.fromObject(jsonObject);
     }
     /**
+     * 分页获取会议信息
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/meeting/list.do")
+    @ResponseBody
+    public String meetingList(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        Integer limit = request.getInt("rows", 10);
+        Integer page = request.getInt("page", 1);
+
+        Integer personId = getOnlinePersonId(httpServletRequest);
+        Person person=personService.getById(personId);
+        Orgnization orgnization=orgnizationService.getOrgById(person.getOrgId());
+
+        List<Integer> orgIdList=new ArrayList<Integer>();
+        orgIdList.add(person.getOrgId());
+        List<Orgnization> parentOrgList=orgnizationService.getParentOrg(orgnization);
+        if(parentOrgList!=null){
+            for(Orgnization parentOrg:parentOrgList){
+                orgIdList.add(parentOrg.getId());
+            }
+        }
+
+        Page pageInfo=new Page();
+        pageInfo.setCurrent((page - 1) * limit);
+        pageInfo.setSize(limit);
+
+        OrgMeetingCondition condition=new OrgMeetingCondition();
+        condition.setOrgList(orgIdList);
+        condition.setTypeList(
+                Arrays.asList(MeetingType.MZPY.getId(), MeetingType.DK.getId(), MeetingType.DXZH.getId(), MeetingType.ZBDH.getId(), MeetingType.DZBWYH.getId())
+        );
+        int count = orgMeetingService.countByCondition(condition);
+        List<OrgMeeting> meetingList=orgMeetingService.getByCondition(condition, pageInfo);
+
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("page", page);
+        jsonObject.put("total", count == 0 ? 0 : count / limit + 1);
+        jsonObject.put("records", count);
+
+        JSONArray rowsArray = new JSONArray();
+        if (meetingList!=null){
+            for (OrgMeeting orgMeeting : meetingList) {
+                JSONObject subOrgObject = new JSONObject();
+                subOrgObject.put("id", orgMeeting.getId());
+                List<String> cellList=new ArrayList<String>();
+                cellList.add(String.valueOf(orgMeeting.getId()));
+                cellList.add(orgMeeting.getOrgnization().getName());
+                cellList.add(orgMeeting.getTheme());
+                cellList.add(TimeUtils.convertToTimeString(orgMeeting.getStartTime()));
+                subOrgObject.put("cell", cellList);
+                rowsArray.add(subOrgObject);
+            }
+        }
+        jsonObject.put("rows",rowsArray);
+        return JsonUtils.fromObject(jsonObject);
+    }
+    /**
      * 分页获取站内信
      * @param httpServletRequest
      * @return
@@ -243,6 +389,31 @@ public class UserController extends BaseController{
         return JsonUtils.fromObject(jsonObject);
     }
 
+    /**
+     *
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/message/info.do")
+    @ResponseBody
+    public String messageInfo(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        Integer id = request.getInt("id");
+        Message mailInfo = messageService.getById(id);
+        if(mailInfo!=null){
+            JSONObject jsonObject=new JSONObject();
+            jsonObject.put("success", true);
+            jsonObject.put("time", TimeUtils.convertToTimeString(mailInfo.getCreateTime()));
+            jsonObject.put("title", mailInfo.getTitle());
+            jsonObject.put("content", mailInfo.getContent());
+            jsonObject.put("subShow",mailInfo.isToSub() ? "是" : "否");
+            return JsonUtils.fromObject(jsonObject);
+        }
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("success", false);
+        return JsonUtils.fromObject(jsonObject);
+    }
     /**
      *
      * @param httpServletRequest
@@ -325,7 +496,7 @@ public class UserController extends BaseController{
             jsonObject.put("number",person.getNumber());
             jsonObject.put("orgName",orgnization.getName());
             jsonObject.put("idNumber",person.getIdNumber());
-            jsonObject.put("createTime",person.getCreateTime());
+            jsonObject.put("createTime",TimeUtils.convertToDateString(person.getCreateTime()));
             jsonObject.put("status",PersonStatus.getInstance(person.getStatus()).getName());
             //todo
             ApplierInfo applierInfo=applierService.getById(person.getApplierInfoId());
@@ -377,16 +548,18 @@ public class UserController extends BaseController{
             return JsonUtils.fromObject(jsonObject);
         }
     }
-
     /**
      * 展现给个人的信息列表
      * @param httpServletRequest
      * @return
      * @throws Exception
      */
-    @RequestMapping("/message/list.do")
+    @RequestMapping("/message/all.do")
     @ResponseBody
-    public String personListMessage(HttpServletRequest httpServletRequest) throws Exception {
+    public String personListMessageAll(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        Integer limit = request.getInt("rows", 10);
+        Integer page = request.getInt("page", 1);
         //获取当前登录账号、或者管理员的ID
         int personId=getOnlinePersonId(httpServletRequest);
         Person person=personService.getById(personId);
@@ -403,20 +576,128 @@ public class UserController extends BaseController{
         }
         condition.setOrgId(orgnization.getId());
         condition.setPersonQuery(true);
+
+        Page pageInfo=new Page();
+        pageInfo.setCurrent((page - 1) * limit);
+        pageInfo.setSize(limit);
+
+        int count=messageService.countMessageByCondtition(condition);
+        List<Message> messageList = messageService.getMessageByCondtition(condition, pageInfo);
+
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("page",page);
+        jsonObject.put("total",count==0?0:count/limit+1);
+        jsonObject.put("records",count);
+        JSONArray rowsArray=new JSONArray();
+
+        if(messageList!=null){
+            for(Message message:messageList){
+                JSONObject subOrgObject=new JSONObject();
+                subOrgObject.put("id", message.getId());
+                List<String> cellList=new ArrayList<String>();
+                cellList.add(String.valueOf(message.getId()));
+                cellList.add(message.getOrgnization().getName());
+                cellList.add(message.getTitle());
+                cellList.add(TimeUtils.convertToDateString(message.getCreateTime()));
+                subOrgObject.put("cell", cellList);
+                rowsArray.add(subOrgObject);
+            }
+        }
+        jsonObject.put("rows",rowsArray);
+        return JsonUtils.fromObject(jsonObject);
+    }
+    /**
+     * 展现给个人的信息列表
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/mail/all.do")
+    @ResponseBody
+    public String personListMailAll(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+        Integer limit = request.getInt("rows", 10);
+        Integer page = request.getInt("page", 1);
+        Page pageInfo=new Page();
+        pageInfo.setCurrent((page - 1) * limit);
+        pageInfo.setSize(limit);
+
+        //获取当前登录账号、或者管理员的ID
+        int personId=getOnlinePersonId(httpServletRequest);
+        Person person=personService.getById(personId);
+
+        int count=mailService.countByPerson(person);
+        List<MailInfo> mailList = mailService.getByPerson(person, pageInfo);
+
+        JSONObject jsonObject=new JSONObject();
+        jsonObject.put("page", page);
+        jsonObject.put("total", count == 0 ? 0 : count / limit + 1);
+        jsonObject.put("records",count);
+        JSONArray rowsArray=new JSONArray();
+
+        if(mailList!=null){
+            for(MailInfo message:mailList){
+                JSONObject subOrgObject=new JSONObject();
+                subOrgObject.put("id", message.getId());
+                List<String> cellList=new ArrayList<String>();
+                cellList.add(String.valueOf(message.getId()));
+                cellList.add(message.getTitle());
+                cellList.add(TimeUtils.convertToDateString(message.getCreateTime()));
+                subOrgObject.put("cell", cellList);
+                rowsArray.add(subOrgObject);
+            }
+        }
+        jsonObject.put("rows",rowsArray);
+        return JsonUtils.fromObject(jsonObject);
+    }
+    /**
+     * 展现给个人的信息列表
+     * @param httpServletRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("/message/list.do")
+    @ResponseBody
+    public String personListMail(HttpServletRequest httpServletRequest) throws Exception {
+        Request request = getRequest(httpServletRequest);
+
         Page pageInfo=new Page();
         pageInfo.setCurrent(0);
         pageInfo.setSize(20);
 
-        List<Message> messageList=messageService.getMessageByCondtition(condition,pageInfo);
+        int personId=getOnlinePersonId(httpServletRequest);
+        if(personId==0){
+            int adminId=getOnlineAdminId(httpServletRequest);
+            Admin adminInfo = adminService.getById(adminId);
+            String adminNumber = adminInfo.getSchoolNumber();
+            Person personInfo = personService.getByNumber(adminNumber);
+            personId=personInfo.getId();
+        }
+        Person person=personService.getById(personId);
+        Orgnization orgnization = orgnizationService.getOrgById(person.getOrgId());
+        List<Orgnization> parentOrgList=orgnizationService.getParentOrg(orgnization);
+
+        MessageCondition condition=new MessageCondition();
+        if(parentOrgList!=null&&parentOrgList.size()>0){
+            List<Integer> orgIdList=new ArrayList<Integer>();
+            for(Orgnization parentOrg:parentOrgList){
+                orgIdList.add(parentOrg.getId());
+            }
+            condition.setOrgList(orgIdList);
+        }
+        condition.setOrgId(orgnization.getId());
+        condition.setPersonQuery(true);
+
+        List<Message> messageList = messageService.getMessageByCondtition(condition, pageInfo);
+
         JSONObject jsonObject=new JSONObject();
         JSONArray dataArray=new JSONArray();
         if(messageList!=null){
-            for(Message message:messageList){
+            for(Message mailInfo:messageList){
                 JSONObject itemObj=new JSONObject();
-                itemObj.put("id",message.getId());
-                itemObj.put("time",TimeUtils.convertToTimeString(message.getCreateTime()));
-                itemObj.put("content",message.getContent());
-                itemObj.put("publisher","#管理员#");
+                itemObj.put("id",mailInfo.getId());
+                itemObj.put("time", TimeUtils.convertToTimeString(mailInfo.getCreateTime()));
+                itemObj.put("title",mailInfo.getTitle());
                 dataArray.add(itemObj);
             }
         }

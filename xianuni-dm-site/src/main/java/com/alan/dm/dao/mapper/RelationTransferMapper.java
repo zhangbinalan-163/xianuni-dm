@@ -40,6 +40,11 @@ public interface RelationTransferMapper {
     /**
      *
      * @param relationTransferInfo
+     */
+    void update(@Param(value="relationTransferInfo")RelationTransferInfo relationTransferInfo);
+    /**
+     *
+     * @param relationTransferInfo
      * @throws DMException
      */
     void delete(@Param(value="relationTransferInfo")RelationTransferInfo relationTransferInfo);

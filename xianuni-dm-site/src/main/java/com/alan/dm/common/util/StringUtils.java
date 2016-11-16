@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSON;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,5 +83,28 @@ public class StringUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 根据出生日期计算年龄
+     * @param birthday
+     * @return
+     */
+    public static int convertBirthdayToAge(Date birthday) {
+        if(birthday == null) {
+            return 0;
+        }
+        Calendar dob = Calendar.getInstance();
+
+        dob.setTime(birthday);
+        Calendar today = Calendar.getInstance();
+        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+        if (today.get(Calendar.MONTH) < dob.get(Calendar.MONTH)) {
+            age--;
+        } else if (today.get(Calendar.MONTH) == dob.get(Calendar.MONTH)
+                && today.get(Calendar.DAY_OF_MONTH) < dob.get(Calendar.DAY_OF_MONTH)) {
+            age--;
+        }
+        return age;
     }
 }
